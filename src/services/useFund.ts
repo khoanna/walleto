@@ -16,6 +16,11 @@ const useFund = () => {
                 body: JSON.stringify(body),
             });
             const data = await response.json();
+            
+            if (!response.ok || data.statusCode >= 400) {
+                throw new Error(data.message || 'Có lỗi xảy ra khi tạo quỹ');
+            }
+            
             return data;
         } catch (error) {
             throw error;
@@ -113,6 +118,11 @@ const useFund = () => {
             const data = await response.json();
             console.log(data);
 
+            // Check if API returned error
+            if (!response.ok || data.statusCode >= 400) {
+                throw new Error(data.message || 'Có lỗi xảy ra khi thêm crypto');
+            }
+
             return data;
         } catch (error) {
             throw error;
@@ -151,6 +161,11 @@ const useFund = () => {
             });
             const data = await response.json();
             console.log(data);
+            
+            if (!response.ok || data.statusCode >= 400) {
+                throw new Error(data.message || 'Có lỗi xảy ra khi thêm giao dịch');
+            }
+            
             return data;
         } catch (error) {
             throw error;

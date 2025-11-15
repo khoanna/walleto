@@ -5,14 +5,14 @@ import usePackage from "@/services/usePackage";
 import usePayment from "@/services/usePayment";
 import { useUserContext } from "@/context";
 import { Loader2 } from "lucide-react";
-
+import { Package } from "@/type/Package";
 export default function BuyPage() {
   const { getPackages, packageLoading } = usePackage();
   const { createPayment, paymentLoading } = usePayment();
   const context = useUserContext();
   const userId = context?.user?.idUser;
 
-  const [packages, setPackages] = useState<any[]>([]);
+  const [packages, setPackages] = useState<Package[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [buyingId, setBuyingId] = useState<string | null>(null);
 
@@ -21,8 +21,9 @@ export default function BuyPage() {
       try {
         setError(null);
         const res = await getPackages();
+
         if (res?.success && Array.isArray(res.data)) {
-          setPackages(res.data);
+          setPackages(res.data as Package[]);
         } else {
           setError("Không lấy được danh sách gói");
         }
@@ -34,7 +35,7 @@ export default function BuyPage() {
     load();
   }, []);
 
-  const handleBuy = async (pkg: any) => {
+  const handleBuy = async (pkg: Package) => {
     if (!userId) {
       alert("Vui lòng đăng nhập");
       return;
@@ -48,7 +49,6 @@ export default function BuyPage() {
       };
       const res = await createPayment(body);
       if (res?.success && res?.data?.orderUrl) {
-        // redirect to payment URL
         window.location.href = res.data.orderUrl;
       } else {
         alert(res?.message || "Không thể tạo thanh toán");
@@ -95,11 +95,10 @@ export default function BuyPage() {
                     </div>
                     <div className="text-sm mt-2">
                       Quyền:{" "}
-                      {pkg.permissions
-                        ?.map((p: any) => p.permissionName)
-                        .join(", ")}
+                      {pkg.permissions?.map((p) => p.permissionName).join(", ")}
                     </div>
                   </div>
+
                   <div className="flex flex-col items-end gap-2">
                     {pkg.packageName === "BASIC" ? (
                       <button

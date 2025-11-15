@@ -13,7 +13,20 @@ import {
   Upload,
   Star,
 } from "lucide-react";
-
+interface InputFieldProps {
+  label: string;
+  required?: boolean;
+  name: string;
+  value: string;
+  editable: boolean;
+  onChange: (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => void;
+  placeholder?: string;
+  multiline?: boolean;
+}
 export default function ProfilePage() {
   const router = useRouter();
   const { getUserProfile, updateUser, uploadAvatar, userLoading } = useUser(); // ← thêm uploadImage
@@ -168,9 +181,9 @@ export default function ProfilePage() {
       } else {
         alert(response?.message || "Lỗi khi cập nhật hồ sơ");
       }
-    } catch (err: any) {
-      console.error("Lỗi trong handleSave:", err);
-      alert(err?.message || "Lỗi khi lưu hồ sơ");
+    } catch (err) {
+      console.error("Lỗi trong handleSave:");
+      alert("Lỗi khi lưu hồ sơ");
     } finally {
       setIsSaving(false);
     }
@@ -415,7 +428,7 @@ function InputField({
   onChange,
   placeholder,
   multiline = false,
-}: any) {
+}: InputFieldProps) {
   return (
     <div className={multiline ? "md:col-span-2" : ""}>
       <label className="block text-sm font-medium mb-2">

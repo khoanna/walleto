@@ -69,7 +69,7 @@ export default function useUser() {
       } else {
         throw new Error(data?.message || "Upload failed");
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Error uploading avatar:", err);
       throw err; // để handleSave bắt được
     }

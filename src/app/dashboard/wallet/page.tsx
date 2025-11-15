@@ -1,36 +1,40 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, {useEffect, useState, useMemo} from "react";
 import dynamic from "next/dynamic";
-import { Loader2, Edit2, Trash2, Plus, History } from "lucide-react";
-import type { ApexOptions } from 'apexcharts';
+import {Loader2, Edit2, Trash2, Plus, History, Wallet} from "lucide-react";
+import type {ApexOptions} from "apexcharts";
 import useTransaction from "@/services/useTransaction";
 import useSaving from "@/services/useSaving";
 import useBudget from "@/services/useBudget";
-import { useUserContext } from "@/context";
-import { ChartTransaction, Transaction } from "@/type/Transaction";
-import { Saving } from "@/type/Saving";
-import { Budget } from "@/type/useBudget";
-import { TransactionFormData } from "@/type/TransactionForm";
-import { BudgetFormData } from "@/type/BudgetForm";
-import { SavingFormData } from "@/type/SavingForm";
-import { SavingTransaction } from "@/type/SavingTransaction";
+import {useUserContext} from "@/context";
+import {ChartTransaction, Transaction} from "@/type/Transaction";
+import {Saving} from "@/type/Saving";
+import {Budget} from "@/type/useBudget";
+import {TransactionFormData} from "@/type/TransactionForm";
+import {BudgetFormData} from "@/type/BudgetForm";
+import {SavingFormData} from "@/type/SavingForm";
+import {SavingTransaction} from "@/type/SavingTransaction";
 import AddEditTransactionModal from "@/components/wallet/AddEditTransactionModal";
 import AddEditBudgetModal from "@/components/wallet/AddEditBudgetModal";
 import AddEditSavingModal from "@/components/wallet/AddEditSavingModal";
 import DeleteConfirmModal from "@/components/wallet/DeleteConfirmModal";
 import AddSavingTransactionModal from "@/components/wallet/AddSavingTransactionModal";
 import SavingTransactionHistoryModal from "@/components/wallet/SavingTransactionHistoryModal";
+import useImgae from "@/services/useImage";
 
-const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
+const ReactApexChart = dynamic(() => import("react-apexcharts"), {ssr: false});
 
 const FinanceDashboard: React.FC = () => {
   const context = useUserContext();
+
+  const {uploadImage} = useImgae();
+
   const {
     getListTransaction,
     createTransaction,
     updateTransaction,
-    deleteTransaction
+    deleteTransaction,
   } = useTransaction();
 
   const {
@@ -39,14 +43,10 @@ const FinanceDashboard: React.FC = () => {
     deleteSaving,
     getListSavingTransactions,
     createSavingTransaction,
-    deleteSavingTransaction
+    deleteSavingTransaction,
   } = useSaving();
 
-  const {
-    getListBudgets,
-    createBudget,
-    deleteBudget
-  } = useBudget();
+  const {getListBudgets, createBudget, deleteBudget} = useBudget();
 
   // State
   const [loading, setLoading] = useState(true);
@@ -56,23 +56,41 @@ const FinanceDashboard: React.FC = () => {
   const [budgetList, setBudgetList] = useState<Budget[]>([]);
 
   // Modal states
-  const [transactionModal, setTransactionModal] = useState({ isOpen: false, mode: "add" as "add" | "edit", data: null as Transaction | null });
-  const [budgetModal, setBudgetModal] = useState({ isOpen: false, mode: "add" as "add" | "edit", data: null as Budget | null });
-  const [savingModal, setSavingModal] = useState({ isOpen: false, mode: "add" as "add" | "edit", data: null as Saving | null });
-  const [deleteModal, setDeleteModal] = useState({ isOpen: false, type: "", id: "", name: "" });
+  const [transactionModal, setTransactionModal] = useState({
+    isOpen: false,
+    mode: "add" as "add" | "edit",
+    data: null as Transaction | null,
+  });
+  const [budgetModal, setBudgetModal] = useState({
+    isOpen: false,
+    mode: "add" as "add" | "edit",
+    data: null as Budget | null,
+  });
+  const [savingModal, setSavingModal] = useState({
+    isOpen: false,
+    mode: "add" as "add" | "edit",
+    data: null as Saving | null,
+  });
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    type: "",
+    id: "",
+    name: "",
+  });
   const [deleteLoading, setDeleteLoading] = useState(false);
-  
+
   // Saving transaction states
-  const [savingTransactionModal, setSavingTransactionModal] = useState({ 
-    isOpen: false, 
-    saving: null as Saving | null 
-  });
-  const [savingHistoryModal, setSavingHistoryModal] = useState({ 
-    isOpen: false, 
+  const [savingTransactionModal, setSavingTransactionModal] = useState({
+    isOpen: false,
     saving: null as Saving | null,
-    transactions: [] as SavingTransaction[]
   });
-  const [savingTransactionsLoading, setSavingTransactionsLoading] = useState(false);
+  const [savingHistoryModal, setSavingHistoryModal] = useState({
+    isOpen: false,
+    saving: null as Saving | null,
+    transactions: [] as SavingTransaction[],
+  });
+  const [savingTransactionsLoading, setSavingTransactionsLoading] =
+    useState(false);
 
   // Fetch all data
   const fetchAllData = async () => {
@@ -81,7 +99,7 @@ const FinanceDashboard: React.FC = () => {
       const [transactionsData, savingsData, budgetsData] = await Promise.all([
         getListTransaction(context?.user?.idUser),
         getListSaving(context?.user?.idUser),
-        getListBudgets(context?.user?.idUser)
+        getListBudgets(context?.user?.idUser),
       ]);
 
       setTransactionList(transactionsData?.data?.expenseList || []);
@@ -108,17 +126,20 @@ const FinanceDashboard: React.FC = () => {
     if (transactionModal.mode === "add") {
       await createTransaction({
         ...data,
-        idUser: context.user.idUser
+        idUser: context.user.idUser,
       });
     } else if (transactionModal.data?.idTransaction) {
-      await updateTransaction({
-        transactionName: data.transactionName,
-        transactionType: data.transactionType,
-        amount: data.amount,
-        transactionCategory: data.transactionCategory,
-        transactionDate: data.transactionDate,
-        idUser: context.user.idUser
-      }, transactionModal.data.idTransaction);
+      await updateTransaction(
+        {
+          transactionName: data.transactionName,
+          transactionType: data.transactionType,
+          amount: data.amount,
+          transactionCategory: data.transactionCategory,
+          transactionDate: data.transactionDate,
+          idUser: context.user.idUser,
+        },
+        transactionModal.data.idTransaction
+      );
     }
     await fetchAllData();
   };
@@ -131,7 +152,7 @@ const FinanceDashboard: React.FC = () => {
       budgetName: data.budgetName,
       budgetGoal: data.budgetGoal,
       urlImage: data.urlImage || "",
-      idUser: context.user.idUser
+      idUser: context.user.idUser,
     });
     await fetchAllData();
   };
@@ -146,7 +167,7 @@ const FinanceDashboard: React.FC = () => {
       targetDate: data.targetDate,
       description: data.description || "",
       urlImage: data.urlImage || "",
-      idUser: context.user.idUser
+      idUser: context.user.idUser,
     });
     await fetchAllData();
   };
@@ -174,13 +195,13 @@ const FinanceDashboard: React.FC = () => {
   // Saving transaction handlers
   const handleOpenSavingHistory = async (saving: Saving) => {
     setSavingTransactionsLoading(true);
-    setSavingHistoryModal({ isOpen: true, saving, transactions: [] });
-    
+    setSavingHistoryModal({isOpen: true, saving, transactions: []});
+
     try {
       const response = await getListSavingTransactions(saving.idSaving);
-      setSavingHistoryModal(prev => ({
+      setSavingHistoryModal((prev) => ({
         ...prev,
-        transactions: response?.data || []
+        transactions: response?.data || [],
       }));
     } catch (error) {
       console.error("Error fetching transactions:", error);
@@ -189,20 +210,20 @@ const FinanceDashboard: React.FC = () => {
     }
   };
 
-  const handleAddSavingTransaction = async (data: { amount: number }) => {
+  const handleAddSavingTransaction = async (data: {amount: number}) => {
     if (!savingTransactionModal.saving) return;
-    
+
     try {
       await createSavingTransaction({
         idSaving: savingTransactionModal.saving.idSaving,
-        amount: data.amount
+        amount: data.amount,
       });
-      
+
       // Refresh data
       await fetchAllData();
-      
+
       // Close add modal and reopen history to show updated list
-      setSavingTransactionModal({ isOpen: false, saving: null });
+      setSavingTransactionModal({isOpen: false, saving: null});
       await handleOpenSavingHistory(savingTransactionModal.saving);
     } catch (error) {
       console.error("Error adding transaction:", error);
@@ -213,15 +234,17 @@ const FinanceDashboard: React.FC = () => {
   const handleDeleteSavingTransaction = async (idSavingDetail: string) => {
     try {
       await deleteSavingTransaction(idSavingDetail);
-      
+
       // Refresh both main data and transaction history
       await fetchAllData();
-      
+
       if (savingHistoryModal.saving) {
-        const response = await getListSavingTransactions(savingHistoryModal.saving.idSaving);
-        setSavingHistoryModal(prev => ({
+        const response = await getListSavingTransactions(
+          savingHistoryModal.saving.idSaving
+        );
+        setSavingHistoryModal((prev) => ({
           ...prev,
-          transactions: response?.data || []
+          transactions: response?.data || [],
         }));
       }
     } catch (error) {
@@ -231,32 +254,45 @@ const FinanceDashboard: React.FC = () => {
   };
 
   // Chart setup - styled like dashboard DonutChart
-  const chartOptions: ApexOptions = useMemo(() => ({
-    chart: {
-      type: 'donut',
-      toolbar: { show: false },
-      foreColor: '#94a3b8',
-    },
-    colors: ['#f59e0b', '#2ec4b6', '#9c27b0', '#ef4444', '#10b981', '#3b82f6'],
-    labels: chartData.map(item => item.transactionCategory),
-    stroke: { width: 0 },
-    dataLabels: { enabled: false },
-    legend: {
-      position: 'bottom',
-      fontSize: '12px',
-      markers: { size: 10, offsetX: 0, offsetY: 0 },
-      itemMargin: { horizontal: 10, vertical: 4 },
-    },
-    tooltip: {
-      y: { formatter: (val: number) => `${val}%` },
-    },
-    grid: { padding: { top: 0, bottom: 0, left: 0, right: 0 } },
-    responsive: [
-      { breakpoint: 480, options: { chart: { height: 240 }, legend: { fontSize: '11px' } } },
-    ],
-  }), [chartData]);
+  const chartOptions: ApexOptions = useMemo(
+    () => ({
+      chart: {
+        type: "donut",
+        toolbar: {show: false},
+        foreColor: "#94a3b8",
+      },
+      colors: [
+        "#f59e0b",
+        "#2ec4b6",
+        "#9c27b0",
+        "#ef4444",
+        "#10b981",
+        "#3b82f6",
+      ],
+      labels: chartData.map((item) => item.transactionCategory),
+      stroke: {width: 0},
+      dataLabels: {enabled: false},
+      legend: {
+        position: "bottom",
+        fontSize: "12px",
+        markers: {size: 10, offsetX: 0, offsetY: 0},
+        itemMargin: {horizontal: 10, vertical: 4},
+      },
+      tooltip: {
+        y: {formatter: (val: number) => `${val}%`},
+      },
+      grid: {padding: {top: 0, bottom: 0, left: 0, right: 0}},
+      responsive: [
+        {
+          breakpoint: 480,
+          options: {chart: {height: 240}, legend: {fontSize: "11px"}},
+        },
+      ],
+    }),
+    [chartData]
+  );
 
-  const chartSeries = chartData.map(item => item.expensePercent);
+  const chartSeries = chartData.map((item) => item.expensePercent);
 
   if (loading) {
     return (
@@ -274,10 +310,11 @@ const FinanceDashboard: React.FC = () => {
           <div className="text-lg font-semibold">Thống kê</div>
           <div className="flex flex-wrap gap-2 sm:gap-4">
             <button
-              onClick={() => setTransactionModal({ isOpen: true, mode: "add", data: null })}
+              onClick={() =>
+                setTransactionModal({isOpen: true, mode: "add", data: null})
+              }
               className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 
-                       active:scale-95 transition-all font-medium text-sm"
-            >
+                       active:scale-95 transition-all font-medium text-sm">
               <Plus className="w-4 h-4" /> Thêm giao dịch
             </button>
           </div>
@@ -287,49 +324,66 @@ const FinanceDashboard: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
           {/* Transaction table */}
           <div className="lg:col-span-7 rounded-2xl bg-background shadow-xl p-4 sm:p-6 transition-all">
-            <h2 className="text-sm font-bold opacity-80 mb-4">Lịch sử tiêu tiền</h2>
+            <h2 className="text-sm font-bold opacity-80 mb-4">
+              Lịch sử tiêu tiền
+            </h2>
             {transactionList.length > 0 ? (
               <div className="overflow-x-auto -mx-4 sm:mx-0">
                 <div className="inline-block min-w-full align-middle">
                   <table className="min-w-full">
                     <thead>
                       <tr className="text-[var(--color-text)] border-b border-[var(--color-border)]/20">
-                        <th className="text-left pb-3 px-4 sm:px-2 font-medium text-xs sm:text-sm">Tên giao dịch</th>
-                        <th className="text-center pb-3 px-2 font-medium text-xs sm:text-sm hidden sm:table-cell">Loại</th>
-                        <th className="text-right pb-3 px-4 sm:px-2 font-medium text-xs sm:text-sm">Số tiền</th>
-                        <th className="text-center pb-3 px-2 font-medium text-xs sm:text-sm hidden md:table-cell">Ngày</th>
-                        <th className="text-center pb-3 px-4 sm:px-2 font-medium text-xs sm:text-sm">Hành động</th>
+                        <th className="text-left pb-3 px-4 sm:px-2 font-medium text-xs sm:text-sm">
+                          Tên giao dịch
+                        </th>
+                        <th className="text-center pb-3 px-2 font-medium text-xs sm:text-sm hidden sm:table-cell">
+                          Loại
+                        </th>
+                        <th className="text-right pb-3 px-4 sm:px-2 font-medium text-xs sm:text-sm">
+                          Số tiền
+                        </th>
+                        <th className="text-center pb-3 px-2 font-medium text-xs sm:text-sm hidden md:table-cell">
+                          Ngày
+                        </th>
+                        <th className="text-center pb-3 px-4 sm:px-2 font-medium text-xs sm:text-sm">
+                          Hành động
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
                       {transactionList.slice(0, 10).map((t) => (
                         <tr
                           key={t.idTransaction}
-                          className="border-b border-[var(--color-border)]/5 hover:bg-foreground/50 transition-colors"
-                        >
+                          className="border-b border-[var(--color-border)]/5 hover:bg-foreground/50 transition-colors">
                           <td className="py-3 px-4 sm:px-2">
                             <div className="flex flex-col gap-1">
-                              <span className="font-medium text-sm">{t.transactionName}</span>
+                              <span className="font-medium text-sm">
+                                {t.transactionName}
+                              </span>
                               <div className="flex items-center gap-2 sm:hidden">
-                                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                                  t.transactionType === "Chi"
-                                    ? "bg-red-500/10 text-red-500"
-                                    : "bg-green-500/10 text-green-500"
-                                }`}>
+                                <span
+                                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                    t.transactionType === "Chi"
+                                      ? "bg-red-500/10 text-red-500"
+                                      : "bg-green-500/10 text-green-500"
+                                  }`}>
                                   {t.transactionType}
                                 </span>
                                 <span className="text-xs text-[var(--color-text)] md:hidden">
-                                  {new Date(t.transactionDate).toLocaleDateString('vi-VN')}
+                                  {new Date(
+                                    t.transactionDate
+                                  ).toLocaleDateString("vi-VN")}
                                 </span>
                               </div>
                             </div>
                           </td>
                           <td className="py-3 px-2 text-center hidden sm:table-cell">
-                            <span className={`px-2.5 py-1 rounded-full text-xs font-medium inline-block ${
-                              t.transactionType === "Chi"
-                                ? "bg-red-500/10 text-red-500"
-                                : "bg-green-500/10 text-green-500"
-                            }`}>
+                            <span
+                              className={`px-2.5 py-1 rounded-full text-xs font-medium inline-block ${
+                                t.transactionType === "Chi"
+                                  ? "bg-red-500/10 text-red-500"
+                                  : "bg-green-500/10 text-green-500"
+                              }`}>
                               {t.transactionType}
                             </span>
                           </td>
@@ -339,27 +393,35 @@ const FinanceDashboard: React.FC = () => {
                             </span>
                           </td>
                           <td className="py-3 px-2 text-center text-sm text-[var(--color-text)] hidden md:table-cell">
-                            {new Date(t.transactionDate).toLocaleDateString('vi-VN')}
+                            {new Date(t.transactionDate).toLocaleDateString(
+                              "vi-VN"
+                            )}
                           </td>
                           <td className="py-3 px-4 sm:px-2">
                             <div className="flex items-center justify-center gap-1.5">
                               <button
-                                onClick={() => setTransactionModal({ isOpen: true, mode: "edit", data: t })}
+                                onClick={() =>
+                                  setTransactionModal({
+                                    isOpen: true,
+                                    mode: "edit",
+                                    data: t,
+                                  })
+                                }
                                 className="p-1.5 hover:bg-blue-500/10 rounded-lg transition-colors"
-                                title="Sửa"
-                              >
+                                title="Sửa">
                                 <Edit2 className="w-4 h-4 text-blue-500" />
                               </button>
                               <button
-                                onClick={() => setDeleteModal({
-                                  isOpen: true,
-                                  type: "transaction",
-                                  id: t.idTransaction,
-                                  name: t.transactionName
-                                })}
+                                onClick={() =>
+                                  setDeleteModal({
+                                    isOpen: true,
+                                    type: "transaction",
+                                    id: t.idTransaction,
+                                    name: t.transactionName,
+                                  })
+                                }
                                 className="p-1.5 hover:bg-red-500/10 rounded-lg transition-colors"
-                                title="Xóa"
-                              >
+                                title="Xóa">
                                 <Trash2 className="w-4 h-4 text-red-500" />
                               </button>
                             </div>
@@ -374,9 +436,10 @@ const FinanceDashboard: React.FC = () => {
               <div className="text-center py-12 text-[var(--color-text)]">
                 <p>Chưa có giao dịch nào</p>
                 <button
-                  onClick={() => setTransactionModal({ isOpen: true, mode: "add", data: null })}
-                  className="mt-4 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all"
-                >
+                  onClick={() =>
+                    setTransactionModal({isOpen: true, mode: "add", data: null})
+                  }
+                  className="mt-4 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all">
                   Thêm giao dịch đầu tiên
                 </button>
               </div>
@@ -387,12 +450,21 @@ const FinanceDashboard: React.FC = () => {
           <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
             {/* Donut Chart - styled like dashboard */}
             <div className="rounded-2xl shadow-xl bg-background p-4 min-h-[340px]">
-              <div className="text-sm font-bold opacity-80 mb-2">Tỉ lệ chi tiêu</div>
+              <div className="text-sm font-bold opacity-80 mb-2">
+                Tỉ lệ chi tiêu
+              </div>
               {chartData.length > 0 ? (
-                <ReactApexChart options={chartOptions} series={chartSeries} type="donut" height={260} />
+                <ReactApexChart
+                  options={chartOptions}
+                  series={chartSeries}
+                  type="donut"
+                  height={260}
+                />
               ) : (
                 <div className="flex items-center justify-center h-[260px]">
-                  <p className="text-sm text-[var(--color-text)]">Chưa có dữ liệu</p>
+                  <p className="text-sm text-[var(--color-text)]">
+                    Chưa có dữ liệu
+                  </p>
                 </div>
               )}
             </div>
@@ -402,10 +474,11 @@ const FinanceDashboard: React.FC = () => {
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-sm font-bold opacity-80">Ngân sách</h2>
                 <button
-                  onClick={() => setBudgetModal({ isOpen: true, mode: "add", data: null })}
+                  onClick={() =>
+                    setBudgetModal({isOpen: true, mode: "add", data: null})
+                  }
                   className="p-1.5 hover:bg-blue-500/10 rounded-lg transition-colors"
-                  title="Thêm ngân sách"
-                >
+                  title="Thêm ngân sách">
                   <Plus className="w-4 h-4 text-blue-500" />
                 </button>
               </div>
@@ -413,22 +486,39 @@ const FinanceDashboard: React.FC = () => {
               {budgetList.length > 0 ? (
                 <div className="space-y-4 max-h-[200px] overflow-y-auto nice-scroll pr-1">
                   {budgetList.map((b) => {
-                    const percent = Math.min(100, Math.round((b.currentBudget / b.budgetGoal) * 100));
+                    const percent = Math.min(
+                      100,
+                      Math.round((b.currentBudget / b.budgetGoal) * 100)
+                    );
                     return (
                       <div key={b.idBudget} className="group">
                         <div className="flex justify-between mb-1.5">
                           <div className="flex items-center gap-2">
-                            <span className="font-medium text-sm">{b.budgetName}</span>
+                            {b.urlImage ? (
+                              <img 
+                                src={b.urlImage} 
+                                alt={b.budgetName}
+                                className="w-6 h-6 rounded object-cover flex-shrink-0"
+                              />
+                            ) : (
+                              <div className="w-6 h-6 rounded bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                                <Wallet className="w-3 h-3 text-blue-500" />
+                              </div>
+                            )}
+                            <span className="font-medium text-sm">
+                              {b.budgetName}
+                            </span>
                             <div className="opacity-0 group-hover:opacity-100 flex gap-1 transition-opacity">
                               <button
-                                onClick={() => setDeleteModal({
-                                  isOpen: true,
-                                  type: "budget",
-                                  id: b.idBudget,
-                                  name: b.budgetName
-                                })}
-                                className="p-1 hover:bg-red-500/10 rounded transition-colors"
-                              >
+                                onClick={() =>
+                                  setDeleteModal({
+                                    isOpen: true,
+                                    type: "budget",
+                                    id: b.idBudget,
+                                    name: b.budgetName,
+                                  })
+                                }
+                                className="p-1 hover:bg-red-500/10 rounded transition-colors">
                                 <Trash2 className="w-3 h-3 text-red-500" />
                               </button>
                             </div>
@@ -440,9 +530,13 @@ const FinanceDashboard: React.FC = () => {
                         <div className="w-full bg-gray-200/30 rounded-full h-2.5">
                           <div
                             className={`h-2.5 rounded-full transition-all ${
-                              percent >= 90 ? 'bg-red-500' : percent >= 70 ? 'bg-yellow-500' : 'bg-green-500'
+                              percent >= 90
+                                ? "bg-red-500"
+                                : percent >= 70
+                                ? "bg-yellow-500"
+                                : "bg-green-500"
                             }`}
-                            style={{ width: `${percent}%` }}
+                            style={{width: `${percent}%`}}
                           />
                         </div>
                         <p className="text-xs text-[var(--color-text)] mt-1.5">
@@ -456,9 +550,10 @@ const FinanceDashboard: React.FC = () => {
                 <div className="text-center py-8 text-sm text-[var(--color-text)]">
                   <p>Chưa có ngân sách nào</p>
                   <button
-                    onClick={() => setBudgetModal({ isOpen: true, mode: "add", data: null })}
-                    className="mt-3 text-blue-500 hover:underline"
-                  >
+                    onClick={() =>
+                      setBudgetModal({isOpen: true, mode: "add", data: null})
+                    }
+                    className="mt-3 text-blue-500 hover:underline">
                     Thêm ngân sách
                   </button>
                 </div>
@@ -472,10 +567,11 @@ const FinanceDashboard: React.FC = () => {
           <div className="flex flex-col sm:flex-row justify-between mb-4 gap-3">
             <div className="text-lg font-semibold">Mục tiêu tiết kiệm</div>
             <button
-              onClick={() => setSavingModal({ isOpen: true, mode: "add", data: null })}
+              onClick={() =>
+                setSavingModal({isOpen: true, mode: "add", data: null})
+              }
               className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold bg-amber-500 text-white shadow-xl cursor-pointer
-            hover:bg-amber-600 active:scale-[0.97] transition-all text-sm sm:text-base w-full sm:w-auto justify-center"
-            >
+            hover:bg-amber-600 active:scale-[0.97] transition-all text-sm sm:text-base w-full sm:w-auto justify-center">
               <Plus className="w-4 h-4" /> Thêm mục tiêu
             </button>
           </div>
@@ -483,39 +579,57 @@ const FinanceDashboard: React.FC = () => {
           {savingList.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {savingList.map((g) => {
-                const percent = Math.min(100, Math.round((g.currentAmount / g.targetAmount) * 100));
+                const percent = Math.min(
+                  100,
+                  Math.round((g.currentAmount / g.targetAmount) * 100)
+                );
                 return (
                   <div
                     key={g.idSaving}
-                    className="border border-[var(--color-border)]/10 bg-background rounded-xl p-4 hover:shadow-md transition group"
-                  >
+                    className="border border-[var(--color-border)]/10 bg-background rounded-xl p-4 hover:shadow-md transition group">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold text-sm sm:text-base">{g.savingName}</h3>
+                      <div className="flex items-center gap-2">
+                        {g.urlImage ? (
+                          <img 
+                            src={g.urlImage} 
+                            alt={g.savingName}
+                            className="w-8 h-8 rounded-lg object-cover"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                            <Wallet className="w-4 h-4 text-amber-500" />
+                          </div>
+                        )}
+                        <h3 className="font-semibold text-sm sm:text-base">
+                          {g.savingName}
+                        </h3>
+                      </div>
                       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => handleOpenSavingHistory(g)}
                           className="p-1.5 hover:bg-blue-500/10 rounded-lg transition-colors"
-                          title="Lịch sử"
-                        >
+                          title="Lịch sử">
                           <History className="w-4 h-4 text-blue-500" />
                         </button>
                         <button
-                          onClick={() => setSavingTransactionModal({ isOpen: true, saving: g })}
+                          onClick={() =>
+                            setSavingTransactionModal({isOpen: true, saving: g})
+                          }
                           className="p-1.5 hover:bg-green-500/10 rounded-lg transition-colors"
-                          title="Thêm tiền"
-                        >
+                          title="Thêm tiền">
                           <Plus className="w-4 h-4 text-green-500" />
                         </button>
                         <button
-                          onClick={() => setDeleteModal({
-                            isOpen: true,
-                            type: "saving",
-                            id: g.idSaving,
-                            name: g.savingName
-                          })}
+                          onClick={() =>
+                            setDeleteModal({
+                              isOpen: true,
+                              type: "saving",
+                              id: g.idSaving,
+                              name: g.savingName,
+                            })
+                          }
                           className="p-1.5 hover:bg-red-500/10 rounded-lg transition-colors"
-                          title="Xóa"
-                        >
+                          title="Xóa">
                           <Trash2 className="w-4 h-4 text-red-500" />
                         </button>
                       </div>
@@ -523,7 +637,7 @@ const FinanceDashboard: React.FC = () => {
 
                     {g.targetDate && (
                       <span className="text-xs sm:text-sm text-[var(--color-text)] whitespace-nowrap">
-                        {new Date(g.targetDate).toLocaleDateString('vi-VN')}
+                        {new Date(g.targetDate).toLocaleDateString("vi-VN")}
                       </span>
                     )}
 
@@ -531,14 +645,14 @@ const FinanceDashboard: React.FC = () => {
                       {g.targetAmount.toLocaleString()}đ
                     </div>
                     <p className="text-xs sm:text-sm text-[var(--color-text)] mb-1">
-                      {g.currentAmount.toLocaleString()}đ đã tiết kiệm ({percent}%)
+                      {g.currentAmount.toLocaleString()}đ đã tiết kiệm (
+                      {percent}%)
                     </p>
 
                     <div className="w-full bg-gray-200/30 rounded-full h-2 mb-2">
                       <div
                         className="h-2 rounded-full bg-amber-500 transition-all"
-                        style={{ width: `${percent}%` }}
-                      ></div>
+                        style={{width: `${percent}%`}}></div>
                     </div>
 
                     {g.description && (
@@ -547,9 +661,11 @@ const FinanceDashboard: React.FC = () => {
                       </p>
                     )}
 
-                    <div className={`mt-2 px-2 py-1 rounded-full text-xs inline-block ${g.status === "Hoàn Thành"
-                        ? "bg-green-500/10 text-green-500"
-                        : "bg-blue-500/10 text-blue-500"
+                    <div
+                      className={`mt-2 px-2 py-1 rounded-full text-xs inline-block ${
+                        g.status === "Hoàn Thành"
+                          ? "bg-green-500/10 text-green-500"
+                          : "bg-blue-500/10 text-blue-500"
                       }`}>
                       {g.status}
                     </div>
@@ -559,11 +675,14 @@ const FinanceDashboard: React.FC = () => {
             </div>
           ) : (
             <div className="text-center py-12 border border-[var(--color-border)]/10 bg-background rounded-xl">
-              <p className="text-[var(--color-text)] mb-4">Chưa có mục tiêu tiết kiệm nào</p>
+              <p className="text-[var(--color-text)] mb-4">
+                Chưa có mục tiêu tiết kiệm nào
+              </p>
               <button
-                onClick={() => setSavingModal({ isOpen: true, mode: "add", data: null })}
-                className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-all"
-              >
+                onClick={() =>
+                  setSavingModal({isOpen: true, mode: "add", data: null})
+                }
+                className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-all">
                 Tạo mục tiêu đầu tiên
               </button>
             </div>
@@ -574,7 +693,9 @@ const FinanceDashboard: React.FC = () => {
       {/* Modals */}
       <AddEditTransactionModal
         isOpen={transactionModal.isOpen}
-        onClose={() => setTransactionModal({ isOpen: false, mode: "add", data: null })}
+        onClose={() =>
+          setTransactionModal({isOpen: false, mode: "add", data: null})
+        }
         onSubmit={handleTransactionSubmit}
         transaction={transactionModal.data}
         mode={transactionModal.mode}
@@ -583,7 +704,7 @@ const FinanceDashboard: React.FC = () => {
 
       <AddEditBudgetModal
         isOpen={budgetModal.isOpen}
-        onClose={() => setBudgetModal({ isOpen: false, mode: "add", data: null })}
+        onClose={() => setBudgetModal({isOpen: false, mode: "add", data: null})}
         onSubmit={handleBudgetSubmit}
         budget={budgetModal.data}
         mode={budgetModal.mode}
@@ -591,7 +712,7 @@ const FinanceDashboard: React.FC = () => {
 
       <AddEditSavingModal
         isOpen={savingModal.isOpen}
-        onClose={() => setSavingModal({ isOpen: false, mode: "add", data: null })}
+        onClose={() => setSavingModal({isOpen: false, mode: "add", data: null})}
         onSubmit={handleSavingSubmit}
         saving={savingModal.data}
         mode={savingModal.mode}
@@ -599,9 +720,17 @@ const FinanceDashboard: React.FC = () => {
 
       <DeleteConfirmModal
         isOpen={deleteModal.isOpen}
-        onClose={() => setDeleteModal({ isOpen: false, type: "", id: "", name: "" })}
+        onClose={() =>
+          setDeleteModal({isOpen: false, type: "", id: "", name: ""})
+        }
         onConfirm={handleDelete}
-        title={`Xóa ${deleteModal.type === "transaction" ? "giao dịch" : deleteModal.type === "budget" ? "ngân sách" : "mục tiêu"}`}
+        title={`Xóa ${
+          deleteModal.type === "transaction"
+            ? "giao dịch"
+            : deleteModal.type === "budget"
+            ? "ngân sách"
+            : "mục tiêu"
+        }`}
         message={`Bạn có chắc chắn muốn xóa "${deleteModal.name}"? Hành động này không thể hoàn tác.`}
         loading={deleteLoading}
       />
@@ -610,7 +739,9 @@ const FinanceDashboard: React.FC = () => {
       {savingTransactionModal.saving && (
         <AddSavingTransactionModal
           isOpen={savingTransactionModal.isOpen}
-          onClose={() => setSavingTransactionModal({ isOpen: false, saving: null })}
+          onClose={() =>
+            setSavingTransactionModal({isOpen: false, saving: null})
+          }
           onSubmit={handleAddSavingTransaction}
           savingName={savingTransactionModal.saving.savingName}
           currentAmount={savingTransactionModal.saving.currentAmount}
@@ -621,14 +752,23 @@ const FinanceDashboard: React.FC = () => {
       {savingHistoryModal.saving && (
         <SavingTransactionHistoryModal
           isOpen={savingHistoryModal.isOpen}
-          onClose={() => setSavingHistoryModal({ isOpen: false, saving: null, transactions: [] })}
+          onClose={() =>
+            setSavingHistoryModal({
+              isOpen: false,
+              saving: null,
+              transactions: [],
+            })
+          }
           savingName={savingHistoryModal.saving.savingName}
           savingId={savingHistoryModal.saving.idSaving}
           transactions={savingHistoryModal.transactions}
           onDelete={handleDeleteSavingTransaction}
           onAddNew={() => {
-            setSavingHistoryModal(prev => ({ ...prev, isOpen: false }));
-            setSavingTransactionModal({ isOpen: true, saving: savingHistoryModal.saving });
+            setSavingHistoryModal((prev) => ({...prev, isOpen: false}));
+            setSavingTransactionModal({
+              isOpen: true,
+              saving: savingHistoryModal.saving,
+            });
           }}
           loading={savingTransactionsLoading}
         />

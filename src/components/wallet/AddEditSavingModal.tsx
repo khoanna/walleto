@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { X, Upload, Image as ImageIcon } from "lucide-react";
 import { Saving } from "@/type/Saving";
 import { SavingFormData } from "@/type/SavingForm";
 import { formatInputNumber, parseFormattedNumber } from "@/utils/formatCurrency";
+import useImgae from "@/services/useImage";
 
 interface AddEditSavingModalProps {
   isOpen: boolean;
@@ -29,6 +30,9 @@ export default function AddEditSavingModal({
     urlImage: ""
   });
   const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { uploadImage } = useImgae();
 
   useEffect(() => {
     if (mode === "edit" && saving) {
@@ -49,6 +53,34 @@ export default function AddEditSavingModal({
       });
     }
   }, [mode, saving, isOpen]);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert("Vui lòng chọn file ảnh");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Kích thước ảnh không được vượt quá 5MB");
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      const imageUrl = await uploadImage(file);
+      setFormData({ ...formData, urlImage: imageUrl });
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert("Có lỗi khi tải ảnh lên, vui lòng thử lại");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,6 +139,50 @@ export default function AddEditSavingModal({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* Image Upload */}
+          <div>
+            <label className="block text-sm font-medium mb-2">Hình ảnh (tùy chọn)</label>
+            <div className="flex items-center gap-3">
+              {formData.urlImage ? (
+                <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-foreground border border-[var(--color-border)]/20">
+                  <img 
+                    src={formData.urlImage} 
+                    alt="Preview" 
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, urlImage: "" })}
+                    className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center"
+                  >
+                    <X className="w-5 h-5 text-white" />
+                  </button>
+                </div>
+              ) : (
+                <div className="w-16 h-16 rounded-lg bg-foreground border border-[var(--color-border)]/20 flex items-center justify-center">
+                  <ImageIcon className="w-6 h-6 text-[var(--color-text)]" />
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingImage}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-foreground border border-[var(--color-border)]/20 
+                         hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              >
+                <Upload className="w-4 h-4" />
+                {uploadingImage ? "Đang tải..." : "Chọn ảnh"}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+            </div>
+          </div>
+
           {/* Saving Name */}
           <div>
             <label className="block text-sm font-medium mb-2">Tên mục tiêu</label>

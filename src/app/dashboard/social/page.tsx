@@ -4,7 +4,8 @@ import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { ApexOptions } from "apexcharts";
-import { Heart, MessageCircle, Send, Smile } from "lucide-react";
+import { Heart, MessageCircle, Send, Smile, Lock } from "lucide-react";
+import { useUserContext } from "@/context";
 
 // Dynamic import cho ApexCharts (tránh lỗi SSR)
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
@@ -28,6 +29,10 @@ interface Post {
 }
 
 export default function SocialPage() {
+  const context = useUserContext();
+  const permissions = context?.permissions;
+  const hasPostPermission = permissions?.includes("SOCIAL_NETWORK") ?? false;
+
   const [posts] = useState<Post[]>([
     {
       id: 1,
@@ -83,32 +88,49 @@ export default function SocialPage() {
   return (
     <div className="min-h-screen p-4 sm:p-6 space-y-6 sm:space-y-8 transition-colors">
       {/* Post composer */}
-      <div className="bg-background rounded-xl shadow-sm border border-[var(--color-border)]/10 p-4 sm:p-5">
-        <textarea
-          placeholder="Viết gì đó..."
-          className="w-full bg-background p-3 rounded-lg border border-[var(--color-border)]/20 focus:ring-1 focus:ring-[#0066FF]/40 text-xs sm:text-sm resize-none"
-          rows={3}
-        />
-        <div className="flex flex-wrap gap-2 mt-3">
-          {[
-            "Chia sẻ danh mục đầu tư",
-            "Chia sẻ phân bố tài chính",
-            "Chia sẻ dòng tiền",
-          ].map((text, idx) => (
-            <button
-              key={idx}
-              className="text-xs px-3 py-1.5 rounded-full bg-[#F1F5F9] dark:bg-[#1C253A] hover:brightness-110 active:scale-95 transition cursor-pointer"
-            >
-              {text}
+      {hasPostPermission ? (
+        <div className="bg-background rounded-xl shadow-sm border border-[var(--color-border)]/10 p-4 sm:p-5">
+          <textarea
+            placeholder="Viết gì đó..."
+            className="w-full bg-background p-3 rounded-lg border border-[var(--color-border)]/20 focus:ring-1 focus:ring-[#0066FF]/40 text-xs sm:text-sm resize-none"
+            rows={3}
+          />
+          <div className="flex flex-wrap gap-2 mt-3">
+            {[
+              "Chia sẻ danh mục đầu tư",
+              "Chia sẻ phân bố tài chính",
+              "Chia sẻ dòng tiền",
+            ].map((text, idx) => (
+              <button
+                key={idx}
+                className="text-xs px-3 py-1.5 rounded-full bg-[#F1F5F9] dark:bg-[#1C253A] hover:brightness-110 active:scale-95 transition cursor-pointer"
+              >
+                {text}
+              </button>
+            ))}
+          </div>
+          <div className="flex justify-end mt-3">
+            <button className="flex items-center gap-2 bg-[#0066FF] text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-[#3385ff] active:scale-95 transition text-xs sm:text-sm">
+              <Send className="w-4 h-4" /> Đăng bài
             </button>
-          ))}
+          </div>
         </div>
-        <div className="flex justify-end mt-3">
-          <button className="flex items-center gap-2 bg-[#0066FF] text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-[#3385ff] active:scale-95 transition text-xs sm:text-sm">
-            <Send className="w-4 h-4" /> Đăng bài
-          </button>
+      ) : (
+        <div className="bg-background rounded-xl shadow-sm border border-[var(--color-border)]/10 p-6 sm:p-8 text-center">
+          <div className="flex justify-center mb-4">
+            <div className="p-4 rounded-full bg-slate-200 dark:bg-slate-700">
+              <Lock className="w-6 h-6 text-slate-600 dark:text-slate-300" />
+            </div>
+          </div>
+          <h3 className="text-lg font-semibold mb-2">
+            Tính năng mạng xã hội bị khóa
+          </h3>
+          <p className="text-slate-600 dark:text-slate-400">
+            Bạn không có quyền truy cập tính năng mạng xã hội. Vui lòng nâng cấp
+            tài khoản để sử dụng.
+          </p>
         </div>
-      </div>
+      )}
 
       {/* Feed */}
       {posts.map((post) => (
@@ -126,7 +148,9 @@ export default function SocialPage() {
               className="rounded-full w-10 h-10 sm:w-12 sm:h-12"
             />
             <div>
-              <div className="font-semibold text-sm sm:text-base">{post.author}</div>
+              <div className="font-semibold text-sm sm:text-base">
+                {post.author}
+              </div>
               <div className="text-xs sm:text-sm">{post.username}</div>
             </div>
           </div>
@@ -162,20 +186,28 @@ export default function SocialPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {["Bitcoin", "Monero", "Cardano", "Ethereum"].map((coin, i) => (
-                    <tr
-                      key={i}
-                      className="border-t border-[var(--color-border)]/10 hover:bg-background/50 transition"
-                    >
-                      <td className="py-2 whitespace-nowrap">{coin}</td>
-                      <td className="whitespace-nowrap">20B</td>
-                      <td className="whitespace-nowrap">$6,777</td>
-                      <td className="whitespace-nowrap">0.0000038</td>
-                      <td className="text-green-500 whitespace-nowrap">+1.1%</td>
-                      <td className="text-red-500 whitespace-nowrap">-2.4%</td>
-                      <td className="text-green-500 whitespace-nowrap">+7.7%</td>
-                    </tr>
-                  ))}
+                  {["Bitcoin", "Monero", "Cardano", "Ethereum"].map(
+                    (coin, i) => (
+                      <tr
+                        key={i}
+                        className="border-t border-[var(--color-border)]/10 hover:bg-background/50 transition"
+                      >
+                        <td className="py-2 whitespace-nowrap">{coin}</td>
+                        <td className="whitespace-nowrap">20B</td>
+                        <td className="whitespace-nowrap">$6,777</td>
+                        <td className="whitespace-nowrap">0.0000038</td>
+                        <td className="text-green-500 whitespace-nowrap">
+                          +1.1%
+                        </td>
+                        <td className="text-red-500 whitespace-nowrap">
+                          -2.4%
+                        </td>
+                        <td className="text-green-500 whitespace-nowrap">
+                          +7.7%
+                        </td>
+                      </tr>
+                    )
+                  )}
                 </tbody>
               </table>
             </div>
@@ -195,7 +227,10 @@ export default function SocialPage() {
           {/* Comments */}
           <div className="space-y-3 pt-2">
             {post.comments.map((c) => (
-              <div key={c.id} className="flex items-start gap-2 text-xs sm:text-sm">
+              <div
+                key={c.id}
+                className="flex items-start gap-2 text-xs sm:text-sm"
+              >
                 <img
                   src="https://i.pravatar.cc/100?img=12"
                   alt={c.author}

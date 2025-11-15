@@ -7,8 +7,15 @@ import useAuth from '@/services/useAuth'
 
 type FetchInit = RequestInit & { _retry?: boolean }
 
+interface RefreshResponse {
+    data?: {
+        accessToken?: string;
+        token?: string;
+    };
+}
+
 let isRefreshing = false
-let refreshPromise: Promise<any> | null = null
+let refreshPromise: Promise<RefreshResponse> | null = null
 
 export default function useAuthFetch() {
     const { refresh } = useAuth()

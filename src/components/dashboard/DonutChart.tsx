@@ -3,12 +3,20 @@
 import { useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import type { ApexOptions } from 'apexcharts';
+import { FinanceDasboard } from '@/type/Dashboard';
 
 const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-export default function DonutChart() {
-  const labels = ['Tiền mặt', 'Crypto', 'Cổ phiếu'];
-  const series: number[] = [45, 25, 30];
+interface DonutChartProps {
+  financeData: FinanceDasboard | null;
+}
+
+export default function DonutChart({ financeData }: DonutChartProps) {
+  const labels = ['Tiền mặt', 'Crypto'];
+  const series: number[] = [
+    financeData?.cashPercent || 0,
+    financeData?.cryptoPercent || 0,
+  ];
 
   const options: ApexOptions = useMemo(() => ({
     chart: {
@@ -16,7 +24,7 @@ export default function DonutChart() {
       toolbar: { show: false },
       foreColor: '#94a3b8',
     },
-    colors: ['#f59e0b', '#34d399', '#2dd4bf'],
+    colors: ['#f59e0b', '#34d399'],
     labels,
     stroke: { width: 0 },
     dataLabels: { enabled: false },
@@ -27,7 +35,7 @@ export default function DonutChart() {
       itemMargin: { horizontal: 10, vertical: 4 },
     },
     tooltip: {
-      y: { formatter: (val: number) => `${val}%` },
+      y: { formatter: (val: number) => `${val.toFixed(2)}%` },
     },
    
     grid: { padding: { top: 0, bottom: 0, left: 0, right: 0 } },

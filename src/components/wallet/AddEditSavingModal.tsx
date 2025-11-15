@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { Saving } from "@/type/Saving";
 import { SavingFormData } from "@/type/SavingForm";
+import { formatInputNumber, parseFormattedNumber } from "@/utils/formatCurrency";
 
 interface AddEditSavingModalProps {
   isOpen: boolean;
@@ -34,7 +35,7 @@ export default function AddEditSavingModal({
       setFormData({
         savingName: saving.savingName,
         description: saving.description || "",
-        targetAmount: saving.targetAmount.toString(),
+        targetAmount: formatInputNumber(saving.targetAmount.toString()),
         targetDate: saving.targetDate ? saving.targetDate.split('T')[0] : "",
         urlImage: saving.urlImage || ""
       });
@@ -73,7 +74,7 @@ export default function AddEditSavingModal({
       await onSubmit({
         savingName: formData.savingName,
         description: formData.description,
-        targetAmount: parseFloat(formData.targetAmount),
+        targetAmount: parseFormattedNumber(formData.targetAmount),
         targetDate: formData.targetDate, // "YYYY-MM-DD" format
         urlImage: formData.urlImage
       });
@@ -136,13 +137,13 @@ export default function AddEditSavingModal({
           <div>
             <label className="block text-sm font-medium mb-2">Số tiền mục tiêu (VNĐ)</label>
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
               value={formData.targetAmount}
-              onChange={(e) => setFormData({ ...formData, targetAmount: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, targetAmount: formatInputNumber(e.target.value) })}
               className="w-full px-4 py-2.5 rounded-lg bg-foreground border border-[var(--color-border)]/20 
                        focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all"
-              placeholder="VD: 50000000"
-              min="0"
+              placeholder="VD: 50.000.000"
             />
           </div>
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { X, Loader2 } from "lucide-react";
 import { SavingTransactionFormData } from "@/type/SavingTransaction";
+import { formatInputNumber, parseFormattedNumber, formatVND } from "@/utils/formatCurrency";
 
 interface AddSavingTransactionModalProps {
   isOpen: boolean;
@@ -28,7 +29,7 @@ export default function AddSavingTransactionModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const amountValue = parseFloat(amount);
+    const amountValue = parseFormattedNumber(amount);
     
     if (!amount || amountValue <= 0) {
       alert("Vui lòng nhập số tiền hợp lệ");
@@ -74,12 +75,12 @@ export default function AddSavingTransactionModal({
             </div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-[var(--color-text)]">Đã tiết kiệm:</span>
-              <span className="font-medium">{currentAmount.toLocaleString()}đ</span>
+              <span className="font-medium">{formatVND(currentAmount)}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-[var(--color-text)]">Còn thiếu:</span>
               <span className="font-medium text-amber-600">
-                {remainingAmount > 0 ? remainingAmount.toLocaleString() : 0}đ
+                {formatVND(remainingAmount > 0 ? remainingAmount : 0)}
               </span>
             </div>
           </div>
@@ -90,14 +91,13 @@ export default function AddSavingTransactionModal({
               Số tiền bỏ vào (VNĐ) <span className="text-red-500">*</span>
             </label>
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={(e) => setAmount(formatInputNumber(e.target.value))}
               className="w-full px-4 py-3 rounded-lg bg-foreground border border-[var(--color-border)]/20 
                        focus:outline-none focus:ring-2 focus:ring-amber-500/40 transition-all text-lg"
-              placeholder="VD: 100000"
-              min="0"
-              step="1000"
+              placeholder="VD: 100.000"
               autoFocus
             />
             {amount && parseFloat(amount) > 0 && (

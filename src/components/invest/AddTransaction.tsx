@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { formatInputNumber, parseFormattedNumber } from '@/utils/formatCurrency'
 
 interface AddTransactionModalProps {
     isOpen: boolean;
@@ -34,8 +35,8 @@ const AddTransaction = ({ isOpen, onClose, onSubmit, loading, assetId, assetName
             type: transactionType,
             price: currentPrice,
             quantity: parseFloat(quantity),
-            fee: parseFloat(fee),
-            expense: parseFloat(expense),
+            fee: parseFormattedNumber(fee),
+            expense: parseFormattedNumber(expense),
             idAsset: assetId,
         });
         handleClose();
@@ -51,31 +52,30 @@ const AddTransaction = ({ isOpen, onClose, onSubmit, loading, assetId, assetName
 
     // Tính quantity từ expense hoặc ngược lại
     const handleQuantityChange = (value: string) => {
-        if (value === '' || parseFloat(value) >= 0) {
-            setQuantity(value);
-            if (value && parseFloat(value) > 0) {
-                setExpense((parseFloat(value) * currentPrice).toString());
-            } else {
-                setExpense('');
-            }
+        setQuantity(value);
+        if (value && parseFloat(value) > 0 && currentPrice > 0) {
+            const calculatedExpense = parseFloat(value) * currentPrice;
+            setExpense(formatInputNumber(Math.round(calculatedExpense).toString()));
+        } else {
+            setExpense('');
         }
     };
 
     const handleExpenseChange = (value: string) => {
-        if (value === '' || parseFloat(value) >= 0) {
-            setExpense(value);
-            if (value && parseFloat(value) > 0 && currentPrice > 0) {
-                setQuantity((parseFloat(value) / currentPrice).toString());
-            } else {
-                setQuantity('');
-            }
+        const formatted = formatInputNumber(value);
+        setExpense(formatted);
+        
+        const numericValue = parseFormattedNumber(formatted);
+        if (numericValue > 0 && currentPrice > 0) {
+            const calculatedQuantity = numericValue / currentPrice;
+            setQuantity(calculatedQuantity.toString());
+        } else {
+            setQuantity('');
         }
     };
 
     const handleFeeChange = (value: string) => {
-        if (value === '' || parseFloat(value) >= 0) {
-            setFee(value);
-        }
+        setFee(formatInputNumber(value));
     };
     
     const formatPrice = (value: number) => {
@@ -173,15 +173,14 @@ const AddTransaction = ({ isOpen, onClose, onSubmit, loading, assetId, assetName
                         {/* Expense (Vốn) */}
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-text">
-                                Vốn
+                                Vốn (VND)
                             </label>
                             <input
-                                type="number"
-                                step="0.01"
-                                min="0"
+                                type="text"
+                                inputMode="numeric"
                                 value={expense}
                                 onChange={(e) => handleExpenseChange(e.target.value)}
-                                placeholder="0.00"
+                                placeholder="0"
                                 className="w-full px-4 py-3 bg-background text-text rounded-lg border border-text/10
                                          focus:outline-none focus:ring-2 focus:ring-text/30 focus:border-transparent
                                          placeholder:text-text/40 transition-all"
@@ -191,15 +190,14 @@ const AddTransaction = ({ isOpen, onClose, onSubmit, loading, assetId, assetName
                         {/* Fee */}
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-text">
-                                Phí giao dịch
+                                Phí giao dịch (VND)
                             </label>
                             <input
-                                type="number"
-                                step="0.01"
-                                min="   0"
+                                type="text"
+                                inputMode="numeric"
                                 value={fee}
                                 onChange={(e) => handleFeeChange(e.target.value)}
-                                placeholder="0.00"
+                                placeholder="0"
                                 className="w-full px-4 py-3 bg-background text-text rounded-lg border border-text/10
                                          focus:outline-none focus:ring-2 focus:ring-text/30 focus:border-transparent
                                          placeholder:text-text/40 transition-all"

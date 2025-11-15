@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { Budget } from "@/type/useBudget";
 import { BudgetFormData } from "@/type/BudgetForm";
+import { formatInputNumber, parseFormattedNumber } from "@/utils/formatCurrency";
 
 interface AddEditBudgetModalProps {
   isOpen: boolean;
@@ -31,7 +32,7 @@ export default function AddEditBudgetModal({
     if (mode === "edit" && budget) {
       setFormData({
         budgetName: budget.budgetName,
-        budgetGoal: budget.budgetGoal.toString(),
+        budgetGoal: formatInputNumber(budget.budgetGoal.toString()),
         urlImage: budget.urlImage || ""
       });
     } else {
@@ -54,7 +55,7 @@ export default function AddEditBudgetModal({
     try {
       await onSubmit({
         budgetName: formData.budgetName,
-        budgetGoal: parseFloat(formData.budgetGoal),
+        budgetGoal: parseFormattedNumber(formData.budgetGoal),
         urlImage: formData.urlImage
       });
       onClose();
@@ -103,13 +104,13 @@ export default function AddEditBudgetModal({
           <div>
             <label className="block text-sm font-medium mb-2">Mục tiêu (VNĐ)</label>
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
               value={formData.budgetGoal}
-              onChange={(e) => setFormData({ ...formData, budgetGoal: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, budgetGoal: formatInputNumber(e.target.value) })}
               className="w-full px-4 py-2.5 rounded-lg bg-foreground border border-[var(--color-border)]/20 
                        focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all"
-              placeholder="VD: 50000000"
-              min="0"
+              placeholder="VD: 50.000.000"
             />
           </div>
 

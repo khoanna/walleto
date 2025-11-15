@@ -31,7 +31,7 @@ export const UserContextProvider = ({
   const [permissions, setPermissions] = useState<string[] | undefined>(
     undefined
   );
-
+  
   const { refresh } = useAuth();
 
   const fetchToken = async () => {

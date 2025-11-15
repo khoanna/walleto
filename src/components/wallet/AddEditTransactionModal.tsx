@@ -5,6 +5,7 @@ import { X, ChevronDown } from "lucide-react";
 import { Transaction } from "@/type/Transaction";
 import { Budget } from "@/type/useBudget";
 import { TransactionFormData } from "@/type/TransactionForm";
+import { formatInputNumber, parseFormattedNumber } from "@/utils/formatCurrency";
 
 interface AddEditTransactionModalProps {
   isOpen: boolean;
@@ -46,7 +47,7 @@ export default function AddEditTransactionModal({
         transactionName: transaction.transactionName,
         transactionCategory: transaction.transactionCategory,
         transactionType: transaction.transactionType,
-        amount: transaction.amount.toString(),
+        amount: formatInputNumber(transaction.amount.toString()),
         transactionDate: transaction.transactionDate.split('T')[0]
       });
     } else {
@@ -84,7 +85,7 @@ export default function AddEditTransactionModal({
         // Nếu là Thu nhập thì gửi danh mục trống, nếu Chi tiêu thì gửi danh mục đã chọn
         transactionCategory: formData.transactionType === "Thu" ? "" : formData.transactionCategory,
         transactionType: formData.transactionType,
-        amount: parseFloat(formData.amount),
+        amount: parseFormattedNumber(formData.amount),
         transactionDate: dateWithoutZ
       });
       onClose();
@@ -223,13 +224,13 @@ export default function AddEditTransactionModal({
           <div>
             <label className="block text-sm font-medium mb-2">Số tiền (VNĐ)</label>
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
               value={formData.amount}
-              onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, amount: formatInputNumber(e.target.value) })}
               className="w-full px-4 py-2.5 rounded-lg bg-foreground border border-[var(--color-border)]/20 
                        focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all"
-              placeholder="VD: 20000"
-              min="0"
+              placeholder="VD: 20.000"
             />
           </div>
 

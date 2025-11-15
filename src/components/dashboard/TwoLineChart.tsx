@@ -2,9 +2,14 @@
 
 import React, { useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { Transaction } from '@/type/Dashboard';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 type Range = 'week' | 'month' | 'year';
+
+interface TwoLineChartProps {
+    transactions: Transaction[];
+}
 
 function Tab({
     active,
@@ -30,32 +35,88 @@ function Tab({
     );
 }
 
-export default function TwoLineChart() {
+// Helper function to process transactions into chart data
+function processTransactions(transactions: Transaction[], range: Range) {
+    const now = new Date();
+    
+    // Initialize data structure based on range
+    let categories: string[] = [];
+    let dataIn: number[] = [];
+    let dataOut: number[] = [];
+    
+    if (range === 'week') {
+        // Last 7 days
+        categories = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+        const counts = Array(7).fill(0).map(() => ({ in: 0, out: 0 }));
+        
+        transactions.forEach(t => {
+            const date = new Date(t.transactionDate);
+            const daysDiff = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+            if (daysDiff < 7 && daysDiff >= 0) {
+                const dayIndex = (date.getDay() + 6) % 7; // Convert to Monday = 0
+                if (t.transactionType === 'Thu') {
+                    counts[dayIndex].in += t.amount / 1000; // Convert to thousands
+                } else {
+                    counts[dayIndex].out += t.amount / 1000;
+                }
+            }
+        });
+        
+        dataIn = counts.map(c => Math.round(c.in));
+        dataOut = counts.map(c => Math.round(c.out));
+        
+    } else if (range === 'month') {
+        // Last 5 weeks
+        categories = ['W1', 'W2', 'W3', 'W4', 'W5'];
+        const counts = Array(5).fill(0).map(() => ({ in: 0, out: 0 }));
+        
+        transactions.forEach(t => {
+            const date = new Date(t.transactionDate);
+            const daysDiff = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+            const weekIndex = Math.floor(daysDiff / 7);
+            if (weekIndex < 5 && weekIndex >= 0) {
+                if (t.transactionType === 'Thu') {
+                    counts[4 - weekIndex].in += t.amount / 1000;
+                } else {
+                    counts[4 - weekIndex].out += t.amount / 1000;
+                }
+            }
+        });
+        
+        dataIn = counts.map(c => Math.round(c.in));
+        dataOut = counts.map(c => Math.round(c.out));
+        
+    } else {
+        // Last 12 months
+        categories = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+        const counts = Array(12).fill(0).map(() => ({ in: 0, out: 0 }));
+        
+        transactions.forEach(t => {
+            const date = new Date(t.transactionDate);
+            const monthsDiff = (now.getFullYear() - date.getFullYear()) * 12 + (now.getMonth() - date.getMonth());
+            if (monthsDiff < 12 && monthsDiff >= 0) {
+                const monthIndex = date.getMonth();
+                if (t.transactionType === 'Thu') {
+                    counts[monthIndex].in += t.amount / 1000;
+                } else {
+                    counts[monthIndex].out += t.amount / 1000;
+                }
+            }
+        });
+        
+        dataIn = counts.map(c => Math.round(c.in));
+        dataOut = counts.map(c => Math.round(c.out));
+    }
+    
+    return { categories, in: dataIn, out: dataOut };
+}
+
+export default function TwoLineChart({ transactions }: TwoLineChartProps) {
     const [range, setRange] = useState<Range>('month');
 
     const dataset = useMemo(() => {
-        switch (range) {
-            case 'week':
-                return {
-                    categories: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
-                    in: [12, 14, 9, 18, 15, 22, 17],
-                    out: [20, 18, 25, 17, 21, 15, 14],
-                };
-            case 'year':
-                return {
-                    categories: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'],
-                    in: [12, 18, 25, 40, 33, 45, 39, 48, 44, 52, 49, 57],
-                    out: [42, 36, 30, 28, 26, 20, 24, 22, 25, 23, 21, 20],
-                };
-            case 'month':
-            default:
-                return {
-                    categories: ['W1', 'W2', 'W3', 'W4', 'W5'],
-                    in: [9, 16, 13, 18, 14],
-                    out: [19, 17, 23, 14, 12],
-                };
-        }
-    }, [range]);
+        return processTransactions(transactions, range);
+    }, [transactions, range]);
 
     const options = useMemo(() => ({
         chart: {
@@ -84,7 +145,13 @@ export default function TwoLineChart() {
         },
         tooltip: {
             theme: 'dark' as const,
-            y: { formatter: (val: number) => `${val.toFixed(0)}k` },
+            y: { 
+                formatter: (val: number) => {
+                    // Convert from thousands back to full amount
+                    const amount = val * 1000;
+                    return `${Math.round(amount).toLocaleString('vi-VN')} đ`;
+                }
+            },
         },
     }), [dataset.categories]);
 
@@ -112,9 +179,6 @@ export default function TwoLineChart() {
                         Theo năm
                     </Tab>
                 </div>
-                <button className="text-xs cursor-pointer text-slate-400 hover:text-slate-200 transition">
-                    Chi tiết →
-                </button>
             </div>
         </div>
     );

@@ -12,6 +12,7 @@ import {
   Menu,
   X,
   Star,
+  Crown,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -245,7 +246,7 @@ export default function Sidebar() {
                     perms?.includes("SOCIAL_NETWORK")
                   );
                   return hasPremium ? (
-                    <Star className="h-5 w-5 text-yellow-400" />
+                    <Crown className="h-5 w-5 text-yellow-400" />
                   ) : null;
                 })()}
               </div>

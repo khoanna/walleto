@@ -12,6 +12,7 @@ import {
   Check,
   Upload,
   Star,
+  Crown,
 } from "lucide-react";
 interface InputFieldProps {
   label: string;
@@ -282,24 +283,32 @@ export default function ProfilePage() {
                 <div className="mt-4 sm:mt-0 sm:ml-6 flex items-center">
                   {(() => {
                     const perms = context?.permissions;
+
                     const hasPremium = !!(
                       perms?.includes("AI_CHATTING") ||
                       perms?.includes("SOCIAL_NETWORK")
                     );
+
+                    // ĐÃ CÓ PREMIUM → hiện badge có thể click xem gói
                     if (hasPremium) {
                       return (
-                        <div className="flex items-center gap-2">
-                          <Star className="h-6 w-6 text-yellow-400" />
-                          <div className="text-sm font-medium">Premium</div>
-                        </div>
+                        <button
+                          onClick={() => router.push("/dashboard/profile/buy")}
+                          className="flex items-center gap-2 px-4 py-2 bg-yellow-500/20 text-yellow-400 border border-yellow-400/50 rounded-lg hover:bg-yellow-500/30 transition font-medium"
+                        >
+                          <Crown className="h-5 w-5" />
+                          <span>Prenium</span>
+                        </button>
                       );
                     }
+
+                    // CHƯA CÓ PREMIUM → nút mua gói như cũ
                     return (
                       <button
                         onClick={() => router.push("/dashboard/profile/buy")}
                         className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-medium"
                       >
-                        Mua gói Premium
+                        Nâng cấp
                       </button>
                     );
                   })()}

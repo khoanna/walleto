@@ -3,11 +3,11 @@ import { useState } from "react";
 export default function usePackage() {
   const [packageLoading, setPackageLoading] = useState(false);
   const { authFetch } = useAuthFetch();
-  const getPackages = async () => {
+  const getPackages = async (idUser: string) => {
     try {
       setPackageLoading(true);
       const response = await authFetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/package/list-package`
+        `${process.env.NEXT_PUBLIC_API_URL}/package/list-package?idUser=${idUser}`
       );
       const data = await response.json();
       return data;

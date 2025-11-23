@@ -208,16 +208,16 @@ export default function BuyPage() {
                     {isBasic ? (
                       <button
                         disabled
-                        className="w-full border rounded-full py-2 text-black  opacity-60 pointer-events-none cursor-not-allowed"
+                        className="w-full border rounded-full py-2 text-black pointer-events-none cursor-not-allowed"
                       >
                         Mặc định
                       </button>
                     ) : pkg.bought ? (
                       <button
                         disabled
-                        className="w-full bg-green-600 text-white rounded-full py-2 cursor-not-allowed opacity-80"
+                        className="w-full bg-red-700 text-white rounded-full py-2 cursor-not-allowed "
                       >
-                        Đã có
+                        Hủy gói
                       </button>
                     ) : (
                       <button

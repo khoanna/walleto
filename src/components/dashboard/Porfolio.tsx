@@ -44,16 +44,18 @@ const Trend = ({ v }: { v: number }) => {
 
 export function PortfolioTable({ assets }: PortfolioTableProps) {
   return (
-    <div className="max-h-[400px] text-text overflow-auto nice-scroll rounded-2xl bg-background backdrop-blur p-3 shadow-[0_10px_30px_rgba(0,0,0,0.25)]">
-      <div className="px-2 py-2 text-xl font-bold ">Danh mục đầu tư</div>
+    <div className="h-full flex flex-col text-text overflow-hidden rounded-2xl bg-background backdrop-blur shadow-[0_10px_30px_rgba(0,0,0,0.25)]">
+      <div className="px-4 sm:px-6 py-3 sm:py-4 text-lg sm:text-xl font-bold border-b border-white/5">
+        Danh mục đầu tư
+      </div>
 
       {/* table */}
-      <div className="overflow-x-autorounded-xl">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="">
+      <div className="flex-1 overflow-auto nice-scroll">
+        <table className="w-full text-xs sm:text-sm">
+          <thead className="sticky top-0 bg-background z-10">
+            <tr className="border-b border-white/5">
               <Th>Name</Th>
-              <Th>Marketcap</Th>
+              <Th className="hidden sm:table-cell">Marketcap</Th>
               <Th className="text-right">Volume</Th>
               <Th className="text-right">Price</Th>
               <Th className="text-right">24h Change</Th>
@@ -62,7 +64,7 @@ export function PortfolioTable({ assets }: PortfolioTableProps) {
           <tbody>
             {assets.length === 0 ? (
               <tr>
-                <td colSpan={5} className="py-8 text-center text-slate-400">
+                <td colSpan={5} className="py-12 sm:py-16 text-center text-slate-400">
                   Chưa có tài sản đầu tư
                 </td>
               </tr>
@@ -73,19 +75,19 @@ export function PortfolioTable({ assets }: PortfolioTableProps) {
                   className="group border-t border-white/5 hover:bg-white/[0.03] transition-colors"
                 >
                   <Td>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       <img
                         src={asset.url || 'https://via.placeholder.com/40'}
                         alt={asset.assetSymbol}
-                        className="size-7 rounded-full ring-1 ring-white/10"
+                        className="size-6 sm:size-7 rounded-full ring-1 ring-white/10"
                       />
                       <div className="leading-tight">
-                        <div className="font-semibold text-slate-100">{asset.assetName}</div>
-                        <div className="text-[11px] text-slate-400">{asset.assetSymbol}</div>
+                        <div className="font-semibold text-slate-100 text-xs sm:text-sm">{asset.assetName}</div>
+                        <div className="text-[10px] sm:text-[11px] text-slate-400">{asset.assetSymbol}</div>
                       </div>
                     </div>
                   </Td>
-                  <Td>{formatCompactNumber(asset.marketCap)} đ</Td>
+                  <Td className="hidden sm:table-cell">{formatCompactNumber(asset.marketCap)} đ</Td>
                   <Td className="text-right">{formatCompactNumber(asset.totalVolume)} đ</Td>
                   <Td className="text-right">{formatVND(asset.currentPrice)}</Td>
                   <Td className="text-right"><Trend v={asset.priceChangePercentage24h} /></Td>

@@ -30,50 +30,54 @@ function formatDate(dateString: string) {
 
 export function BalanceActivity({ transactions }: BalanceActivityProps) {
   return (
-    <div className="max-h-[400px] nice-scroll overflow-y-scroll rounded-2xl  bg-background text-text backdrop-blur p-3 shadow-[0_10px_30px_rgba(0,0,0,0.25)]">
-      <div className="px-2 py-2 text-xl font-bold ">Giao dịch tuần này</div>
+    <div className="h-full flex flex-col rounded-2xl bg-background text-text backdrop-blur shadow-[0_10px_30px_rgba(0,0,0,0.25)] overflow-hidden">
+      <div className="px-4 sm:px-6 py-3 sm:py-4 text-lg sm:text-xl font-bold border-b border-white/5">
+        Giao dịch tuần này
+      </div>
 
-      {transactions.length === 0 ? (
-        <div className="py-8 text-center text-slate-400">
-          Chưa có giao dịch nào
-        </div>
-      ) : (
-        <ul className="mt-1 divide-y divide-white/5">
-          {transactions.map((t, i) => {
-            // Determine if it's income or expense based on amount (positive = income)
-            const isIncome = t.amount > 0;
-            const color = isIncome
-              ? 'text-emerald-400 bg-emerald-500/10 ring-emerald-400/20'
-              : 'text-rose-400 bg-rose-500/10 ring-rose-400/20';
-            
-            return (
-              <li key={t.idTransaction} className="flex items-center justify-between p-3 hover:bg-white/[0.03] rounded-xl transition-colors">
-                <div className="flex items-center gap-3">
-                  <span
-                    className={[
-                      'grid place-items-center size-10 rounded-xl ring-1',
-                      color.split(' ').slice(1).join(' '),
-                    ].join(' ')}
-                  >
-                    {isIncome ? (
-                      <ArrowUpRight className="size-5 text-emerald-400" />
-                    ) : (
-                      <ArrowDownRight className="size-5 text-rose-400" />
-                    )}
-                  </span>
-                  <div className="leading-tight">
-                    <div className="font-medium ">{t.transactionName}</div>
-                    <div className="text-[11px]">{formatDate(t.transactionDate)}</div>
+      <div className="flex-1 overflow-y-auto nice-scroll">
+        {transactions.length === 0 ? (
+          <div className="py-12 sm:py-16 text-center text-slate-400">
+            Chưa có giao dịch nào
+          </div>
+        ) : (
+          <ul className="divide-y divide-white/5 p-2">
+            {transactions.map((t, i) => {
+              // Determine if it's income or expense based on amount (positive = income)
+              const isIncome = t.amount > 0;
+              const color = isIncome
+                ? 'text-emerald-400 bg-emerald-500/10 ring-emerald-400/20'
+                : 'text-rose-400 bg-rose-500/10 ring-rose-400/20';
+              
+              return (
+                <li key={t.idTransaction} className="flex items-center justify-between p-2 sm:p-3 hover:bg-white/[0.03] rounded-xl transition-colors">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                    <span
+                      className={[
+                        'grid place-items-center size-8 sm:size-10 rounded-xl ring-1 flex-shrink-0',
+                        color.split(' ').slice(1).join(' '),
+                      ].join(' ')}
+                    >
+                      {isIncome ? (
+                        <ArrowUpRight className="size-4 sm:size-5 text-emerald-400" />
+                      ) : (
+                        <ArrowDownRight className="size-4 sm:size-5 text-rose-400" />
+                      )}
+                    </span>
+                    <div className="leading-tight min-w-0 flex-1">
+                      <div className="font-medium text-xs sm:text-sm truncate">{t.transactionName}</div>
+                      <div className="text-[10px] sm:text-[11px] text-slate-400">{formatDate(t.transactionDate)}</div>
+                    </div>
                   </div>
-                </div>
-                <div className="text-text font-semibold">
-                  {formatVND(Math.abs(t.amount))}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+                  <div className="text-text font-semibold text-xs sm:text-sm flex-shrink-0 ml-2">
+                    {formatVND(Math.abs(t.amount))}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }

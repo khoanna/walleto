@@ -45,9 +45,11 @@ export default function DonutChart({ financeData }: DonutChartProps) {
   }), [labels]);
 
   return (
-    <div className="rounded-2xl shadow-xl bg-background p-4 min-h-[340px]">
+    <div className="rounded-2xl shadow-xl bg-background p-3 sm:p-4 h-full flex flex-col">
       <div className="text-sm text-text font-bold opacity-80 mb-2">Tài chính</div>
-      <ReactApexChart options={options} series={series} type="donut" height={260} />
+      <div className="flex-1 flex items-center justify-center min-h-0">
+        <ReactApexChart options={options} series={series} type="donut" height="90%" />
+      </div>
     </div>
   );
 }

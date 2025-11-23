@@ -18,14 +18,14 @@ const Portfolio = () => {
     }
 
     return (
-        <div className="w-full min-h-screen flex flex-col p-4 sm:p-6 gap-4 sm:gap-6 overflow-hidden">
-            {/* Crypto Table Section - 50% */}
-            <div className='h-[400px] sm:h-[500px] flex-shrink-0 overflow-hidden'>
+        <div className="h-screen flex flex-col p-2 sm:p-3 lg:p-4 gap-3 sm:gap-4 overflow-hidden bg-foreground">
+            {/* Crypto Table Section - Responsive height */}
+            <div className='h-[45vh] sm:h-[48vh] flex-shrink-0 overflow-hidden'>
                 <CryptoTable />
             </div>
 
-            {/* Fund Section - 50% */}
-            <div className=''>
+            {/* Fund Section - Takes remaining space */}
+            <div className='flex-1 min-h-0 overflow-hidden'>
                 <Fund />
             </div>
         </div>

@@ -50,34 +50,46 @@ export default function DashBoard() {
 
   if (loading) {
     return (
-      <div className="p-4 sm:p-6 lg:p-8 pt-4 sm:pt-6 bg-foreground flex items-center justify-center min-h-screen">
+      <div className="h-screen flex items-center justify-center bg-foreground">
         <Loader2 className="animate-spin size-8 text-text" />
       </div>
     );
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 pt-4 sm:pt-6 bg-foreground flex flex-col gap-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4">
-        <div className="md:col-span-2 lg:col-span-3">
-          <TwoLineChart transactions={transactionData?.data || []} />
+    <div className="min-h-screen bg-foreground p-3 sm:p-4 lg:p-6">
+      <div className="h-full flex flex-col gap-3 sm:gap-4">
+        {/* Top Row - Charts & Account */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3 sm:gap-4">
+          {/* Line Chart - Takes more space on large screens */}
+          <div className="md:col-span-2 lg:col-span-3 h-[340px] sm:h-[380px]">
+            <TwoLineChart transactions={transactionData?.data || []} />
+          </div>
+          
+          {/* Donut Chart */}
+          <div className="lg:col-span-2 h-[340px] sm:h-[380px]">
+            <DonutChart financeData={financeData} />
+          </div>
+          
+          {/* Account Cards */}
+          <div className="lg:col-span-2 h-[340px] sm:h-[380px]">
+            <Account financeData={financeData} weekData={weekData} />
+          </div>
         </div>
-        <div className="lg:col-span-2">
-          <DonutChart financeData={financeData} />
-        </div>
-        <div className="lg:col-span-2">
-          <Account financeData={financeData} weekData={weekData} />
-        </div>
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-7 gap-4">
-         <div className="lg:col-span-5">
-          <PortfolioTable assets={assetData?.data || []} />
-        </div>
-        <div className="lg:col-span-2">
-          <BalanceActivity transactions={weekData?.listBriefTransactionResponses || []} />
-        </div>
-      </div>
 
+        {/* Bottom Row - Portfolio & Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-7 gap-3 sm:gap-4 flex-1">
+          {/* Portfolio Table */}
+          <div className="lg:col-span-5 min-h-[400px] sm:min-h-[450px]">
+            <PortfolioTable assets={assetData?.data || []} />
+          </div>
+          
+          {/* Activity List */}
+          <div className="lg:col-span-2 min-h-[400px] sm:min-h-[450px]">
+            <BalanceActivity transactions={weekData?.listBriefTransactionResponses || []} />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

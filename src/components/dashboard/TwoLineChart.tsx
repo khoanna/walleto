@@ -161,14 +161,13 @@ export default function TwoLineChart({ transactions }: TwoLineChartProps) {
     ]), [dataset]);
 
     return (
-        <div className="rounded-2xl p-4 bg-background shadow-xl min-h-[340px]">
-
-            <div style={{ height: 270 }}>
-                <Chart options={options} series={series} type="line" height={270} />
+        <div className="rounded-2xl p-3 sm:p-4 bg-background shadow-xl h-full flex flex-col">
+            <div className="flex-1 min-h-0">
+                <Chart options={options} series={series} type="line" height="100%" />
             </div>
 
-            <div className="mt-2 flex items-center justify-between">
-                <div className="flex gap-2">
+            <div className="mt-2 pt-2 border-t border-white/5 flex items-center justify-center sm:justify-between">
+                <div className="flex gap-1.5 sm:gap-2">
                     <Tab  active={range === 'week'} onClick={() => setRange('week')}>
                         Theo tuần
                     </Tab>

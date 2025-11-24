@@ -8,18 +8,24 @@ import { Loader2, Crown, CheckCircle, XCircle } from "lucide-react";
 import { Package } from "@/type/Package";
 
 export default function BuyPage() {
-  const { getPackages, packageLoading } = usePackage();
+  const { getPackages, packageLoading, cancelPackage } = usePackage();
   const { createPayment, paymentLoading } = usePayment();
   const context = useUserContext();
 
-  const userId = context?.user?.idUser;
-
+  const idUser = context?.user?.idUser;
+  const refreshUser = context?.refreshUser;
   const [packages, setPackages] = useState<Package[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [buyingId, setBuyingId] = useState<string | null>(null);
   // Thêm state cho modal
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
+  //hủy gói
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancellingPackage, setCancellingPackage] = useState<Package | null>(
+    null
+  );
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
 
   // Format VNĐ #,###
   const formatMoney = (value: number) =>
@@ -39,14 +45,14 @@ export default function BuyPage() {
 
   useEffect(() => {
     const load = async () => {
-      if (!userId) {
+      if (!idUser) {
         setError("Vui lòng đăng nhập để xem gói");
         return;
       }
 
       try {
         setError(null);
-        const res = await getPackages(userId);
+        const res = await getPackages(idUser);
 
         if (res?.success && Array.isArray(res.data)) {
           setPackages(res.data as Package[]);
@@ -59,7 +65,7 @@ export default function BuyPage() {
       }
     };
     load();
-  }, [userId]);
+  }, [idUser]);
 
   // Hàm mở modal xác nhận
   const handleBuyClick = (pkg: Package) => {
@@ -75,7 +81,7 @@ export default function BuyPage() {
 
   // Hàm xử lý mua thực sự
   const handleConfirmBuy = async () => {
-    if (!selectedPackage || !userId) {
+    if (!selectedPackage || !idUser) {
       handleCloseModal();
       return;
     }
@@ -84,7 +90,7 @@ export default function BuyPage() {
 
     try {
       const body = {
-        idUser: userId,
+        idUser: idUser,
         idPackage: selectedPackage.idPackage,
         amount: selectedPackage.price,
       };
@@ -104,6 +110,42 @@ export default function BuyPage() {
     }
   };
 
+  const handleCancelClick = (pkg: Package) => {
+    setCancellingPackage(pkg);
+    setShowCancelModal(true);
+  };
+
+  // Hàm đóng modal hủy
+  const handleCloseCancelModal = () => {
+    setShowCancelModal(false);
+    setCancellingPackage(null);
+    setCancellingId(null);
+  };
+
+  // Hàm xác nhận hủy gói
+  const handleConfirmCancel = async () => {
+    if (!cancellingPackage || !idUser) return;
+
+    setCancellingId(cancellingPackage.idPackage);
+
+    try {
+      const form = { idUser: idUser!, idPackage: cancellingPackage.idPackage };
+      const res = await cancelPackage(form);
+
+      if (res?.success) {
+        alert("Hủy gói thành công!");
+        refreshUser && refreshUser(); // Cập nhật lại thông tin user (gói hiện tại)
+      } else {
+        alert(res?.message || "Hủy gói thất bại");
+      }
+    } catch (error) {
+      console.error("Error canceling package:", error);
+      alert("Đã có lỗi xảy ra khi hủy gói");
+    } finally {
+      setCancellingId(null);
+      handleCloseCancelModal();
+    }
+  };
   // 3 quyền default
   const defaultPermissions = [
     "Quản lý dòng tiền",
@@ -214,8 +256,9 @@ export default function BuyPage() {
                       </button>
                     ) : pkg.bought ? (
                       <button
-                        disabled
-                        className="w-full bg-red-700 text-white rounded-full py-2 cursor-not-allowed "
+                        disabled={paymentLoading}
+                        className="w-full bg-red-700 text-white rounded-full py-2 cursor-not-allowed"
+                        onClick={() => handleCancelClick(pkg)}
                       >
                         Hủy gói
                       </button>
@@ -236,7 +279,45 @@ export default function BuyPage() {
           </div>
         )}
       </div>
+      {/* Modal xác nhận HỦY gói */}
+      {showCancelModal && cancellingPackage && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
+            <h3 className="text-xl font-bold text-red-600 mb-3">
+              Xác nhận hủy gói
+            </h3>
+            <p className="text-gray-700 mb-6">
+              Bạn có chắc chắn muốn{" "}
+              <strong>hủy gói {cancellingPackage.packageName}</strong>?
+              <br />
+              <span className="text-sm text-gray-500">
+                Sau khi hủy, bạn sẽ mất quyền truy cập các tính năng cao cấp cho
+                đến khi gia hạn lại.
+              </span>
+            </p>
 
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={handleCloseCancelModal}
+                disabled={cancellingId === cancellingPackage.idPackage}
+                className="px-5 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
+              >
+                Không, giữ lại
+              </button>
+              <button
+                onClick={handleConfirmCancel}
+                disabled={cancellingId === cancellingPackage.idPackage}
+                className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50 flex items-center gap-2"
+              >
+                {cancellingId === cancellingPackage.idPackage && (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                )}
+                Có, hủy gói
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Modal xác nhận */}
       {showConfirmModal && selectedPackage && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">

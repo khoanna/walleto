@@ -35,7 +35,7 @@ export default function HeroSection() {
 
             <div className="px-4 mt-50 flex flex-col items-center justify-center z-20">
                 <h1 className="text-5xl md:text-7xl font-extrabold mb-4 tracking-wide text-gray-100">
-                    WALLETTO
+                    WALLETO
                 </h1>
                 <p className="text-sm md:text-base text-gray-300 mb-6 leading-relaxed">
                     Giải pháp tài chính tối ưu dành <br /> cho bạn và ví của bạn

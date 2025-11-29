@@ -1,289 +1,734 @@
 "use client";
 
-import React, { useState } from "react";
-import dynamic from "next/dynamic";
-import Image from "next/image";
-import { ApexOptions } from "apexcharts";
-import { Heart, MessageCircle, Send, Smile, Lock, X } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+
+// Hooks & Services
+import useEvaluate from "@/services/useEvaluate";
+import useDashboard from "@/services/useDashboard";
+import useTransaction from "@/services/useTransaction";
+import usePost from "@/services/usePost";
+import useImgae from "@/services/useImage";
+import useFriendship from "@/services/useFriendship";
 import { useUserContext } from "@/context";
 
-// Dynamic ApexCharts
-const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
+// Types
+import {
+  TransactionOfPost,
+  InvestmentAssetOfPost,
+  Post,
+  FriendshipData,
+  UserInfo,
+  ShareType,
+  DateFilter,
+  ApiResponse,
+  EvaluateResponse,
+} from "@/type/Social";
+import { Transaction, Asset } from "@/type/Dashboard";
 
-interface Comment {
-  id: number;
-  author: string;
-  text: string;
-}
-
-interface Post {
-  id: number;
-  author: string;
-  username: string;
-  avatar: string;
-  content: string;
-  chart?: boolean;
-  table?: boolean;
-  image?: string;
-  likes: number;
-  comments: Comment[];
-}
-
-interface Friend {
-  id: number;
-  name: string;
-  avatar: string;
-}
+// UI Components
+import { PostForm, PostItem } from "@/components/social/SocialFeed";
+import {
+  UserSearchBox,
+  FriendRequestList,
+  FriendList,
+} from "@/components/social/SocialSidebar";
+import {
+  AssetSelectionModal,
+  EditPostModal,
+  DeleteFriendModal,
+  ChatPopup,
+} from "@/components/social/SocialModals";
 
 export default function SocialPage() {
   const context = useUserContext();
+  const user = context?.user;
   const permissions = context?.permissions;
   const hasPostPermission = permissions?.includes("SOCIAL_NETWORK") ?? false;
 
-  // ---------------- MOCK DATA ----------------
-  const [posts] = useState<Post[]>([
-    {
-      id: 1,
-      author: "Khang Dương",
-      username: "@grcs_1212",
-      avatar: "https://i.pravatar.cc/150?img=3",
-      content: "Đây là dòng tiền của tôi 💰",
-      chart: true,
-      likes: 12542,
-      comments: [
-        { id: 1, author: "Tiến Khang", text: "Rất chi tiết 🔥" },
-        { id: 2, author: "Ngọc Anh", text: "Chart này đẹp thật 😍" },
-      ],
-    },
-    {
-      id: 2,
-      author: "Tiến Khang",
-      username: "@daxuu",
-      avatar: "https://i.pravatar.cc/150?img=5",
-      content: "Đây là danh mục đầu tư của tôi 📊",
-      table: true,
-      likes: 12342,
-      comments: [{ id: 1, author: "Bình", text: "Nice portfolio 💪" }],
-    },
-  ]);
+  const { getListTransaction } = useTransaction();
+  const {
+    createTransactionPost,
+    postLoading,
+    getListPostApproved,
+    createAssetPost,
+    deletePost,
+    updatePost,
+    updateTransactionPost,
+    updateAssetPost,
+  } = usePost();
+  const { getInvesmentAsset } = useDashboard();
+  const { uploadImage } = useImgae();
+  const { createEvaluate } = useEvaluate();
+  const {
+    getUserList,
+    getFriendshipReceiveOfUser,
+    getFriendshipOfUser,
+    getFriendshipSentOfUser,
+    acceptFrienship,
+    rejectFrienship,
+    createFrienship,
+    deleteFrienship,
+  } = useFriendship();
 
-  const suggestedFriends: Friend[] = [
-    { id: 1, name: "Minh Anh", avatar: "https://i.pravatar.cc/150?img=6" },
-    { id: 2, name: "Hoàng", avatar: "https://i.pravatar.cc/150?img=8" },
-    { id: 3, name: "Thảo My", avatar: "https://i.pravatar.cc/150?img=11" },
-  ];
-
-  const friendList: Friend[] = [
-    { id: 10, name: "Duy", avatar: "https://i.pravatar.cc/150?img=16" },
-    { id: 11, name: "Khôi", avatar: "https://i.pravatar.cc/150?img=17" },
-    { id: 12, name: "Nhi", avatar: "https://i.pravatar.cc/150?img=18" },
-  ];
-
-  // ---------------- UPLOAD ẢNH ----------------
+  // --- STATE ---
+  const [postContent, setPostContent] = useState<string>("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [shareType, setShareType] = useState<ShareType>("none");
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setSelectedImage(url);
+  const [rawTransactionList, setRawTransactionList] = useState<Transaction[]>(
+    []
+  );
+  const [shareChartData, setShareChartData] = useState<
+    TransactionOfPost[] | null
+  >(null);
+  const [dateFilter, setDateFilter] = useState<DateFilter>({
+    from: "",
+    to: "",
+  });
+
+  const [shareAssetData, setShareAssetData] = useState<
+    InvestmentAssetOfPost[] | null
+  >(null);
+  const [pendingAssets, setPendingAssets] = useState<Asset[]>([]);
+  const [selectedAssetIds, setSelectedAssetIds] = useState<Set<string>>(
+    new Set()
+  );
+  const [isSelectingAssets, setIsSelectingAssets] = useState(false);
+
+  const [activeMenuPostId, setActiveMenuPostId] = useState<string | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
+  const [showCommentBox, setShowCommentBox] = useState<string | null>(null);
+  const [starRating, setStarRating] = useState<Record<string, number>>({});
+  const [commentText, setCommentText] = useState<Record<string, string>>({});
+  const [expandedComments, setExpandedComments] = useState<
+    Record<string, boolean>
+  >({});
+
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [currentChat, setCurrentChat] = useState<UserInfo | null>(null);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [allUsers, setAllUsers] = useState<UserInfo[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<UserInfo[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [friendRequests, setFriendRequests] = useState<FriendshipData[]>([]);
+  const [sentRequests, setSentRequests] = useState<FriendshipData[]>([]);
+  const [myFriends, setMyFriends] = useState<FriendshipData[]>([]);
+  const [friendshipLoading, setFriendshipLoading] = useState(false);
+  const [friendToDelete, setFriendToDelete] = useState<{
+    idFriendship: string;
+    name: string;
+  } | null>(null);
+
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  // --- LOGIC FUNCTIONS (Hoisted & Typed) ---
+  const fetchPosts = async () => {
+    if (user?.idUser) {
+      // Ép kiểu response về ApiResponse<Post[]>
+      const r = (await getListPostApproved(user.idUser)) as ApiResponse<Post[]>;
+      if (r?.success) setPosts(r.data);
+    }
   };
 
-  // ---------------- CHAT POPUP ----------------
-  const [currentChat, setCurrentChat] = useState<Friend | null>(null);
+  useEffect(() => {
+    fetchPosts();
+    fetchFriendData();
+  }, [user?.idUser]);
 
-  const openChat = (friend: Friend) => {
-    setCurrentChat(friend);
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      )
+        setShowSearchResults(false);
+      if (
+        activeMenuPostId &&
+        !(event.target as HTMLElement).closest(".post-menu-trigger")
+      )
+        setActiveMenuPostId(null);
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [activeMenuPostId]);
+
+  const getFriendInfo = (f: FriendshipData) =>
+    !f.infFriendshipResponse.receiver
+      ? f.infFriendshipResponse.sender
+      : user?.idUser && f.infFriendshipResponse.sender.idUser === user.idUser
+      ? f.infFriendshipResponse.receiver
+      : f.infFriendshipResponse.sender;
+
+  const fetchFriendData = async () => {
+    if (!user?.idUser) return;
+    try {
+      setFriendshipLoading(true);
+      const reqRes = (await getFriendshipReceiveOfUser(
+        user.idUser
+      )) as ApiResponse<FriendshipData[]>;
+      if (reqRes?.success) setFriendRequests(reqRes.data);
+
+      const friendRes = (await getFriendshipOfUser(user.idUser)) as ApiResponse<
+        FriendshipData[]
+      >;
+      if (friendRes?.success) setMyFriends(friendRes.data);
+
+      const sentRes = (await getFriendshipSentOfUser(
+        user.idUser
+      )) as ApiResponse<FriendshipData[]>;
+      if (sentRes?.success) setSentRequests(sentRes.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setFriendshipLoading(false);
+    }
   };
-  const closeChat = () => setCurrentChat(null);
 
-  // ---------------- CHART ----------------
-  const chartOptions: ApexOptions = {
-    chart: {
-      id: "cashflow",
-      toolbar: { show: false },
-      animations: { enabled: true },
-    },
-    colors: ["#22C55E", "#EF4444"],
-    stroke: { curve: "smooth", width: 3 },
-    legend: { position: "top" },
-    grid: { borderColor: "rgba(200,200,200,0.2)" },
-    xaxis: {
-      categories: ["T1", "T2", "T3", "T4", "T5", "T6"],
-      labels: { style: { colors: "#94a3b8" } },
-    },
+  const checkIsFriend = (targetId: string) =>
+    myFriends.some((f) => getFriendInfo(f)?.idUser === targetId);
+  const checkIsPendingRequest = (targetId: string) =>
+    friendRequests.some(
+      (req) => req.infFriendshipResponse.sender.idUser === targetId
+    );
+  const checkIsSentRequest = (targetId: string) =>
+    sentRequests.some(
+      (req) => req.infFriendshipResponse.receiver?.idUser === targetId
+    );
+
+  const handleSearchFocus = async () => {
+    setShowSearchResults(true);
+    if (allUsers.length === 0) {
+      const res = (await getUserList()) as ApiResponse<UserInfo[]>;
+      if (res?.success) {
+        const list = res.data.filter((u) => u.idUser !== user?.idUser);
+        setAllUsers(list);
+        setFilteredUsers(list);
+      }
+    } else handleSearchChange(searchQuery);
   };
 
-  const chartSeries = [
-    { name: "Tiền vào", data: [20, 30, 40, 35, 60, 80] },
-    { name: "Tiền ra", data: [15, 25, 50, 70, 50, 45] },
-  ];
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    if (!query.trim()) setFilteredUsers(allUsers);
+    else
+      setFilteredUsers(
+        allUsers.filter(
+          (u) =>
+            u.name.toLowerCase().includes(query.toLowerCase()) ||
+            (u.email && u.email.toLowerCase().includes(query.toLowerCase()))
+        )
+      );
+  };
 
-  // -----------------------------------------------------
-  // ------------------- UI RETURN -----------------------
-  // -----------------------------------------------------
+  const handleSendFriendRequest = async (targetId: string) => {
+    if (!user?.idUser) return;
+    const res = (await createFrienship({
+      idUser: user.idUser,
+      idRef: targetId,
+    })) as ApiResponse<FriendshipData>;
+    if (res?.success) {
+      alert("Đã gửi lời mời!");
+      fetchFriendData();
+    }
+  };
 
+  const handleAcceptRequest = async (sid: string) => {
+    const req = friendRequests.find(
+      (r) => r.infFriendshipResponse.sender.idUser === sid
+    );
+    if (!req) return;
+    const res = (await acceptFrienship(req.idFriendship, {
+      status: "Chấp Nhận",
+    })) as ApiResponse<FriendshipData>;
+    if (res?.success) fetchFriendData();
+  };
+
+  const handleRejectRequest = async (sid: string) => {
+    const req = friendRequests.find(
+      (r) => r.infFriendshipResponse.sender.idUser === sid
+    );
+    if (!req) return;
+    const res = (await rejectFrienship(req.idFriendship, {
+      status: "Từ Chối",
+    })) as ApiResponse<FriendshipData>;
+    if (res?.success)
+      setFriendRequests((p) =>
+        p.filter((r) => r.infFriendshipResponse.sender.idUser !== sid)
+      );
+  };
+
+  const confirmDeleteFriend = async () => {
+    if (!friendToDelete) return;
+    const res = (await deleteFrienship(
+      friendToDelete.idFriendship
+    )) as ApiResponse<FriendshipData>;
+    if (res?.success) {
+      setMyFriends((p) =>
+        p.filter((f) => f.idFriendship !== friendToDelete.idFriendship)
+      );
+      await fetchFriendData();
+      if (currentChat?.name === friendToDelete.name) setCurrentChat(null);
+      setFriendToDelete(null);
+    } else alert("Xóa thất bại!");
+  };
+
+  const loadRawTransactions = async () => {
+    if (!user?.idUser) return [];
+    // Giả sử API trả về { data: { expenseList: Transaction[] } }
+    const res = (await getListTransaction(user.idUser)) as ApiResponse<{
+      expenseList: Transaction[];
+    }>;
+    setRawTransactionList(res?.data?.expenseList || []);
+    return res?.data?.expenseList || [];
+  };
+
+  const loadRawAssets = async () => {
+    if (!user?.idUser) return [];
+    // Giả sử API trả về { data: Asset[] }
+    const res = (await getInvesmentAsset(user.idUser)) as ApiResponse<Asset[]>;
+    setPendingAssets(res.data || []);
+    return res.data || [];
+  };
+
+  const handleShareCashflow = async () => {
+    if (!user?.idUser) return alert("Chưa đăng nhập!");
+    const list = await loadRawTransactions();
+    if (!list.length) return alert("Không có dữ liệu!");
+    const now = new Date();
+    const from = new Date(now.getFullYear(), now.getMonth(), 1)
+      .toISOString()
+      .split("T")[0];
+    const to = now.toISOString().split("T")[0];
+    setDateFilter({ from, to });
+    filterAndSetTransactions(list, from, to);
+    setShareType("cashflow");
+    setShareAssetData(null);
+  };
+
+  const filterAndSetTransactions = (
+    list: Transaction[],
+    from: string,
+    to: string
+  ) => {
+    const fT = new Date(from).getTime();
+    const tT = new Date(to).getTime() + 86400000;
+    const filtered = list.filter((i) => {
+      const d = new Date(i.createAt).getTime();
+      return d >= fT && d < tT;
+    });
+
+    const formatted: TransactionOfPost[] = filtered.map((i) => ({
+      transactionName: i.transactionName,
+      transactionType: (i.transactionType === "Chi" ? "Chi" : "Thu") as
+        | "Chi"
+        | "Thu",
+      amount: i.amount,
+      transactionDate: i.transactionDate,
+    }));
+    setShareChartData(formatted);
+  };
+
+  useEffect(() => {
+    if (
+      shareType === "cashflow" &&
+      rawTransactionList.length &&
+      dateFilter.from &&
+      dateFilter.to
+    )
+      filterAndSetTransactions(
+        rawTransactionList,
+        dateFilter.from,
+        dateFilter.to
+      );
+  }, [dateFilter.from, dateFilter.to]);
+
+  const handleSharePortfolio = async () => {
+    if (!user?.idUser) return alert("Chưa đăng nhập!");
+    const list = await loadRawAssets(); // Chờ tải danh sách tài sản
+    if (!list.length) {
+      alert("Chưa có danh mục!");
+      return; // Thoát nếu không có dữ liệu
+    }
+    // Đảm bảo pendingAssets được cập nhật trước khi mở modal
+    setPendingAssets(list);
+    setSelectedAssetIds(new Set()); // Reset danh sách đã chọn
+    setIsSelectingAssets(true); // Mở modal
+    setShareType("portfolio");
+    setShareChartData(null); // Reset dữ liệu dòng tiền
+  };
+
+  const confirmAssetSelection = () => {
+    if (!selectedAssetIds.size) return alert("Chọn ít nhất 1!");
+    const selected = pendingAssets.filter((i) =>
+      selectedAssetIds.has(i.idAsset)
+    );
+    const formatted: InvestmentAssetOfPost[] = selected.map((i: Asset) => ({
+      assetName: i.assetName,
+      assetSymbol: i.assetSymbol.toUpperCase(),
+      currentPrice: i.currentPrice,
+      marketCap: i.marketCap,
+      totalVolume: i.totalVolume,
+      priceChangePercentage24h: i.priceChangePercentage24h,
+      url: i.url,
+    }));
+    setShareAssetData(formatted);
+    setIsSelectingAssets(false);
+  };
+
+  const resetPostForm = () => {
+    setPostContent("");
+    setSelectedFile(null);
+    setSelectedImage(null);
+    setShareChartData(null);
+    setShareAssetData(null);
+    setShareType("none");
+    fetchPosts();
+  };
+
+  const handleSubmitPost = async () => {
+    if (!user?.idUser) return alert("Chưa đăng nhập!");
+    if (
+      !postContent.trim() &&
+      !selectedFile &&
+      !shareChartData &&
+      !shareAssetData
+    )
+      return alert("Nội dung trống!");
+    const url = selectedFile ? await uploadImage(selectedFile) : "";
+    let res: ApiResponse<Post> | undefined;
+
+    if (shareAssetData?.length)
+      res = (await createAssetPost({
+        title: postContent || "Danh mục",
+        content: postContent || "",
+        urlImage: url,
+        idUser: user.idUser,
+        investmentAssetOfPost: shareAssetData,
+      })) as ApiResponse<Post>;
+    else if (shareChartData?.length)
+      res = (await createTransactionPost({
+        title: postContent || "Dòng tiền",
+        content: postContent || "",
+        urlImage: url,
+        idUser: user.idUser,
+        transactionOfPost: shareChartData,
+      })) as ApiResponse<Post>;
+    else
+      res = (await createTransactionPost({
+        title: postContent.substring(0, 50) || "Bài mới",
+        content: postContent,
+        urlImage: url,
+        idUser: user.idUser,
+        transactionOfPost: [],
+      })) as ApiResponse<Post>;
+
+    if (res?.success) {
+      alert("Thành công!");
+      resetPostForm();
+    } else alert(res?.message || "Lỗi!");
+  };
+
+  const handleDeletePost = async (id: string) => {
+    if (!window.confirm("Xóa?")) return;
+    const res = (await deletePost(id)) as ApiResponse<boolean>;
+    if (res?.success) {
+      alert("Đã xóa");
+      fetchPosts();
+    } else alert("Lỗi!");
+  };
+
+  const handleEditPost = async (post: Post) => {
+    // Reset form state first
+    setSelectedFile(null);
+    setSelectedAssetIds(new Set());
+
+    // Set post content FIRST before opening modal
+    setPostContent(post.content || post.title || "");
+    setSelectedImage(post.urlImage || null);
+    setEditingPost(post);
+    setActiveMenuPostId(null);
+
+    const snap = post.snapshotResponse?.[0];
+    if (snap?.transactionOfPosts?.length) {
+      setShareType("cashflow");
+      setShareChartData(snap.transactionOfPosts);
+      setShareAssetData(null);
+      await loadRawTransactions();
+      const now = new Date().toISOString().split("T")[0];
+      setDateFilter({ from: now, to: now });
+    } else if (snap?.investmentAssetOfPosts?.length) {
+      setShareType("portfolio");
+      setShareAssetData(snap.investmentAssetOfPosts);
+      setShareChartData(null);
+      const assets = await loadRawAssets();
+      const ids = new Set<string>();
+      const symbols = new Set(
+        snap.investmentAssetOfPosts.map((a) => a.assetSymbol.toUpperCase())
+      );
+      assets.forEach((a: Asset) => {
+        if (symbols.has(a.assetSymbol.toUpperCase())) ids.add(a.idAsset);
+      });
+      setSelectedAssetIds(ids);
+    } else {
+      setShareType("none");
+      setShareChartData(null);
+      setShareAssetData(null);
+    }
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateSubmit = async () => {
+    if (!editingPost || !user?.idUser) return;
+
+    let finalContent = postContent.trim();
+    if (!finalContent) {
+      finalContent = (editingPost.content || editingPost.title || "").trim();
+    }
+    if (!finalContent) {
+      return alert("Nội dung không được để trống!");
+    }
+
+    const finalTitle = editingPost.title?.trim() || finalContent;
+
+    const url = selectedFile
+      ? await uploadImage(selectedFile)
+      : selectedImage || editingPost.urlImage || "";
+
+    let res;
+
+    if (shareType === "cashflow" && shareChartData) {
+      res = await updateTransactionPost(editingPost.idPost, {
+        title: finalTitle,
+        content: finalContent,
+        urlImage: url,
+        transactionOfPost: shareChartData,
+      });
+    } else if (shareType === "portfolio" && shareAssetData) {
+      res = await updateAssetPost(editingPost.idPost, {
+        title: finalTitle,
+        content: finalContent,
+        urlImage: url,
+        investmentAssetOfPost: shareAssetData,
+      });
+    } else {
+      // Đây là post thường → gọi updatePost
+      res = await updatePost(editingPost.idPost, {
+        title: finalTitle,
+        content: finalContent,
+        urlImage: url,
+      });
+    }
+
+    if (res?.success) {
+      alert("Cập nhật thành công!");
+      setIsEditModalOpen(false);
+      setEditingPost(null);
+      resetPostForm();
+    } else {
+      alert(res?.message || "Cập nhật thất bại!");
+    }
+  };
+  const handleEvaluate = async (postId: string) => {
+    if (!user?.idUser) return alert("Chưa đăng nhập!");
+    const res = (await createEvaluate({
+      star: starRating[postId] || 5,
+      comment: commentText[postId] || "",
+      idUser: user.idUser,
+      idPost: postId,
+    })) as ApiResponse<EvaluateResponse>;
+    if (res?.success) {
+      alert("Đã gửi đánh giá!");
+      setCommentText((p) => ({ ...p, [postId]: "" }));
+      setShowCommentBox(null);
+      fetchPosts();
+    }
+  };
+
+  // --- RENDER ---
   return (
     <div className="min-h-screen p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4">
-      {/* FEED LIST */}
+      {/* LEFT COL */}
       <div className="lg:col-span-8 space-y-6">
-        {/* --- POST COMPOSER --- */}
         {hasPostPermission && (
-          <div className="bg-background rounded-xl border p-4 space-y-3">
-            <textarea
-              placeholder="Viết gì đó..."
-              className="w-full bg-background p-3 rounded-lg border text-sm resize-none"
-              rows={3}
+          <div className="bg-background rounded-xl border p-4 space-y-4 relative">
+            <h3 className="text-sm font-bold text-gray-500">TẠO BÀI VIẾT</h3>
+            <PostForm
+              content={postContent}
+              setContent={setPostContent}
+              selectedImage={selectedImage}
+              onImageUpload={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const f = e.target.files?.[0];
+                if (f) {
+                  setSelectedFile(f);
+                  setSelectedImage(URL.createObjectURL(f));
+                }
+              }}
+              onRemoveImage={() => {
+                setSelectedImage(null);
+                setSelectedFile(null);
+              }}
+              shareType={shareType}
+              setShareType={setShareType}
+              chartData={shareChartData}
+              setChartData={setShareChartData}
+              assetData={shareAssetData}
+              setAssetData={setShareAssetData}
+              dateFilter={dateFilter}
+              setDateFilter={setDateFilter}
+              onShareCashflow={handleShareCashflow}
+              onSharePortfolio={handleSharePortfolio}
+              onSelectAssets={() => setIsSelectingAssets(true)}
+              onSubmit={handleSubmitPost}
+              isLoading={postLoading}
+              isEditMode={false}
             />
-
-            {/* BUTTON SELECT IMAGE */}
-            <label className="px-3 py-1.5 text-xs text-gray-200 bg-[#F1F5F9] dark:bg-[#1C253A] rounded-full cursor-pointer hover:brightness-110">
-              Upload ảnh từ máy bạn
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleImageUpload}
-              />
-            </label>
-            <label className="px-3 py-1.5 text-xs ml-2 text-gray-200 bg-[#F1F5F9] dark:bg-[#1C253A] rounded-full cursor-pointer hover:brightness-110">
-              Chia sẻ danh mục đầu tư
-              <button className="hidden" onClick={() => {}} />
-            </label>
-            <label className="px-3 py-1.5 text-xs ml-2 text-gray-200 bg-[#F1F5F9] dark:bg-[#1C253A] rounded-full cursor-pointer hover:brightness-110">
-              Chia sẻ biểu đồ dòng tiền
-              <button className="hidden" onClick={() => {}} />
-            </label>
-
-            {/* Image Preview */}
-            {selectedImage && (
-              <div className="mt-3 relative w-40">
-                <img src={selectedImage} className="rounded-lg shadow-md" />
-                <button
-                  onClick={() => setSelectedImage(null)}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white p-1 rounded-full"
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            )}
-
-            <button className="flex mt-2 items-center  gap-2 bg-[#022d6d] text-white px-4 py-2 rounded-lg text-sm">
-              <Send className="w-4" /> Đăng bài
-            </button>
           </div>
         )}
-
-        {/* --- POSTS FEED --- */}
-        {posts.map((post) => (
-          <div key={post.id} className="bg-background rounded-xl border p-4">
-            <div className="flex items-center gap-3">
-              <img src={post.avatar} className="w-10 h-10 rounded-full" />
-              <div>
-                <p className="font-semibold text-sm">{post.author}</p>
-                <p className="text-xs">{post.username}</p>
-              </div>
-            </div>
-
-            <p className="text-sm mt-3">{post.content}</p>
-
-            {post.chart && (
-              <div className="mt-3">
-                <Chart
-                  options={chartOptions}
-                  series={chartSeries}
-                  type="line"
-                  height={240}
-                />
-              </div>
-            )}
-
-            {post.table && (
-              <div className="overflow-x-auto mt-3 text-sm">
-                <table className="w-full border-t">
-                  <tbody>
-                    {["Bitcoin", "Monero", "Cardano", "Ethereum"].map(
-                      (c, i) => (
-                        <tr key={i} className="border-t">
-                          <td className="py-2">{c}</td>
-                          <td>20B</td>
-                          <td>$6,777</td>
-                          <td>0.0000038</td>
-                          <td className="text-green-500">+1.1%</td>
-                          <td className="text-red-500">-2.4%</td>
-                          <td className="text-green-500">+7.7%</td>
-                        </tr>
-                      )
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        ))}
+        <div className="space-y-6">
+          {posts.map((post) => (
+            <PostItem
+              key={post.idPost}
+              post={post}
+              currentUserId={user?.idUser}
+              onEdit={handleEditPost}
+              onDelete={handleDeletePost}
+              activeMenuId={activeMenuPostId}
+              toggleMenu={setActiveMenuPostId}
+              showCommentBox={showCommentBox === post.idPost}
+              toggleCommentBox={() =>
+                setShowCommentBox(
+                  showCommentBox === post.idPost ? null : post.idPost
+                )
+              }
+              starRating={starRating[post.idPost] || 5}
+              setStarRating={(v: number) =>
+                setStarRating({ ...starRating, [post.idPost]: v })
+              }
+              commentText={commentText[post.idPost] || ""}
+              setCommentText={(v: string) =>
+                setCommentText({ ...commentText, [post.idPost]: v })
+              }
+              onSubmitComment={() => handleEvaluate(post.idPost)}
+              isExpanded={!!expandedComments[post.idPost]}
+              toggleExpanded={() =>
+                setExpandedComments({
+                  ...expandedComments,
+                  [post.idPost]: !expandedComments[post.idPost],
+                })
+              }
+            />
+          ))}
+        </div>
       </div>
 
-      {/* ----------------------------------------------------- */}
-      {/* RIGHT SIDEBAR */}
-      {/* ----------------------------------------------------- */}
-
+      {/* RIGHT COL */}
       <div className="lg:col-span-4 space-y-4">
-        {/* Suggested Friends */}
-        <div className="bg-background border p-4 rounded-xl">
-          <h3 className="font-semibold mb-3">Gợi ý kết bạn</h3>
-          <div className="space-y-3">
-            {suggestedFriends.map((f) => (
-              <div key={f.id} className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <img src={f.avatar} className="w-10 h-10 rounded-full" />
-                  <span className="text-sm">{f.name}</span>
-                </div>
-                <button className="px-3 py-1 bg-[#0066FF] text-white rounded-lg text-xs">
-                  Kết bạn
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Friend List */}
-        <div className="bg-background border p-4 rounded-xl">
-          <h3 className="font-semibold mb-3">Tin nhắn</h3>
-          <div className="space-y-3">
-            {friendList.map((f) => (
-              <div
-                key={f.id}
-                onClick={() => openChat(f)}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-background/50 cursor-pointer transition"
-              >
-                <img src={f.avatar} className="w-9 h-9 rounded-full" />
-                <span className="text-sm">{f.name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <UserSearchBox
+          query={searchQuery}
+          setQuery={setSearchQuery}
+          onFocus={handleSearchFocus}
+          results={filteredUsers}
+          showResults={showSearchResults}
+          searchRef={searchRef}
+          onSendRequest={handleSendFriendRequest}
+          checkIsFriend={checkIsFriend}
+          checkIsPending={checkIsPendingRequest}
+          checkIsSent={checkIsSentRequest}
+        />
+        <FriendRequestList
+          requests={friendRequests}
+          onAccept={handleAcceptRequest}
+          onReject={handleRejectRequest}
+          isLoading={friendshipLoading}
+        />
+        <FriendList
+          friends={myFriends}
+          getFriendInfo={getFriendInfo}
+          onChat={setCurrentChat}
+          onDelete={(id: string, name: string) =>
+            setFriendToDelete({ idFriendship: id, name })
+          }
+          isLoading={friendshipLoading}
+        />
       </div>
 
-      {/* ----------------------------------------------------- */}
-      {/* CHAT POP-UP */}
-      {/* ----------------------------------------------------- */}
-      {currentChat && (
-        <div className="fixed bottom-4 right-4 bg-background border shadow-xl rounded-xl w-72 p-3">
-          <div className="flex justify-between items-center mb-2">
-            <p className="font-semibold">{currentChat.name}</p>
-            <X className="cursor-pointer" onClick={closeChat} />
-          </div>
-
-          <div className="h-40 bg-background/40 rounded-lg p-2 overflow-y-auto text-sm">
-            {/* mock tin nhắn */}
-            <p className="mb-2 bg-white/20 p-2 rounded-lg">Hello 👋</p>
-          </div>
-
-          <input
-            className="w-full mt-2 px-3 py-2 border rounded-lg text-sm"
-            placeholder="Nhập tin nhắn..."
+      {/* MODALS */}
+      {isSelectingAssets && (
+        <AssetSelectionModal
+          assets={pendingAssets}
+          selectedIds={selectedAssetIds}
+          onToggle={(id: string) => {
+            const newSet = new Set(selectedAssetIds);
+            if (newSet.has(id)) newSet.delete(id);
+            else newSet.add(id);
+            setSelectedAssetIds(newSet);
+          }}
+          onConfirm={confirmAssetSelection}
+          onClose={() => {
+            // only close the modal on generic close (used after confirm)
+            setIsSelectingAssets(false);
+          }}
+          onCancel={() => {
+            // explicit cancel (e.g., clicking X) should reset selection state
+            setIsSelectingAssets(false);
+            setShareAssetData(null);
+            setShareType("none");
+            setSelectedAssetIds(new Set());
+          }}
+        />
+      )}
+      {isEditModalOpen && editingPost && (
+        <EditPostModal
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setEditingPost(null);
+            resetPostForm();
+          }}
+        >
+          <PostForm
+            content={postContent}
+            setContent={setPostContent}
+            selectedImage={selectedImage}
+            onImageUpload={(e: React.ChangeEvent<HTMLInputElement>) => {
+              const f = e.target.files?.[0];
+              if (f) {
+                setSelectedFile(f);
+                setSelectedImage(URL.createObjectURL(f));
+              }
+            }}
+            onRemoveImage={() => {
+              setSelectedImage(null);
+              setSelectedFile(null);
+            }}
+            shareType={shareType}
+            setShareType={setShareType}
+            chartData={shareChartData}
+            setChartData={setShareChartData}
+            assetData={shareAssetData}
+            setAssetData={setShareAssetData}
+            dateFilter={dateFilter}
+            setDateFilter={setDateFilter}
+            onShareCashflow={handleShareCashflow}
+            onSharePortfolio={handleSharePortfolio}
+            onSelectAssets={() => setIsSelectingAssets(true)}
+            onSubmit={handleUpdateSubmit}
+            isLoading={postLoading}
+            isEditMode={true}
           />
-        </div>
+        </EditPostModal>
+      )}
+      {friendToDelete && (
+        <DeleteFriendModal
+          name={friendToDelete.name}
+          onCancel={() => setFriendToDelete(null)}
+          onConfirm={confirmDeleteFriend}
+        />
+      )}
+      {currentChat && (
+        <ChatPopup user={currentChat} onClose={() => setCurrentChat(null)} />
       )}
     </div>
   );

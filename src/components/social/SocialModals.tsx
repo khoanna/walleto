@@ -2,7 +2,7 @@
 import { X, CheckCircle, Circle, AlertTriangle, Send } from "lucide-react";
 import { UserAvatar } from "./SocialFeed";
 import { UserInfo } from "@/type/Social";
-import { Asset } from "@/type/Dashboard"; // Import type Asset
+import { Asset } from "@/type/Dashboard";
 
 // --- 1. ASSET MODAL ---
 interface AssetSelectionModalProps {
@@ -11,7 +11,6 @@ interface AssetSelectionModalProps {
   onToggle: (id: string) => void;
   onConfirm: () => void;
   onClose: () => void;
-  // optional callback to signal parent to reset/clear selection when modal is closed
   onCancel?: () => void;
 }
 
@@ -29,7 +28,6 @@ export const AssetSelectionModal = ({
         <h3 className="font-bold">Chọn tài sản chia sẻ</h3>
         <button
           onClick={() => {
-            // notify parent to clear selection if provided, then close
             if (onCancel) onCancel();
             onClose();
           }}
@@ -54,6 +52,7 @@ export const AssetSelectionModal = ({
               ) : (
                 <Circle className="text-gray-300" size={20} />
               )}
+              {/* Note: Ideally use Next/Image here if domains are configured */}
               <img
                 src={asset.url}
                 className="w-8 h-8 rounded-full bg-white"
@@ -72,7 +71,6 @@ export const AssetSelectionModal = ({
       <div className="p-3 border-t">
         <button
           onClick={() => {
-            // confirm selected and close
             onConfirm();
             onClose();
           }}
@@ -219,7 +217,9 @@ export const EditCommentModal = ({
   onConfirm,
   isLoading = false,
 }: EditCommentModalProps) => {
-  const { Star } = require("lucide-react");
+  // Removed forbidden require() call here.
+  // The 'Star' icon wasn't being used (emojis were used instead), so it's safe to remove.
+
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
       <div className="bg-white dark:bg-[#1C253A] rounded-xl shadow-2xl w-full max-w-sm">

@@ -187,7 +187,7 @@ export const EditPostModal = ({ onClose, children }: EditPostModalProps) => (
   <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in slide-in-from-bottom-5">
     <div className="bg-gray-200 w-full max-w-2xl rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
       <div className="p-4 border-b flex justify-between items-center">
-        <h3 className="font-bold text-lg">Chỉnh sửa bài viết</h3>
+        <h3 className="font-bold text-black text-lg">Chỉnh sửa bài viết</h3>
         <button onClick={onClose}>
           <X size={24} />
         </button>

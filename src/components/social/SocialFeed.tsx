@@ -136,7 +136,7 @@ export const PostForm = (props: PostFormProps) => {
     <div className="space-y-4">
       <textarea
         placeholder="Chia sẻ suy nghĩ..."
-        className="w-full bg-background p-3 rounded-lg border text-sm resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+        className="w-full  p-3 rounded-lg border text-sm resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={3}
@@ -202,7 +202,9 @@ export const PostForm = (props: PostFormProps) => {
       {shareType === "cashflow" && (
         <div className="mt-4 border rounded-lg p-4 ">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-            <p className="font-semibold text-sm">Dữ liệu dòng tiền</p>
+            <p className="font-semibold text-black text-sm">
+              Dữ liệu dòng tiền
+            </p>
             <div className="flex items-center gap-2 text-sm  p-1.5 rounded border shadow-sm">
               <input
                 type="date"
@@ -230,12 +232,12 @@ export const PostForm = (props: PostFormProps) => {
                 }}
                 className="text-xs text-red-500 hover:underline"
               >
-                Hủy bỏ
+                <X />
               </button>
             )}
           </div>
           {chartData && (
-            <div className="border rounded-lg p-2 bg-background/50 mb-3">
+            <div className="border rounded-lg p-2 bg-background-gray/50 mb-3">
               <Chart
                 options={chartOptions}
                 series={[
@@ -282,7 +284,7 @@ export const PostForm = (props: PostFormProps) => {
                   }}
                   className="text-xs text-red-500 hover:underline"
                 >
-                  Hủy bỏ
+                  <X />
                 </button>
               )}
             </div>
@@ -405,7 +407,7 @@ export const PostItem = (props: PostItemProps) => {
               <MoreVertical size={20} />
             </button>
             {activeMenuId === post.idPost && (
-              <div className="absolute right-0 top-full mt-1 w-32 bg-white dark:bg-gray-800 border rounded-lg shadow-xl z-10 overflow-hidden">
+              <div className="absolute right-0 top-full mt-1 w-32 bg-gray-100 border rounded-lg shadow-xl z-10 overflow-hidden">
                 <button
                   onClick={() => onEdit(post)}
                   className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2"

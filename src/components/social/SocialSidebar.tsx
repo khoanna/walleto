@@ -205,7 +205,7 @@ export const FriendList = ({
             <div
               key={f.idFriendship}
               onClick={() => onChat(friendInfo)}
-              className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition group"
+              className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 cursor-pointer transition group"
             >
               <div className="relative">
                 <UserAvatar url={friendInfo.urlAvatar} />

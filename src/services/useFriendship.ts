@@ -6,7 +6,11 @@ export default function useFriendship() {
   const { authFetch } = useAuthFetch();
 
   // Wrapper để tự động bật/tắt loading
-  const handleRequest = async (url: string, method: string, body?: any) => {
+  const handleRequest = async (
+    url: string,
+    method: string,
+    body?: Record<string, string | boolean>
+  ) => {
     try {
       setFriendshipLoading(true);
       const res = await authFetch(url, {

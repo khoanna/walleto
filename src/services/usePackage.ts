@@ -91,11 +91,34 @@ export default function usePackage() {
       setPackageLoading(false);
     }
   };
+
+  const cancelPackage = async (body: { idUser: string; idPackage: string }) => {
+    try {
+      setPackageLoading(true);
+      const response = await authFetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/payment/cancel-package-for-payment`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        }
+      );
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setPackageLoading(false);
+    }
+  };
   return {
     packageLoading,
     getPackages,
     createPackage,
     updatePackage,
     deletePackage,
+    cancelPackage,
   };
 }

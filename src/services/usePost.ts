@@ -85,11 +85,11 @@ export default function usePost() {
     }
   };
 
-  const getListPostApproved = async () => {
+  const getListPostApproved = async (idUser: string) => {
     try {
       setPostLoading(true);
       const response = await authFetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/post/list-post-approved`,
+        `${process.env.NEXT_PUBLIC_API_URL}/post/list-post-approved?idUser=${idUser}`,
         {
           method: "GET",
           headers: {
@@ -247,11 +247,18 @@ export default function usePost() {
           headers: {
             "Content-Type": "application/json",
           },
+          // GỬI TRỰC TIẾP, KHÔNG BỌC postUpdateRequest
+          body: JSON.stringify({
+            title: body.title,
+            content: body.content,
+            urlImage: body.urlImage || "",
+          }),
         }
       );
       const data = await response.json();
       return data;
     } catch (error) {
+      console.error("Update post error:", error);
       throw error;
     } finally {
       setPostLoading(false);

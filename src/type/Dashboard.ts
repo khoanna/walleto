@@ -6,7 +6,7 @@ export interface FinanceDasboard {
   cryptoPercent: number;
 }
 
-interface Asset {
+export interface Asset {
   idAsset: string;
   id: string;
   assetName: string;
@@ -19,31 +19,31 @@ interface Asset {
 }
 
 export interface Transaction {
-    idTransaction: string;
-    transactionName: string;
-    transactionType: "Thu" | "Chi";
-    amount: number;
-    transactionCategory: string;
-    transactionDate: string;
-    createAt: string;
+  idTransaction: string;
+  transactionName: string;
+  transactionType: "Thu" | "Chi";
+  amount: number;
+  transactionCategory: string;
+  transactionDate: string;
+  createAt: string;
 }
 
 interface BriefTransaction {
-    idTransaction: string;
-    transactionName: string;
-    amount: number;
-    transactionDate: string;
+  idTransaction: string;
+  transactionName: string;
+  amount: number;
+  transactionDate: string;
 }
 
 export interface InvestmentAssetDashboard {
-    data: Asset[];
+  data: Asset[];
 }
 
 export interface TransactionDashboard {
-    data: Transaction[];
+  data: Transaction[];
 }
 
 export interface TransactionThisWeekDashboard {
-    totalTransactionInWeek: number;
-    listBriefTransactionResponses: BriefTransaction[];
+  totalTransactionInWeek: number;
+  listBriefTransactionResponses: BriefTransaction[];
 }

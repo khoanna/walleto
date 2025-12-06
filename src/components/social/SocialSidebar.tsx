@@ -40,10 +40,10 @@ export const UserSearchBox = (props: UserSearchBoxProps) => {
   } = props;
   return (
     <div
-      className="bg-background border p-4 rounded-xl shadow-sm relative"
+      className="bg-background/60 p-4 rounded-xl shadow-lg relative"
       ref={searchRef}
     >
-      <div className="flex items-center gap-2 border rounded-lg px-3 py-2 focus-within:ring-1 focus-within:ring-blue-500">
+      <div className="flex items-center gap-2 rounded-lg px-3 py-2 focus-within:ring-2 focus-within:ring-blue-500 bg">
         <Search size={18} className="text-gray-400" />
         <input
           type="text"
@@ -55,7 +55,7 @@ export const UserSearchBox = (props: UserSearchBoxProps) => {
         />
       </div>
       {showResults && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-background border rounded-lg shadow-xl max-h-60 overflow-y-auto z-10 p-2 space-y-1">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-background rounded-lg shadow-xl max-h-60 overflow-y-auto z-10 p-2 space-y-1">
           {results.length === 0 ? (
             <p className="text-xs text-center text-gray-500 py-2">
               Không tìm thấy
@@ -118,7 +118,7 @@ export const FriendRequestList = ({
   onReject,
   isLoading = false,
 }: FriendRequestListProps) => (
-  <div className="bg-background border p-4 rounded-xl shadow-sm">
+  <div className="bg-background/60 p-4 rounded-xl shadow-lg">
     <h3 className="font-semibold text-sm mb-3">
       Yêu cầu kết bạn <span className="text-blue-600">({requests.length})</span>
     </h3>
@@ -135,7 +135,7 @@ export const FriendRequestList = ({
         requests.map((req) => (
           <div
             key={req.idFriendship}
-            className="flex flex-col gap-2 p-2 border rounded-lg "
+            className="flex flex-col gap-2 p-3 rounded-lg  shadow-sm hover:shadow-md transition-shadow"
           >
             <div className="flex items-center gap-3">
               <UserAvatar url={req.infFriendshipResponse.sender.urlAvatar} />
@@ -184,7 +184,7 @@ export const FriendList = ({
   onDelete,
   isLoading = false,
 }: FriendListProps) => (
-  <div className="bg-background border p-4 rounded-xl shadow-sm">
+  <div className="bg-background/60 p-4 rounded-xl shadow-lg">
     <h3 className="font-semibold mb-3 text-sm">
       Danh sách bạn bè ({friends.length})
     </h3>
@@ -205,7 +205,7 @@ export const FriendList = ({
             <div
               key={f.idFriendship}
               onClick={() => onChat(friendInfo)}
-              className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 cursor-pointer transition group"
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/40 cursor-pointer transition-all shadow-sm hover:shadow-md group"
             >
               <div className="relative">
                 <UserAvatar url={friendInfo.urlAvatar} />

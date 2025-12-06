@@ -23,8 +23,8 @@ export const AssetSelectionModal = ({
   onCancel,
 }: AssetSelectionModalProps) => (
   <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-    <div className="bg-gray-200 w-full max-w-md rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
-      <div className="p-4 border-b flex justify-between items-center  rounded-t-xl">
+    <div className="bg-white dark:bg-[#1C253A] w-full max-w-md rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700/50 flex justify-between items-center rounded-t-xl">
         <h3 className="font-bold">Chọn tài sản chia sẻ</h3>
         <button
           onClick={() => {

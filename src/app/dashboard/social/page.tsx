@@ -553,7 +553,7 @@ export default function SocialPage() {
       {/* LEFT COL */}
       <div className="lg:col-span-8 space-y-6">
         {hasPostPermission && (
-          <div className="bg-background rounded-xl border p-4 space-y-4 relative">
+          <div className="bg-background/70 rounded-xl p-4 space-y-4 relative shadow-md">
             <h3 className="text-sm font-bold text-gray-500">TẠO BÀI VIẾT</h3>
             <PostForm
               content={postContent}

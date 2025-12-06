@@ -46,8 +46,9 @@ export default function FeatureSection() {
           Tích hợp mọi tính năng cần thiết
         </h2>
         <p className="text-gray-400 mt-4 text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
-          Walleto cung cấp đầy đủ các chức năng giúp bạn vừa tiện lợi, vừa dễ dàng
-          trong việc quản lý tài chính, cũng như tiết kiệm chi tiêu của bản thân.
+          Walleto cung cấp đầy đủ các chức năng giúp bạn vừa tiện lợi, vừa dễ
+          dàng trong việc quản lý tài chính, cũng như tiết kiệm chi tiêu của bản
+          thân.
         </p>
       </div>
 
@@ -75,7 +76,9 @@ export default function FeatureSection() {
               <h3 className="text-lg font-semibold mb-2 text-gray-100">
                 {item.title}
               </h3>
-              <p className="text-sm text-gray-400 leading-relaxed">{item.desc}</p>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                {item.desc}
+              </p>
             </div>
           </div>
         ))}
@@ -104,7 +107,9 @@ export default function FeatureSection() {
               <h3 className="text-lg font-semibold mb-2 text-gray-100">
                 {item.title}
               </h3>
-              <p className="text-sm text-gray-400 leading-relaxed">{item.desc}</p>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                {item.desc}
+              </p>
             </div>
           </div>
         ))}

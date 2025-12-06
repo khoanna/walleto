@@ -125,7 +125,7 @@ export const PostForm = (props: PostFormProps) => {
     stroke: { curve: "smooth", width: 2 },
     xaxis: {
       categories: chartData?.map((t) => t.transactionDate) || [],
-      labels: { formatter: (val) => formatDateVN(val) },
+      labels: { formatter: (val: string) => formatDateVN(val) },
     },
     tooltip: {
       x: { formatter: (val) => formatDateVN(new Date(val).toISOString()) },
@@ -374,7 +374,7 @@ export const PostItem = (props: PostItemProps) => {
     stroke: { curve: "smooth", width: 2 },
     xaxis: {
       categories: transactionData?.map((t) => t.transactionDate) || [],
-      labels: { formatter: (val) => formatDateVN(val) },
+      labels: { formatter: (val: string) => formatDateVN(val) },
     },
     tooltip: {
       x: { formatter: (val) => formatDateVN(new Date(val).toISOString()) },

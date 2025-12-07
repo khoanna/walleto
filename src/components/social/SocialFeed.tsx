@@ -125,7 +125,7 @@ export const PostForm = (props: PostFormProps) => {
     stroke: { curve: "smooth", width: 2 },
     xaxis: {
       categories: chartData?.map((t) => t.transactionDate) || [],
-      labels: { formatter: (val) => formatDateVN(val) },
+      labels: { formatter: (val: string) => formatDateVN(val) },
     },
     tooltip: {
       x: { formatter: (val) => formatDateVN(new Date(val).toISOString()) },
@@ -136,7 +136,7 @@ export const PostForm = (props: PostFormProps) => {
     <div className="space-y-4">
       <textarea
         placeholder="Chia sẻ suy nghĩ..."
-        className="w-full  p-3 rounded-lg border text-sm resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+        className="w-full  p-3 rounded-lg border text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={3}
@@ -191,7 +191,7 @@ export const PostForm = (props: PostFormProps) => {
           />
           <button
             onClick={onRemoveImage}
-            className="absolute -top-2 -right-2 bg-white text-red-500 p-1 rounded-full shadow border"
+            className="absolute -top-2 -right-2 bg-white text-red-500 p-1 rounded-full shadow-md"
           >
             <X size={14} />
           </button>
@@ -374,7 +374,7 @@ export const PostItem = (props: PostItemProps) => {
     stroke: { curve: "smooth", width: 2 },
     xaxis: {
       categories: transactionData?.map((t) => t.transactionDate) || [],
-      labels: { formatter: (val) => formatDateVN(val) },
+      labels: { formatter: (val: string) => formatDateVN(val) },
     },
     tooltip: {
       x: { formatter: (val) => formatDateVN(new Date(val).toISOString()) },
@@ -382,7 +382,7 @@ export const PostItem = (props: PostItemProps) => {
   };
 
   return (
-    <div className="bg-background rounded-xl border p-4 shadow-sm hover:shadow-md transition-shadow duration-300 relative group">
+    <div className="bg-background rounded-xl p-4 shadow-sm hover:shadow-lg transition-all duration-300 relative group">
       {/* Header */}
       <div className="flex justify-between items-start mb-3">
         <div className="flex items-center gap-3">
@@ -407,7 +407,7 @@ export const PostItem = (props: PostItemProps) => {
               <MoreVertical size={20} />
             </button>
             {activeMenuId === post.idPost && (
-              <div className="absolute right-0 top-full mt-1 w-32 bg-gray-100 border rounded-lg shadow-xl z-10 overflow-hidden">
+              <div className="absolute right-0 top-full mt-1 w-32 bg-white dark:bg-gray-800 rounded-lg shadow-xl z-10 overflow-hidden">
                 <button
                   onClick={() => onEdit(post)}
                   className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2"
@@ -508,7 +508,7 @@ export const PostItem = (props: PostItemProps) => {
       )}
 
       {/* Footer */}
-      <div className="flex justify-between items-center border-t pt-3 mt-2">
+      <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700/50">
         <div className="flex items-center gap-1 text-yellow-500">
           <Star className="fill-yellow-500 w-4 h-4" />
           <span className="text-sm font-bold">
@@ -543,7 +543,7 @@ export const PostItem = (props: PostItemProps) => {
           </div>
           <div className="flex gap-2">
             <textarea
-              className="flex-1 p-2 border rounded text-sm resize-none"
+              className="flex-1 p-2 rounded text-sm resize-none border-b focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Viết đánh giá..."
               rows={1}
               value={commentText}
@@ -559,7 +559,7 @@ export const PostItem = (props: PostItemProps) => {
         </div>
       )}
       {visibleComments.length > 0 && (
-        <div className="mt-3 pt-2 border-t space-y-3">
+        <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700/50 space-y-3">
           {visibleComments.map((c: EvaluateResponse) => (
             <div key={c.idEvaluate} className="flex gap-2">
               <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex-shrink-0" />

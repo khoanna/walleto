@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import Image from "next/image";
 import useAuth from "@/services/useAuth";
-import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { saveToken } from "@/services/Token";
-import { useUserContext } from "@/context";
+import {Loader2} from "lucide-react";
+import {useRouter} from "next/navigation";
+import {saveToken} from "@/services/Token";
+import {useUserContext} from "@/context";
+import {jwtDecode} from "jwt-decode";
+import {ADMIN_ROLE, ROLE_KEY} from "@/utils/constant";
 
 type AuthMode = "signIn" | "signUp" | "forgot" | "verify" | "reset";
 
@@ -23,8 +25,7 @@ export default function AuthPage() {
         <div
           className={`flex flex-col items-center justify-center w-full lg:w-1/2 px-6 sm:px-8 py-8 lg:py-6 transition-all duration-500 ${
             isLeftDark ? "bg-[#050F24] text-white" : "bg-white text-[#050F24]"
-          }`}
-        >
+          }`}>
           <Image
             src="/logo.png"
             alt="Logo"
@@ -44,8 +45,7 @@ export default function AuthPage() {
               Người mới?{" "}
               <button
                 onClick={() => setMode("signUp")}
-                className="cursor-pointer text-blue-500 hover:underline font-semibold"
-              >
+                className="cursor-pointer text-blue-500 hover:underline font-semibold">
                 Đăng ký ngay
               </button>
             </div>
@@ -56,8 +56,7 @@ export default function AuthPage() {
               Đã có tài khoản?{" "}
               <button
                 onClick={() => setMode("signIn")}
-                className="cursor-pointer text-blue-400 hover:underline font-semibold"
-              >
+                className="cursor-pointer text-blue-400 hover:underline font-semibold">
                 Đăng nhập ngay
               </button>
             </div>
@@ -66,8 +65,7 @@ export default function AuthPage() {
           {(mode === "forgot" || mode === "reset") && (
             <button
               onClick={() => setMode("signIn")}
-              className="cursor-pointer mt-6 sm:mt-10 px-6 py-2.5 border border-white/40 rounded-full text-sm sm:text-base hover:bg-white/10 transition-all duration-300 hover:scale-105"
-            >
+              className="cursor-pointer mt-6 sm:mt-10 px-6 py-2.5 border border-white/40 rounded-full text-sm sm:text-base hover:bg-white/10 transition-all duration-300 hover:scale-105">
               ← Quay lại
             </button>
           )}
@@ -77,26 +75,16 @@ export default function AuthPage() {
         <div
           className={`flex flex-col items-center justify-center w-full lg:w-1/2 px-6 sm:px-10 py-8 lg:py-6 transition-all duration-500 ${
             isLeftDark ? "bg-white text-[#050F24]" : "bg-[#050F24] text-white"
-          }`}
-        >
+          }`}>
           {mode === "signIn" && <SignIn setMode={setMode} />}
 
-          {mode === "signUp" && (
-            <SignUp setMode={setMode} setCurrentEmail={setCurrentEmail} />
-          )}
-          {mode === "verify" && (
-            <VerifyOtp email={currentEmail} setMode={setMode} />
-          )}
+          {mode === "signUp" && <SignUp setMode={setMode} setCurrentEmail={setCurrentEmail} />}
+          {mode === "verify" && <VerifyOtp email={currentEmail} setMode={setMode} />}
 
           {mode === "forgot" && (
-            <ForgotPassword
-              setMode={setMode}
-              setCurrentEmail={setCurrentEmail}
-            />
+            <ForgotPassword setMode={setMode} setCurrentEmail={setCurrentEmail} />
           )}
-          {mode === "reset" && (
-            <ResetPassword setMode={setMode} currentEmail={currentEmail} />
-          )}
+          {mode === "reset" && <ResetPassword setMode={setMode} currentEmail={currentEmail} />}
         </div>
       </div>
     </div>
@@ -142,26 +130,25 @@ const Button = ({
     disabled={loading}
     className="cursor-pointer w-full py-3 sm:py-3.5 mt-2 sm:mt-3 bg-gradient-to-r from-[#081A32] to-[#0B2142] text-white font-semibold rounded-xl 
     shadow-md hover:shadow-xl hover:brightness-110 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed
-    active:scale-95 text-sm sm:text-base"
-  >
+    active:scale-95 text-sm sm:text-base">
     {loading ? <Loader2 className="animate-spin mx-auto" size={20} /> : label}
   </button>
 );
 
 /* ---------------- SIGN IN ---------------- */
-function SignIn({ setMode }: { setMode: (m: AuthMode) => void }) {
+function SignIn({setMode}: {setMode: (m: AuthMode) => void}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { refreshUser } = useUserContext() || {};
+  const {refreshUser} = useUserContext() || {};
 
   const router = useRouter();
 
-  const { login, authLoading } = useAuth();
+  const {login, authLoading} = useAuth();
   const userContext = useUserContext();
-  const { setUser } = userContext || {};
+  const {setUser} = userContext || {};
 
-  const { refresh } = useAuth();
+  const {refresh} = useAuth();
 
   const fetchToken = async () => {
     try {
@@ -169,7 +156,12 @@ function SignIn({ setMode }: { setMode: (m: AuthMode) => void }) {
       const token = data?.data?.token;
       saveToken(token);
       setUser?.(data?.data?.infUser);
-      router.push("/dashboard");
+      const decodedToken = jwtDecode(token) as unknown as {[ROLE_KEY]: string};
+      if (decodedToken[ROLE_KEY] !== ADMIN_ROLE) {
+        router.push("/dashboard");
+        return;
+      }
+      router.push("/admin");
     } catch (error) {
       setUser?.(undefined);
     }
@@ -181,14 +173,23 @@ function SignIn({ setMode }: { setMode: (m: AuthMode) => void }) {
 
   const handleLogin = async () => {
     try {
-      const data = await login({ email, password });
+      const data = await login({email, password});
       saveToken(data?.data?.token);
       setUser?.(data?.data?.infUser);
+      const decodedToken = jwtDecode(data?.data?.token) as unknown as {[ROLE_KEY]: string};
+      if (decodedToken[ROLE_KEY] !== ADMIN_ROLE) {
+        setEmail("");
+        setPassword("");
+        setError("");
+        await refreshUser?.();
+        router.push("/dashboard");
+        return;
+      }
       setEmail("");
       setPassword("");
       setError("");
       await refreshUser?.();
-      router.push("/dashboard");
+      router.push("/admin");
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
@@ -204,23 +205,12 @@ function SignIn({ setMode }: { setMode: (m: AuthMode) => void }) {
       <p className="text-sm opacity-80 mb-6">
         Vui lòng nhập thông tin xác thực của bạn để đăng nhập
       </p>
-      <Input
-        placeholder="Email"
-        type="email"
-        value={email}
-        onChange={setEmail}
-      />
-      <Input
-        placeholder="Mật khẩu"
-        type="password"
-        value={password}
-        onChange={setPassword}
-      />
+      <Input placeholder="Email" type="email" value={email} onChange={setEmail} />
+      <Input placeholder="Mật khẩu" type="password" value={password} onChange={setPassword} />
       {error && <p className="text-xs text-red-500 mb-2">{error}</p>}
       <p
         className="text-xs opacity-80 mb-2 cursor-pointer hover:underline"
-        onClick={() => setMode("forgot")}
-      >
+        onClick={() => setMode("forgot")}>
         Quên mật khẩu?
       </p>
       <Button label="Đăng nhập" onClick={handleLogin} loading={authLoading} />
@@ -242,14 +232,13 @@ function SignUp({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
 
-  const { register, authLoading } = useAuth();
+  const {register, authLoading} = useAuth();
 
   const handleSignup = async () => {
     try {
       if (password !== confirmPassword) throw new Error("Mật khẩu không khớp");
-      if (password.length < 6)
-        throw new Error("Mật khẩu phải có ít nhất 6 ký tự");
-      await register({ name, email, password, confirmPassword });
+      if (password.length < 6) throw new Error("Mật khẩu phải có ít nhất 6 ký tự");
+      await register({name, email, password, confirmPassword});
 
       setName("");
       setEmail("");
@@ -273,18 +262,8 @@ function SignUp({
       <h2 className="text-2xl font-bold mb-2">Đăng ký</h2>
       <p className="text-sm opacity-80 mb-6">Nhập thông tin để đăng ký.</p>
       <Input placeholder="Tên" value={name} onChange={setName} />
-      <Input
-        placeholder="Email"
-        type="email"
-        value={email}
-        onChange={setEmail}
-      />
-      <Input
-        placeholder="Mật khẩu"
-        type="password"
-        value={password}
-        onChange={setPassword}
-      />
+      <Input placeholder="Email" type="email" value={email} onChange={setEmail} />
+      <Input placeholder="Mật khẩu" type="password" value={password} onChange={setPassword} />
       <Input
         placeholder="Xác nhận mật khẩu"
         type="password"
@@ -307,7 +286,7 @@ function ForgotPassword({
 }) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
-  const { forgotPassword, authLoading } = useAuth();
+  const {forgotPassword, authLoading} = useAuth();
 
   const handleForgotPassword = async () => {
     try {
@@ -328,36 +307,19 @@ function ForgotPassword({
   return (
     <div className="w-full max-w-sm text-center">
       <h2 className="text-2xl font-bold mb-2">Quên mật khẩu</h2>
-      <p className="text-sm opacity-80 mb-6">
-        Vui lòng nhập email để đặt lại mật khẩu
-      </p>
-      <Input
-        placeholder="Email"
-        type="email"
-        value={email}
-        onChange={setEmail}
-      />
+      <p className="text-sm opacity-80 mb-6">Vui lòng nhập email để đặt lại mật khẩu</p>
+      <Input placeholder="Email" type="email" value={email} onChange={setEmail} />
       {error && <p className="text-xs text-red-500 mb-2">{error}</p>}
-      <Button
-        label="QUÊN MẬT KHẨU"
-        onClick={handleForgotPassword}
-        loading={authLoading}
-      />
+      <Button label="QUÊN MẬT KHẨU" onClick={handleForgotPassword} loading={authLoading} />
     </div>
   );
 }
 
 /* ---------------- VERIFY OTP ---------------- */
-function VerifyOtp({
-  email,
-  setMode,
-}: {
-  email?: string;
-  setMode: (m: AuthMode) => void;
-}) {
+function VerifyOtp({email, setMode}: {email?: string; setMode: (m: AuthMode) => void}) {
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
-  const { confirmOTPRegister, authLoading } = useAuth();
+  const {confirmOTPRegister, authLoading} = useAuth();
 
   const handleVerify = async () => {
     if (!email) return;
@@ -399,22 +361,15 @@ function ResetPassword({
   const [error, setError] = useState("");
   const [otp, setOtp] = useState("");
 
-  const { confirmOTPForgotPassword, authLoading } = useAuth();
+  const {confirmOTPForgotPassword, authLoading} = useAuth();
 
   const handleReset = async () => {
     try {
-      if (newPassword !== confirmPassword)
-        throw new Error("Mật khẩu không khớp");
-      if (newPassword.length < 6)
-        throw new Error("Mật khẩu phải có ít nhất 6 ký tự");
+      if (newPassword !== confirmPassword) throw new Error("Mật khẩu không khớp");
+      if (newPassword.length < 6) throw new Error("Mật khẩu phải có ít nhất 6 ký tự");
       if (!currentEmail) throw new Error("Email không hợp lệ");
       if (!otp) throw new Error("Vui lòng nhập OTP");
-      await confirmOTPForgotPassword(
-        currentEmail,
-        otp.trim(),
-        newPassword,
-        confirmPassword
-      );
+      await confirmOTPForgotPassword(currentEmail, otp.trim(), newPassword, confirmPassword);
       setNewPassword("");
       setConfirmPassword("");
       setOtp("");

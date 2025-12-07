@@ -13,12 +13,15 @@ import {
   X,
   Star,
   Crown,
+  Shield,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import useAuth from "@/services/useAuth";
 import { useUserContext } from "@/context";
+import { getToken } from "@/services/Token";
+import { decodeJWT } from "@/services/JwtDecoder";
 
 // Interface riêng cho Context (chỉ cần 3 field)
 interface ContextUser {
@@ -61,10 +64,17 @@ const NAV: Item[] = [
     href: "/dashboard/social",
     icon: <Share2 className="size-5 text-yellow-400" />,
   },
+  {
+    label: "Admin",
+    href: "/admin",
+    icon: <Shield className="size-5 text-red-400" />,
+  },
   { label: "Đăng xuất", href: "", icon: <LogOut className="size-5" /> },
 ];
 
 const WIDTH = 260;
+const ROLE_KEY = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
+const ADMIN_ROLE = "ADMIN";
 
 export default function Sidebar() {
   const activePath = usePathname();
@@ -72,6 +82,7 @@ export default function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const context = useUserContext();
   const userInfo = context?.user; // ← Kiểu: ContextUser | undefined
@@ -79,6 +90,16 @@ export default function Sidebar() {
 
   useEffect(() => setMounted(true), []);
   const isDark = mounted && resolvedTheme === "dark";
+
+  // Check admin role
+  useEffect(() => {
+    const token = getToken();
+    if (token) {
+      const decoded = decodeJWT(token);
+      const role = decoded?.[ROLE_KEY];
+      setIsAdmin(role === ADMIN_ROLE);
+    }
+  }, []);
 
   const { logout } = useAuth();
 
@@ -91,6 +112,10 @@ export default function Sidebar() {
     // Nếu là Mạng xã hội, kiểm tra quyền SOCIAL_NETWORK
     if (item.label === "Mạng xã hội") {
       return permissions?.includes("SOCIAL_NETWORK") ?? false;
+    }
+    // Nếu là Admin, kiểm tra role
+    if (item.label === "Admin") {
+      return isAdmin;
     }
     // Items khác luôn hiển thị
     return true;

@@ -8,4 +8,6 @@ export default interface User {
   totalAmount: number;
   urlAvatar: string | null;
   createAt?: string;
+  isActive?: boolean;
+  role?: string;
 }

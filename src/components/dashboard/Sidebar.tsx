@@ -22,6 +22,7 @@ import useAuth from "@/services/useAuth";
 import { useUserContext } from "@/context";
 import { getToken } from "@/services/Token";
 import { decodeJWT } from "@/services/JwtDecoder";
+import NotificationBell from "./NotificationBell";
 
 // Interface riêng cho Context (chỉ cần 3 field)
 interface ContextUser {
@@ -171,9 +172,15 @@ export default function Sidebar() {
         ].join(" ")}
         aria-label="Sidebar"
       >
-        {/* Brand + Theme */}
+        {/* Brand + Theme + Notification */}
         <div className="flex text-xl sm:text-2xl mb-6 sm:mb-8 items-center justify-center gap-3 sm:gap-4 pt-12 lg:pt-0">
           <div className="font-semibold tracking-wide">Walleto</div>
+          
+          {/* Notification Bell */}
+          {userInfo?.idUser && (
+            <NotificationBell idUser={userInfo.idUser} />
+          )}
+          
           {mounted ? (
             <button
               onClick={() => setTheme(isDark ? "light" : "dark")}

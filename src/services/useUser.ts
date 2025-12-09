@@ -1,11 +1,11 @@
 // services/useUser.ts (Giả sử đường dẫn)
 
-import { useState } from "react";
+import {useState} from "react";
 import useAuthFetch from "./useAuthFetch";
 
 export default function useUser() {
   const [userLoading, setUserLoading] = useState(false);
-  const { authFetch } = useAuthFetch();
+  const {authFetch} = useAuthFetch();
 
   const getUserProfile = async (idUser: string) => {
     try {
@@ -28,12 +28,9 @@ export default function useUser() {
   const getAllUsers = async () => {
     try {
       setUserLoading(true);
-      const response = await authFetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/user/all-users`,
-        {
-          method: "GET",
-        }
-      );
+      const response = await authFetch(`${process.env.NEXT_PUBLIC_API_URL}/user/all-users`, {
+        method: "GET",
+      });
       const data = await response.json();
       return data;
     } catch (error) {
@@ -41,20 +38,17 @@ export default function useUser() {
     } finally {
       setUserLoading(false);
     }
-  }; // 🔽 HÀM MỚI ĐƯỢC THÊM VÀO 🔽
+  };
 
   const uploadAvatar = async (file: File): Promise<string> => {
     const form = new FormData();
     form.append("file", file);
 
     try {
-      const res = await authFetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/cloud-image/upload-image`,
-        {
-          method: "POST",
-          body: form,
-        }
-      );
+      const res = await authFetch(`${process.env.NEXT_PUBLIC_API_URL}/cloud-image/upload-image`, {
+        method: "POST",
+        body: form,
+      });
 
       // Kiểm tra status trước khi parse JSON
       if (!res.ok) {
@@ -74,7 +68,6 @@ export default function useUser() {
       throw err; // để handleSave bắt được
     }
   };
-  // 🔼 KẾT THÚC HÀM MỚI 🔼
 
   const CreateUser = async (body: {
     name: string;
@@ -88,16 +81,13 @@ export default function useUser() {
   }) => {
     try {
       setUserLoading(true);
-      const response = await authFetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/user/add-user`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(body),
-        }
-      );
+      const response = await authFetch(`${process.env.NEXT_PUBLIC_API_URL}/user/add-user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
       const data = await response.json();
       return data;
     } catch (error) {
@@ -151,7 +141,25 @@ export default function useUser() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ idUser }),
+          body: JSON.stringify({idUser}),
+        }
+      );
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setUserLoading(false);
+    }
+  };
+
+  const banOrUnbanUser = async (idUser: string) => {
+    try {
+      setUserLoading(true);
+      const response = await authFetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/user/delete-or-restore-user?idUser=${idUser}`,
+        {
+          method: "PATCH",
         }
       );
       const data = await response.json();
@@ -166,10 +174,11 @@ export default function useUser() {
   return {
     getUserProfile,
     getAllUsers,
-    uploadAvatar, // <-- Export hàm mới
+    uploadAvatar,
     CreateUser,
     updateUser,
     deleteUser,
     userLoading,
+    banOrUnbanUser,
   };
 }

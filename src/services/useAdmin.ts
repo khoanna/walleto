@@ -45,6 +45,44 @@ export const useAdmin = () => {
     }
   };
 
+  // Get all approved posts for admin (without idUser filter)
+  const getAllApprovedPosts = async (): Promise<SocialApiResponse<Post[]>> => {
+    setApproveLoading(true);
+    try {
+      const response = await authFetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/post/list-post-approved`,
+        {
+          method: "GET",
+        }
+      );
+      const data: SocialApiResponse<Post[]> = await response.json();
+      return data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setApproveLoading(false);
+    }
+  };
+
+  // Get all posts for admin (with idUser to see all posts)
+  const getAllPosts = async (idUser: string): Promise<SocialApiResponse<Post[]>> => {
+    setApproveLoading(true);
+    try {
+      const response = await authFetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/post/list-post-approved?idUser=${idUser}`,
+        {
+          method: "GET",
+        }
+      );
+      const data: SocialApiResponse<Post[]> = await response.json();
+      return data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setApproveLoading(false);
+    }
+  };
+
   const getListPostNotApproved = async (): Promise<
     SocialApiResponse<Post[]>
   > => {
@@ -244,6 +282,8 @@ export const useAdmin = () => {
   return {
     getListPostNotApproved,
     getListPosApproved,
+    getAllApprovedPosts,
+    getAllPosts,
     approvePost,
     rejectPost,
     approveLoading,

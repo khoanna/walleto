@@ -172,7 +172,7 @@ export const FriendRequestList = ({
 interface FriendListProps {
   friends: FriendshipData[];
   getFriendInfo: (f: FriendshipData) => UserInfo | null;
-  onChat: (u: UserInfo) => void;
+  onChat: (u: UserInfo, idFriendship: string) => void;
   onDelete: (id: string, name: string) => void;
   isLoading?: boolean;
 }
@@ -204,7 +204,7 @@ export const FriendList = ({
           return (
             <div
               key={f.idFriendship}
-              onClick={() => onChat(friendInfo)}
+              onClick={() => onChat(friendInfo, f.idFriendship)}
               className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/40 cursor-pointer transition-all shadow-sm hover:shadow-md group"
             >
               <div className="relative">

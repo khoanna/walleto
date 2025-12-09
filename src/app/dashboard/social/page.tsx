@@ -107,7 +107,7 @@ export default function SocialPage() {
   >({});
 
   const [posts, setPosts] = useState<Post[]>([]);
-  const [currentChat, setCurrentChat] = useState<UserInfo | null>(null);
+  const [currentChat, setCurrentChat] = useState<{ user: UserInfo; idFriendship: string } | null>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [allUsers, setAllUsers] = useState<UserInfo[]>([]);
@@ -270,7 +270,7 @@ export default function SocialPage() {
         p.filter((f) => f.idFriendship !== friendToDelete.idFriendship)
       );
       await fetchFriendData();
-      if (currentChat?.name === friendToDelete.name) setCurrentChat(null);
+      if (currentChat?.user?.name === friendToDelete.name) setCurrentChat(null);
       setFriendToDelete(null);
     } else alert("Xóa thất bại!");
   };
@@ -647,7 +647,7 @@ export default function SocialPage() {
         <FriendList
           friends={myFriends}
           getFriendInfo={getFriendInfo}
-          onChat={setCurrentChat}
+          onChat={(u, idFriendship) => setCurrentChat({ user: u, idFriendship })}
           onDelete={(id: string, name: string) =>
             setFriendToDelete({ idFriendship: id, name })
           }
@@ -728,7 +728,11 @@ export default function SocialPage() {
         />
       )}
       {currentChat && (
-        <ChatPopup user={currentChat} onClose={() => setCurrentChat(null)} />
+        <ChatPopup 
+          user={currentChat.user} 
+          idFriendship={currentChat.idFriendship}
+          onClose={() => setCurrentChat(null)} 
+        />
       )}
     </div>
   );

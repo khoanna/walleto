@@ -41,14 +41,14 @@ export const UserAvatar = ({
     return (
       <img
         src={url}
-        className={`${size} rounded-full object-cover border bg-gray-100`}
+        className={`${size} rounded-full object-cover bg-gray-100`}
         alt="Avatar"
       />
     );
   }
   return (
     <div
-      className={`${size} rounded-full bg-gray-200 dark:bg-gray-700 border flex items-center justify-center text-gray-500 dark:text-gray-400`}
+      className={`${size} rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400`}
     >
       <User size={iconSize} />
     </div>
@@ -136,7 +136,7 @@ export const PostForm = (props: PostFormProps) => {
     <div className="space-y-4">
       <textarea
         placeholder="Chia sẻ suy nghĩ..."
-        className="w-full  p-3 rounded-lg border text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full p-3 rounded-lg bg-foreground text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={3}
@@ -186,12 +186,12 @@ export const PostForm = (props: PostFormProps) => {
         <div className="mt-3 relative w-40">
           <img
             src={selectedImage}
-            className="rounded-lg shadow-sm border"
+            className="rounded-lg shadow-sm"
             alt="preview"
           />
           <button
             onClick={onRemoveImage}
-            className="absolute -top-2 -right-2 bg-white text-red-500 p-1 rounded-full shadow-md"
+            className="absolute -top-2 -right-2 bg-white dark:bg-gray-800 text-red-500 p-1 rounded-full shadow-md"
           >
             <X size={14} />
           </button>
@@ -200,12 +200,12 @@ export const PostForm = (props: PostFormProps) => {
 
       {/* Cashflow Section - ĐÃ FIX LỖI HỦY */}
       {shareType === "cashflow" && (
-        <div className="mt-4 border rounded-lg p-4 ">
+        <div className="mt-4 bg-foreground rounded-xl p-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-            <p className="font-semibold text-black text-sm">
+            <p className="font-semibold text-sm">
               Dữ liệu dòng tiền
             </p>
-            <div className="flex items-center gap-2 text-sm  p-1.5 rounded border shadow-sm">
+            <div className="flex items-center gap-2 text-sm bg-background p-1.5 rounded-lg shadow-sm">
               <input
                 type="date"
                 value={dateFilter.from}
@@ -237,7 +237,7 @@ export const PostForm = (props: PostFormProps) => {
             )}
           </div>
           {chartData && (
-            <div className="border rounded-lg p-2 bg-background-gray/50 mb-3">
+            <div className="rounded-xl p-2 bg-background mb-3">
               <Chart
                 options={chartOptions}
                 series={[
@@ -264,7 +264,7 @@ export const PostForm = (props: PostFormProps) => {
 
       {/* Portfolio Section */}
       {shareType === "portfolio" && assetData && (
-        <div className="mt-4 border rounded-lg p-4 ">
+        <div className="mt-4 bg-foreground rounded-xl p-4">
           <div className="flex justify-between items-center mb-2">
             <p className="font-semibold text-sm">
               Danh mục ({assetData.length} coin)
@@ -293,7 +293,7 @@ export const PostForm = (props: PostFormProps) => {
             {assetData.map((a) => (
               <div
                 key={a.assetSymbol}
-                className="flex items-center gap-1  border px-2 py-1 rounded text-xs"
+                className="flex items-center gap-1 bg-background px-2 py-1 rounded-lg text-xs shadow-sm"
               >
                 <img
                   src={a.url}
@@ -433,14 +433,14 @@ export const PostItem = (props: PostItemProps) => {
       {post.urlImage && (
         <img
           src={post.urlImage}
-          className="w-full h-auto max-h-96 object-cover rounded-lg border mb-3"
+          className="w-full h-auto max-h-96 object-cover rounded-xl mb-3"
           alt="content"
         />
       )}
 
       {/* Chart */}
       {transactionData && transactionData.length > 0 && (
-        <div className="border rounded-lg p-2 bg-background/50 mb-3">
+        <div className="rounded-xl p-2 bg-foreground mb-3">
           <Chart
             options={chartOptions}
             series={[
@@ -465,9 +465,9 @@ export const PostItem = (props: PostItemProps) => {
 
       {/* Asset Table */}
       {assetData && assetData.length > 0 && (
-        <div className="overflow-x-auto border rounded-lg mb-3">
+        <div className="overflow-x-auto rounded-xl mb-3 bg-foreground">
           <table className="w-full text-sm">
-            <thead className="text-gray-200 bg-gray-100 dark:bg-gray-800">
+            <thead className="text-text bg-background">
               <tr>
                 <th className="text-left p-2 pl-3">Token</th>
                 <th className="text-right p-2">Price</th>
@@ -478,7 +478,7 @@ export const PostItem = (props: PostItemProps) => {
               {assetData.map((a, i) => (
                 <tr
                   key={i}
-                  className="border-t hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                  className="hover:bg-background/50"
                 >
                   <td className="p-2 pl-3 flex items-center gap-2">
                     <img
@@ -543,7 +543,7 @@ export const PostItem = (props: PostItemProps) => {
           </div>
           <div className="flex gap-2">
             <textarea
-              className="flex-1 p-2 rounded text-sm resize-none border-b focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 p-2 rounded-lg bg-foreground text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Viết đánh giá..."
               rows={1}
               value={commentText}
@@ -551,7 +551,7 @@ export const PostItem = (props: PostItemProps) => {
             />
             <button
               onClick={onSubmitComment}
-              className="bg-blue-600 text-white px-3 rounded text-sm font-medium"
+              className="bg-blue-600 text-white px-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition"
             >
               Gửi
             </button>

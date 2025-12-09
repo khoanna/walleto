@@ -41,7 +41,8 @@ export const UserContextProvider = ({
       const token = data?.data?.token;
       saveToken(token);
       setUser(data?.data?.infUser);
-
+      console.log("User info:", data?.data?.infUser);
+      
       // Decode token to extract permissions
       if (token) {
         const decoded = decodeJWT(token);

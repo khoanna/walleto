@@ -1,8 +1,19 @@
+// components/home/Feature.tsx
+"use client";
+
 import React from "react";
 import Image from "next/image";
+import { motion, Variants, Transition } from "framer-motion";
+
+interface FeatureItem {
+  title: string;
+  desc: string;
+  img: string;
+  height: number;
+}
 
 export default function FeatureSection() {
-  const topFeatures = [
+  const topFeatures: FeatureItem[] = [
     {
       title: "Trực quan giao diện",
       desc: "Với những thông tin cần thiết, và những biểu đồ giúp bạn dễ xử lý thông tin.",
@@ -23,7 +34,7 @@ export default function FeatureSection() {
     },
   ];
 
-  const bottomFeatures = [
+  const bottomFeatures: FeatureItem[] = [
     {
       title: "Mục tiêu tiết kiệm",
       desc: "Tạo những mục tiêu chi tiêu để quản lý tài chính tốt hơn.",
@@ -38,25 +49,78 @@ export default function FeatureSection() {
     },
   ];
 
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.3,
+      },
+    },
+  };
+
+  const itemVariants: Variants = {
+    hidden: { y: 30, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 15,
+      },
+    },
+  };
+
+  const cardHoverTransition: Transition = {
+    type: "spring",
+    stiffness: 300,
+    damping: 20,
+  };
+
   return (
     <section className="w-full bg-[#050F24] text-white py-24 px-6 md:px-20">
       {/* ===== Title + Description ===== */}
-      <div className="max-w-4xl mx-auto text-center mb-20">
+      <motion.div
+        className="max-w-4xl mx-auto text-center mb-20"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.5 }}
+        transition={{ duration: 0.6 }}
+      >
         <h2 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-gray-100 via-gray-200 to-gray-500 tracking-tight">
           Tích hợp mọi tính năng cần thiết
         </h2>
-        <p className="text-gray-400 mt-4 text-sm md:text-base leading-relaxed max-w-2xl mx-auto">
+        <motion.p
+          className="text-gray-400 mt-4 text-sm md:text-base leading-relaxed max-w-2xl mx-auto"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+        >
           Walleto cung cấp đầy đủ các chức năng giúp bạn vừa tiện lợi, vừa dễ
           dàng trong việc quản lý tài chính, cũng như tiết kiệm chi tiêu của bản
           thân.
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
 
       {/* ===== Top Features ===== */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20"
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+      >
         {topFeatures.map((item, i) => (
-          <div
+          <motion.div
             key={i}
+            variants={itemVariants}
+            whileHover={{
+              scale: 1.03,
+              transition: cardHoverTransition,
+            }}
             className="group bg-[#0C162C]/80 border border-white/10 rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(255,255,255,0.03)] hover:shadow-[0_0_25px_rgba(255,255,255,0.07)] transition-all duration-500 hover:-translate-y-1"
           >
             <div
@@ -69,26 +133,41 @@ export default function FeatureSection() {
                 width={400}
                 height={item.height}
                 className="object-contain max-h-full transition-transform duration-500 group-hover:scale-105"
-                priority
+                priority={i < 2} // Prioritize first 2 images
               />
             </div>
             <div className="p-6">
-              <h3 className="text-lg font-semibold mb-2 text-gray-100">
+              <motion.h3
+                className="text-lg font-semibold mb-2 text-gray-100"
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
                 {item.title}
-              </h3>
+              </motion.h3>
               <p className="text-sm text-gray-400 leading-relaxed">
                 {item.desc}
               </p>
             </div>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {/* ===== Bottom Features ===== */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-2 gap-8"
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+      >
         {bottomFeatures.map((item, i) => (
-          <div
+          <motion.div
             key={i}
+            variants={itemVariants}
+            whileHover={{
+              scale: 1.03,
+              transition: cardHoverTransition,
+            }}
             className="group bg-[#0C162C]/80 border border-white/10 rounded-2xl overflow-hidden shadow-[0_0_20px_rgba(255,255,255,0.03)] hover:shadow-[0_0_25px_rgba(255,255,255,0.07)] transition-all duration-500 hover:-translate-y-1"
           >
             <div
@@ -104,16 +183,20 @@ export default function FeatureSection() {
               />
             </div>
             <div className="p-6">
-              <h3 className="text-lg font-semibold mb-2 text-gray-100">
+              <motion.h3
+                className="text-lg font-semibold mb-2 text-gray-100"
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
                 {item.title}
-              </h3>
+              </motion.h3>
               <p className="text-sm text-gray-400 leading-relaxed">
                 {item.desc}
               </p>
             </div>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </section>
   );
 }

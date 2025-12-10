@@ -136,7 +136,7 @@ export const PostForm = (props: PostFormProps) => {
     <div className="space-y-4">
       <textarea
         placeholder="Chia sẻ suy nghĩ..."
-        className="w-full p-3 rounded-lg bg-foreground text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full p-3 border-1 rounded-lg bg-foreground text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={3}
@@ -202,9 +202,7 @@ export const PostForm = (props: PostFormProps) => {
       {shareType === "cashflow" && (
         <div className="mt-4 bg-foreground rounded-xl p-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-            <p className="font-semibold text-sm">
-              Dữ liệu dòng tiền
-            </p>
+            <p className="font-semibold text-sm">Dữ liệu dòng tiền</p>
             <div className="flex items-center gap-2 text-sm bg-background p-1.5 rounded-lg shadow-sm">
               <input
                 type="date"
@@ -476,10 +474,7 @@ export const PostItem = (props: PostItemProps) => {
             </thead>
             <tbody>
               {assetData.map((a, i) => (
-                <tr
-                  key={i}
-                  className="hover:bg-background/50"
-                >
+                <tr key={i} className="hover:bg-background/50">
                   <td className="p-2 pl-3 flex items-center gap-2">
                     <img
                       src={a.url}

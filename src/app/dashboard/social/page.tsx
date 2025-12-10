@@ -39,6 +39,9 @@ import {
   ChatPopup,
 } from "@/components/social/SocialModals";
 
+// Icons cho Tab Mobile
+import { Newspaper, Users } from "lucide-react";
+
 export default function SocialPage() {
   const context = useUserContext();
   const user = context?.user;
@@ -71,6 +74,9 @@ export default function SocialPage() {
   } = useFriendship();
 
   // --- STATE ---
+  // State quản lý Tab trên Mobile (Mặc định là Feed)
+  const [mobileTab, setMobileTab] = useState<"feed" | "friends">("feed");
+
   const [postContent, setPostContent] = useState<string>("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -107,7 +113,10 @@ export default function SocialPage() {
   >({});
 
   const [posts, setPosts] = useState<Post[]>([]);
-  const [currentChat, setCurrentChat] = useState<{ user: UserInfo; idFriendship: string } | null>(null);
+  const [currentChat, setCurrentChat] = useState<{
+    user: UserInfo;
+    idFriendship: string;
+  } | null>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [allUsers, setAllUsers] = useState<UserInfo[]>([]);
@@ -127,7 +136,6 @@ export default function SocialPage() {
   // --- LOGIC FUNCTIONS (Hoisted & Typed) ---
   const fetchPosts = async () => {
     if (user?.idUser) {
-      // Ép kiểu response về ApiResponse<Post[]>
       const r = (await getListPostApproved(user.idUser)) as ApiResponse<Post[]>;
       if (r?.success) setPosts(r.data);
     }
@@ -277,7 +285,6 @@ export default function SocialPage() {
 
   const loadRawTransactions = async () => {
     if (!user?.idUser) return [];
-    // Giả sử API trả về { data: { expenseList: Transaction[] } }
     const res = (await getListTransaction(user.idUser)) as ApiResponse<{
       expenseList: Transaction[];
     }>;
@@ -287,7 +294,6 @@ export default function SocialPage() {
 
   const loadRawAssets = async () => {
     if (!user?.idUser) return [];
-    // Giả sử API trả về { data: Asset[] }
     const res = (await getInvesmentAsset(user.idUser)) as ApiResponse<Asset[]>;
     setPendingAssets(res.data || []);
     return res.data || [];
@@ -347,17 +353,16 @@ export default function SocialPage() {
 
   const handleSharePortfolio = async () => {
     if (!user?.idUser) return alert("Chưa đăng nhập!");
-    const list = await loadRawAssets(); // Chờ tải danh sách tài sản
+    const list = await loadRawAssets();
     if (!list.length) {
       alert("Chưa có danh mục!");
-      return; // Thoát nếu không có dữ liệu
+      return;
     }
-    // Đảm bảo pendingAssets được cập nhật trước khi mở modal
     setPendingAssets(list);
-    setSelectedAssetIds(new Set()); // Reset danh sách đã chọn
-    setIsSelectingAssets(true); // Mở modal
+    setSelectedAssetIds(new Set());
+    setIsSelectingAssets(true);
     setShareType("portfolio");
-    setShareChartData(null); // Reset dữ liệu dòng tiền
+    setShareChartData(null);
   };
 
   const confirmAssetSelection = () => {
@@ -441,11 +446,9 @@ export default function SocialPage() {
   };
 
   const handleEditPost = async (post: Post) => {
-    // Reset form state first
     setSelectedFile(null);
     setSelectedAssetIds(new Set());
 
-    // Set post content FIRST before opening modal
     setPostContent(post.content || post.title || "");
     setSelectedImage(post.urlImage || null);
     setEditingPost(post);
@@ -514,7 +517,6 @@ export default function SocialPage() {
         investmentAssetOfPost: shareAssetData,
       });
     } else {
-      // Đây là post thường → gọi updatePost
       res = await updatePost(editingPost.idPost, {
         title: finalTitle,
         content: finalContent,
@@ -549,12 +551,180 @@ export default function SocialPage() {
 
   // --- RENDER ---
   return (
-    <div className="min-h-screen p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4">
-      {/* LEFT COL */}
-      <div className="lg:col-span-8 space-y-6">
-        {hasPostPermission && (
-          <div className="bg-background/70 rounded-xl p-4 space-y-4 relative shadow-md">
-            <h3 className="text-sm font-bold text-gray-500">TẠO BÀI VIẾT</h3>
+    <div className="min-h-screen p-4 sm:p-6">
+      {/* TAB SWITCHER - MOBILE ONLY */}
+      <div className="lg:hidden mb-6">
+        <div className="flex p-1 bg-gray-200 dark:bg-gray-800 rounded-xl shadow-inner">
+          <button
+            onClick={() => setMobileTab("feed")}
+            className={`flex-1 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
+              mobileTab === "feed"
+                ? "bg-white dark:bg-gray-700 text-blue-600 shadow-sm"
+                : "text-gray-500 hover:text-gray-700 dark:text-gray-400"
+            }`}
+          >
+            <Newspaper size={16} /> Bảng tin
+          </button>
+          <button
+            onClick={() => setMobileTab("friends")}
+            className={`flex-1 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
+              mobileTab === "friends"
+                ? "bg-white dark:bg-gray-700 text-blue-600 shadow-sm"
+                : "text-gray-500 hover:text-gray-700 dark:text-gray-400"
+            }`}
+          >
+            <Users size={16} /> Bạn bè & Tìm kiếm
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* LEFT COL: FEED */}
+        <div
+          className={`lg:col-span-8 space-y-6 ${
+            mobileTab === "feed" ? "block" : "hidden lg:block"
+          }`}
+        >
+          {hasPostPermission && (
+            <div className="bg-background/70 rounded-xl p-4 space-y-4 relative shadow-md">
+              <h3 className="text-sm font-bold text-gray-500">TẠO BÀI VIẾT</h3>
+              <PostForm
+                content={postContent}
+                setContent={setPostContent}
+                selectedImage={selectedImage}
+                onImageUpload={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const f = e.target.files?.[0];
+                  if (f) {
+                    setSelectedFile(f);
+                    setSelectedImage(URL.createObjectURL(f));
+                  }
+                }}
+                onRemoveImage={() => {
+                  setSelectedImage(null);
+                  setSelectedFile(null);
+                }}
+                shareType={shareType}
+                setShareType={setShareType}
+                chartData={shareChartData}
+                setChartData={setShareChartData}
+                assetData={shareAssetData}
+                setAssetData={setShareAssetData}
+                dateFilter={dateFilter}
+                setDateFilter={setDateFilter}
+                onShareCashflow={handleShareCashflow}
+                onSharePortfolio={handleSharePortfolio}
+                onSelectAssets={() => setIsSelectingAssets(true)}
+                onSubmit={handleSubmitPost}
+                isLoading={postLoading}
+                isEditMode={false}
+              />
+            </div>
+          )}
+          <div className="space-y-6">
+            {posts.map((post) => (
+              <PostItem
+                key={post.idPost}
+                post={post}
+                currentUserId={user?.idUser}
+                onEdit={handleEditPost}
+                onDelete={handleDeletePost}
+                activeMenuId={activeMenuPostId}
+                toggleMenu={setActiveMenuPostId}
+                showCommentBox={showCommentBox === post.idPost}
+                toggleCommentBox={() =>
+                  setShowCommentBox(
+                    showCommentBox === post.idPost ? null : post.idPost
+                  )
+                }
+                starRating={starRating[post.idPost] || 5}
+                setStarRating={(v: number) =>
+                  setStarRating({ ...starRating, [post.idPost]: v })
+                }
+                commentText={commentText[post.idPost] || ""}
+                setCommentText={(v: string) =>
+                  setCommentText({ ...commentText, [post.idPost]: v })
+                }
+                onSubmitComment={() => handleEvaluate(post.idPost)}
+                isExpanded={!!expandedComments[post.idPost]}
+                toggleExpanded={() =>
+                  setExpandedComments({
+                    ...expandedComments,
+                    [post.idPost]: !expandedComments[post.idPost],
+                  })
+                }
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* RIGHT COL: SIDEBAR (FRIENDS) */}
+        <div
+          className={`lg:col-span-4 space-y-4 ${
+            mobileTab === "friends" ? "block" : "hidden lg:block"
+          }`}
+        >
+          <UserSearchBox
+            query={searchQuery}
+            setQuery={setSearchQuery}
+            onFocus={handleSearchFocus}
+            results={filteredUsers}
+            showResults={showSearchResults}
+            searchRef={searchRef}
+            onSendRequest={handleSendFriendRequest}
+            checkIsFriend={checkIsFriend}
+            checkIsPending={checkIsPendingRequest}
+            checkIsSent={checkIsSentRequest}
+          />
+          <FriendRequestList
+            requests={friendRequests}
+            onAccept={handleAcceptRequest}
+            onReject={handleRejectRequest}
+            isLoading={friendshipLoading}
+          />
+          <FriendList
+            friends={myFriends}
+            getFriendInfo={getFriendInfo}
+            onChat={(u, idFriendship) =>
+              setCurrentChat({ user: u, idFriendship })
+            }
+            onDelete={(id: string, name: string) =>
+              setFriendToDelete({ idFriendship: id, name })
+            }
+            isLoading={friendshipLoading}
+          />
+        </div>
+
+        {/* MODALS */}
+        {isSelectingAssets && (
+          <AssetSelectionModal
+            assets={pendingAssets}
+            selectedIds={selectedAssetIds}
+            onToggle={(id: string) => {
+              const newSet = new Set(selectedAssetIds);
+              if (newSet.has(id)) newSet.delete(id);
+              else newSet.add(id);
+              setSelectedAssetIds(newSet);
+            }}
+            onConfirm={confirmAssetSelection}
+            onClose={() => {
+              setIsSelectingAssets(false);
+            }}
+            onCancel={() => {
+              setIsSelectingAssets(false);
+              setShareAssetData(null);
+              setShareType("none");
+              setSelectedAssetIds(new Set());
+            }}
+          />
+        )}
+        {isEditModalOpen && editingPost && (
+          <EditPostModal
+            onClose={() => {
+              setIsEditModalOpen(false);
+              setEditingPost(null);
+              resetPostForm();
+            }}
+          >
             <PostForm
               content={postContent}
               setContent={setPostContent}
@@ -581,159 +751,27 @@ export default function SocialPage() {
               onShareCashflow={handleShareCashflow}
               onSharePortfolio={handleSharePortfolio}
               onSelectAssets={() => setIsSelectingAssets(true)}
-              onSubmit={handleSubmitPost}
+              onSubmit={handleUpdateSubmit}
               isLoading={postLoading}
-              isEditMode={false}
+              isEditMode={true}
             />
-          </div>
+          </EditPostModal>
         )}
-        <div className="space-y-6">
-          {posts.map((post) => (
-            <PostItem
-              key={post.idPost}
-              post={post}
-              currentUserId={user?.idUser}
-              onEdit={handleEditPost}
-              onDelete={handleDeletePost}
-              activeMenuId={activeMenuPostId}
-              toggleMenu={setActiveMenuPostId}
-              showCommentBox={showCommentBox === post.idPost}
-              toggleCommentBox={() =>
-                setShowCommentBox(
-                  showCommentBox === post.idPost ? null : post.idPost
-                )
-              }
-              starRating={starRating[post.idPost] || 5}
-              setStarRating={(v: number) =>
-                setStarRating({ ...starRating, [post.idPost]: v })
-              }
-              commentText={commentText[post.idPost] || ""}
-              setCommentText={(v: string) =>
-                setCommentText({ ...commentText, [post.idPost]: v })
-              }
-              onSubmitComment={() => handleEvaluate(post.idPost)}
-              isExpanded={!!expandedComments[post.idPost]}
-              toggleExpanded={() =>
-                setExpandedComments({
-                  ...expandedComments,
-                  [post.idPost]: !expandedComments[post.idPost],
-                })
-              }
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* RIGHT COL */}
-      <div className="lg:col-span-4 space-y-4">
-        <UserSearchBox
-          query={searchQuery}
-          setQuery={setSearchQuery}
-          onFocus={handleSearchFocus}
-          results={filteredUsers}
-          showResults={showSearchResults}
-          searchRef={searchRef}
-          onSendRequest={handleSendFriendRequest}
-          checkIsFriend={checkIsFriend}
-          checkIsPending={checkIsPendingRequest}
-          checkIsSent={checkIsSentRequest}
-        />
-        <FriendRequestList
-          requests={friendRequests}
-          onAccept={handleAcceptRequest}
-          onReject={handleRejectRequest}
-          isLoading={friendshipLoading}
-        />
-        <FriendList
-          friends={myFriends}
-          getFriendInfo={getFriendInfo}
-          onChat={(u, idFriendship) => setCurrentChat({ user: u, idFriendship })}
-          onDelete={(id: string, name: string) =>
-            setFriendToDelete({ idFriendship: id, name })
-          }
-          isLoading={friendshipLoading}
-        />
-      </div>
-
-      {/* MODALS */}
-      {isSelectingAssets && (
-        <AssetSelectionModal
-          assets={pendingAssets}
-          selectedIds={selectedAssetIds}
-          onToggle={(id: string) => {
-            const newSet = new Set(selectedAssetIds);
-            if (newSet.has(id)) newSet.delete(id);
-            else newSet.add(id);
-            setSelectedAssetIds(newSet);
-          }}
-          onConfirm={confirmAssetSelection}
-          onClose={() => {
-            // only close the modal on generic close (used after confirm)
-            setIsSelectingAssets(false);
-          }}
-          onCancel={() => {
-            // explicit cancel (e.g., clicking X) should reset selection state
-            setIsSelectingAssets(false);
-            setShareAssetData(null);
-            setShareType("none");
-            setSelectedAssetIds(new Set());
-          }}
-        />
-      )}
-      {isEditModalOpen && editingPost && (
-        <EditPostModal
-          onClose={() => {
-            setIsEditModalOpen(false);
-            setEditingPost(null);
-            resetPostForm();
-          }}
-        >
-          <PostForm
-            content={postContent}
-            setContent={setPostContent}
-            selectedImage={selectedImage}
-            onImageUpload={(e: React.ChangeEvent<HTMLInputElement>) => {
-              const f = e.target.files?.[0];
-              if (f) {
-                setSelectedFile(f);
-                setSelectedImage(URL.createObjectURL(f));
-              }
-            }}
-            onRemoveImage={() => {
-              setSelectedImage(null);
-              setSelectedFile(null);
-            }}
-            shareType={shareType}
-            setShareType={setShareType}
-            chartData={shareChartData}
-            setChartData={setShareChartData}
-            assetData={shareAssetData}
-            setAssetData={setShareAssetData}
-            dateFilter={dateFilter}
-            setDateFilter={setDateFilter}
-            onShareCashflow={handleShareCashflow}
-            onSharePortfolio={handleSharePortfolio}
-            onSelectAssets={() => setIsSelectingAssets(true)}
-            onSubmit={handleUpdateSubmit}
-            isLoading={postLoading}
-            isEditMode={true}
+        {friendToDelete && (
+          <DeleteFriendModal
+            name={friendToDelete.name}
+            onCancel={() => setFriendToDelete(null)}
+            onConfirm={confirmDeleteFriend}
           />
-        </EditPostModal>
-      )}
-      {friendToDelete && (
-        <DeleteFriendModal
-          name={friendToDelete.name}
-          onCancel={() => setFriendToDelete(null)}
-          onConfirm={confirmDeleteFriend}
-        />
-      )}
-      {currentChat && (
-        <ChatPopup 
-          user={currentChat.user} 
-          idFriendship={currentChat.idFriendship}
-          onClose={() => setCurrentChat(null)} 
-        />
-      )}
+        )}
+        {currentChat && (
+          <ChatPopup
+            user={currentChat.user}
+            idFriendship={currentChat.idFriendship}
+            onClose={() => setCurrentChat(null)}
+          />
+        )}
+      </div>
     </div>
   );
 }

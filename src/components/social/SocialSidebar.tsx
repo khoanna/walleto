@@ -48,7 +48,7 @@ export const UserSearchBox = (props: UserSearchBoxProps) => {
         <input
           type="text"
           placeholder="Tìm kiếm người dùng..."
-          className="bg-transparent focus:outline-none w-full text-sm"
+          className="bg-transparent  focus:outline-none w-full text-sm"
           value={query}
           onFocus={onFocus}
           onChange={(e) => setQuery(e.target.value)}

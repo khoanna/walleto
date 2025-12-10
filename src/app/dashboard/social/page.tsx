@@ -600,6 +600,7 @@ export default function SocialPage() {
         idEvaluate,
         body
       )) as ApiResponse<EvaluateResponse>;
+
       if (res?.success && res.data) {
         const updatedComment = res.data;
         setPosts((prevPosts) =>
@@ -609,6 +610,7 @@ export default function SocialPage() {
                 p.evaluateResponse.evaluateResponses.map((e) =>
                   e.idEvaluate === idEvaluate ? updatedComment : e
                 );
+
               const newAverage =
                 p.evaluateResponse.totalComments > 0
                   ? updatedEvaluations.reduce(

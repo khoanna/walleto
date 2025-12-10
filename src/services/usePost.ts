@@ -7,6 +7,7 @@ import { InvestmentAssetOfPost } from "@/type/InvestmentAssetOfPost";
 export default function usePost() {
   const { authFetch } = useAuthFetch();
   const [postLoading, setPostLoading] = useState(false);
+  const [isFetching, setIsFetching] = useState(false);
 
   const createTransactionPost = async (body: {
     title: string;
@@ -66,7 +67,7 @@ export default function usePost() {
 
   const getListPostByUser = async (idUser: string) => {
     try {
-      setPostLoading(true);
+      setIsFetching(true);
       const response = await authFetch(
         `${process.env.NEXT_PUBLIC_API_URL}/post/list-post-by-user?idUser=${idUser}`,
         {
@@ -81,13 +82,13 @@ export default function usePost() {
     } catch (error) {
       throw error;
     } finally {
-      setPostLoading(false);
+      setIsFetching(false);
     }
   };
 
   const getListPostApproved = async (idUser: string) => {
     try {
-      setPostLoading(true);
+      setIsFetching(true);
       const response = await authFetch(
         `${process.env.NEXT_PUBLIC_API_URL}/post/list-post-approved?idUser=${idUser}`,
         {
@@ -102,13 +103,13 @@ export default function usePost() {
     } catch (error) {
       throw error;
     } finally {
-      setPostLoading(false);
+      setIsFetching(false);
     }
   };
 
   const getListNotApprovedPosts = async () => {
     try {
-      setPostLoading(true);
+      setIsFetching(true);
       const response = await authFetch(
         `${process.env.NEXT_PUBLIC_API_URL}/post/list-post-not-approved`,
         {
@@ -123,7 +124,7 @@ export default function usePost() {
     } catch (error) {
       throw error;
     } finally {
-      setPostLoading(false);
+      setIsFetching(false);
     }
   };
 
@@ -264,9 +265,62 @@ export default function usePost() {
       setPostLoading(false);
     }
   };
+  const CreateFavouritePost = async (body: {
+    idPost: string;
+    idUser: string;
+  }) => {
+    try {
+      setPostLoading(true);
+      const response = await authFetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/favorite/create-favorite`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            idPost: body.idPost,
+            idUser: body.idUser,
+          }),
+        }
+      );
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setPostLoading(false);
+    }
+  };
+
+  const DeleteFavouritePost = async (body: {
+    idPost: string;
+    idUser: string;
+  }) => {
+    try {
+      setPostLoading(true);
+      const formData = new FormData();
+      formData.append("idPost", body.idPost);
+      formData.append("idUser", body.idUser);
+      const response = await authFetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/favorite/delete-favorite`,
+        {
+          method: "DELETE",
+          body: formData,
+        }
+      );
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      throw error;
+    } finally {
+      setPostLoading(false);
+    }
+  };
 
   return {
     postLoading,
+    isFetching,
     createTransactionPost,
     createAssetPost,
     getListPostByUser,
@@ -277,5 +331,7 @@ export default function usePost() {
     updateTransactionPost,
     updateAssetPost,
     updatePost,
+    CreateFavouritePost,
+    DeleteFavouritePost,
   };
 }

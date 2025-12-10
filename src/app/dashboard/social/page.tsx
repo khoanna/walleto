@@ -39,8 +39,7 @@ import {
   ChatPopup,
 } from "@/components/social/SocialModals";
 
-// Icons cho Tab Mobile
-import { Newspaper, Users } from "lucide-react";
+import { Newspaper, Users, Loader2 } from "lucide-react";
 
 export default function SocialPage() {
   const context = useUserContext();
@@ -52,16 +51,20 @@ export default function SocialPage() {
   const {
     createTransactionPost,
     postLoading,
+    isFetching,
     getListPostApproved,
+    getListPostByUser,
     createAssetPost,
     deletePost,
     updatePost,
     updateTransactionPost,
     updateAssetPost,
+    CreateFavouritePost,
+    DeleteFavouritePost,
   } = usePost();
   const { getInvesmentAsset } = useDashboard();
   const { uploadImage } = useImgae();
-  const { createEvaluate } = useEvaluate();
+  const { createEvaluate, updateEvaluate, deleteEvaluate } = useEvaluate();
   const {
     getUserList,
     getFriendshipReceiveOfUser,
@@ -113,6 +116,7 @@ export default function SocialPage() {
   >({});
 
   const [posts, setPosts] = useState<Post[]>([]);
+  const [showUserPostsOnly, setShowUserPostsOnly] = useState(false);
   const [currentChat, setCurrentChat] = useState<{
     user: UserInfo;
     idFriendship: string;
@@ -136,13 +140,18 @@ export default function SocialPage() {
   // --- LOGIC FUNCTIONS (Hoisted & Typed) ---
   const fetchPosts = async () => {
     if (user?.idUser) {
-      const r = (await getListPostApproved(user.idUser)) as ApiResponse<Post[]>;
+      const r = showUserPostsOnly
+        ? ((await getListPostByUser(user.idUser)) as ApiResponse<Post[]>)
+        : ((await getListPostApproved(user.idUser)) as ApiResponse<Post[]>);
       if (r?.success) setPosts(r.data);
     }
   };
 
   useEffect(() => {
     fetchPosts();
+  }, [user?.idUser, showUserPostsOnly]);
+
+  useEffect(() => {
     fetchFriendData();
   }, [user?.idUser]);
 
@@ -541,11 +550,163 @@ export default function SocialPage() {
       idUser: user.idUser,
       idPost: postId,
     })) as ApiResponse<EvaluateResponse>;
-    if (res?.success) {
+
+    if (res?.success && res.data) {
       alert("Đã gửi đánh giá!");
+      const newComment = res.data;
+
+      setPosts((prevPosts) =>
+        prevPosts.map((p) => {
+          if (p.idPost === postId) {
+            const updatedEvaluations = [
+              newComment,
+              ...p.evaluateResponse.evaluateResponses,
+            ];
+            const newTotal = p.evaluateResponse.totalComments + 1;
+            const newAverage =
+              updatedEvaluations.reduce((acc, curr) => acc + curr.star, 0) /
+              newTotal;
+
+            return {
+              ...p,
+              evaluateResponse: {
+                ...p.evaluateResponse,
+                evaluateResponses: updatedEvaluations,
+                totalComments: newTotal,
+                averageStars: newAverage,
+              },
+            };
+          }
+          return p;
+        })
+      );
+
       setCommentText((p) => ({ ...p, [postId]: "" }));
       setShowCommentBox(null);
-      fetchPosts();
+    } else {
+      alert("Lỗi khi gửi đánh giá!");
+    }
+  };
+
+  const handleUpdateComment = async (
+    postId: string,
+    idEvaluate: string,
+    body: { comment?: string; star?: number }
+  ) => {
+    if (!user?.idUser) return alert("Chưa đăng nhập!");
+    try {
+      const res = (await updateEvaluate(idEvaluate, body)) as ApiResponse<
+        EvaluateResponse
+      >;
+      if (res?.success && res.data) {
+        const updatedComment = res.data;
+        setPosts((prevPosts) =>
+          prevPosts.map((p) => {
+            if (p.idPost === postId) {
+              const updatedEvaluations = p.evaluateResponse.evaluateResponses.map(
+                (e) => (e.idEvaluate === idEvaluate ? updatedComment : e)
+              );
+              const newAverage =
+                p.evaluateResponse.totalComments > 0
+                  ? updatedEvaluations.reduce(
+                      (acc, curr) => acc + curr.star,
+                      0
+                    ) / p.evaluateResponse.totalComments
+                  : 0;
+
+              return {
+                ...p,
+                evaluateResponse: {
+                  ...p.evaluateResponse,
+                  evaluateResponses: updatedEvaluations,
+                  averageStars: newAverage,
+                },
+              };
+            }
+            return p;
+          })
+        );
+      } else {
+        alert("Lỗi khi cập nhật bình luận!");
+      }
+    } catch (error) {
+      console.error("Error updating evaluate:", error);
+      alert("Lỗi khi cập nhật bình luận!");
+    }
+  };
+
+  const handleToggleFavorite = async (
+    postId: string,
+    isFavorited: boolean
+  ): Promise<void> => {
+    if (!user?.idUser) return alert("Chưa đăng nhập!");
+    try {
+      const res = isFavorited
+        ? await DeleteFavouritePost({ idPost: postId, idUser: user.idUser })
+        : await CreateFavouritePost({ idPost: postId, idUser: user.idUser });
+
+      if (res?.success) {
+        setPosts((prevPosts) =>
+          prevPosts.map((p) => {
+            if (p.idPost === postId) {
+              return { ...p, isFavorited: !isFavorited };
+            }
+            return p;
+          })
+        );
+      } else {
+        throw new Error("API call failed");
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+      alert("Lỗi khi cập nhật thích bài viết!");
+    }
+  };
+
+  const handleDeleteComment = async (
+    postId: string,
+    idEvaluate: string
+  ): Promise<void> => {
+    if (!confirm("Bạn chắc chắn muốn xóa bình luận này?")) return;
+    try {
+      const res = await deleteEvaluate(idEvaluate);
+      if (res?.success) {
+        alert("Đã xóa bình luận!");
+        setPosts((prevPosts) =>
+          prevPosts.map((p) => {
+            if (p.idPost === postId) {
+              const updatedEvaluations =
+                p.evaluateResponse.evaluateResponses.filter(
+                  (e) => e.idEvaluate !== idEvaluate
+                );
+              const newTotal = p.evaluateResponse.totalComments - 1;
+              const newAverage =
+                newTotal > 0
+                  ? updatedEvaluations.reduce(
+                      (acc, curr) => acc + curr.star,
+                      0
+                    ) / newTotal
+                  : 0;
+
+              return {
+                ...p,
+                evaluateResponse: {
+                  ...p.evaluateResponse,
+                  evaluateResponses: updatedEvaluations,
+                  totalComments: newTotal,
+                  averageStars: newAverage,
+                },
+              };
+            }
+            return p;
+          })
+        );
+      } else {
+        alert("Lỗi khi xóa bình luận!");
+      }
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+      alert("Lỗi khi xóa bình luận!");
     }
   };
 
@@ -620,40 +781,72 @@ export default function SocialPage() {
               />
             </div>
           )}
+          <div className="flex gap-2 items-center mb-4">
+            <span className="text-sm text-gray-600">Hiển thị:</span>
+            <button
+              onClick={() => setShowUserPostsOnly(false)}
+              className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
+                !showUserPostsOnly
+                  ? "bg-blue-600 text-white font-medium"
+                  : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300"
+              }`}
+            >
+              Tất cả bài viết
+            </button>
+            <button
+              onClick={() => setShowUserPostsOnly(true)}
+              className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
+                showUserPostsOnly
+                  ? "bg-blue-600 text-white font-medium"
+                  : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300"
+              }`}
+            >
+              Bài viết của tôi
+            </button>
+          </div>
           <div className="space-y-6">
-            {posts.map((post) => (
-              <PostItem
-                key={post.idPost}
-                post={post}
-                currentUserId={user?.idUser}
-                onEdit={handleEditPost}
-                onDelete={handleDeletePost}
-                activeMenuId={activeMenuPostId}
-                toggleMenu={setActiveMenuPostId}
-                showCommentBox={showCommentBox === post.idPost}
-                toggleCommentBox={() =>
-                  setShowCommentBox(
-                    showCommentBox === post.idPost ? null : post.idPost
-                  )
-                }
-                starRating={starRating[post.idPost] || 5}
-                setStarRating={(v: number) =>
-                  setStarRating({ ...starRating, [post.idPost]: v })
-                }
-                commentText={commentText[post.idPost] || ""}
-                setCommentText={(v: string) =>
-                  setCommentText({ ...commentText, [post.idPost]: v })
-                }
-                onSubmitComment={() => handleEvaluate(post.idPost)}
-                isExpanded={!!expandedComments[post.idPost]}
-                toggleExpanded={() =>
-                  setExpandedComments({
-                    ...expandedComments,
-                    [post.idPost]: !expandedComments[post.idPost],
-                  })
-                }
-              />
-            ))}
+            {isFetching ? (
+              <div className="flex justify-center items-center py-10">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+              </div>
+            ) : (
+              posts.map((post) => (
+                <PostItem
+                  key={post.idPost}
+                  post={post}
+                  currentUserId={user?.idUser}
+                  onEdit={handleEditPost}
+                  onDelete={handleDeletePost}
+                  activeMenuId={activeMenuPostId}
+                  toggleMenu={setActiveMenuPostId}
+                  showCommentBox={showCommentBox === post.idPost}
+                  toggleCommentBox={() =>
+                    setShowCommentBox(
+                      showCommentBox === post.idPost ? null : post.idPost
+                    )
+                  }
+                  starRating={starRating[post.idPost] || 5}
+                  setStarRating={(v: number) =>
+                    setStarRating({ ...starRating, [post.idPost]: v })
+                  }
+                  commentText={commentText[post.idPost] || ""}
+                  setCommentText={(v: string) =>
+                    setCommentText({ ...commentText, [post.idPost]: v })
+                  }
+                  onSubmitComment={() => handleEvaluate(post.idPost)}
+                  isExpanded={!!expandedComments[post.idPost]}
+                  toggleExpanded={() =>
+                    setExpandedComments({
+                      ...expandedComments,
+                      [post.idPost]: !expandedComments[post.idPost],
+                    })
+                  }
+                  onToggleFavorite={handleToggleFavorite}
+                  onDeleteComment={handleDeleteComment}
+                  onUpdateComment={handleUpdateComment}
+                />
+              ))
+            )}
           </div>
         </div>
 

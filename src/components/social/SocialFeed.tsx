@@ -11,6 +11,7 @@ import {
   X,
   Calendar,
   Plus,
+  Heart,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { ApexOptions } from "apexcharts";
@@ -338,6 +339,13 @@ interface PostItemProps {
   onSubmitComment: () => void;
   isExpanded: boolean;
   toggleExpanded: () => void;
+  onToggleFavorite?: (postId: string, isFavorited: boolean) => Promise<void>;
+  onDeleteComment?: (postId: string, idEvaluate: string) => Promise<void>;
+  onUpdateComment?: (
+    postId: string,
+    idEvaluate: string,
+    body: { comment?: string; star?: number }
+  ) => Promise<void>;
 }
 
 export const PostItem = (props: PostItemProps) => {
@@ -357,168 +365,508 @@ export const PostItem = (props: PostItemProps) => {
     onSubmitComment,
     isExpanded,
     toggleExpanded,
+    onToggleFavorite,
+    onDeleteComment,
+    onUpdateComment,
   } = props;
 
-  const isOwner = currentUserId === post.userOfPostResponse.idUser;
-  const snapshot = post.snapshotResponse?.[0] ?? {};
-  const transactionData = snapshot.transactionOfPosts ?? null;
-  const assetData = snapshot.investmentAssetOfPosts ?? null;
-  const comments = post.evaluateResponse.evaluateResponses || [];
-  const visibleComments = isExpanded ? comments : comments.slice(0, 3);
+    const [isFavoriting, setIsFavoriting] = React.useState(false);
 
-  const chartOptions: ApexOptions = {
-    chart: { toolbar: { show: false } },
-    colors: ["#22C55E", "#EF4444"],
-    stroke: { curve: "smooth", width: 2 },
-    xaxis: {
-      categories: transactionData?.map((t) => t.transactionDate) || [],
-      labels: { formatter: (val: string) => formatDateVN(val) },
-    },
-    tooltip: {
-      x: { formatter: (val) => formatDateVN(new Date(val).toISOString()) },
-    },
-  };
+    const [isDeletingComment, setIsDeletingComment] = React.useState<
 
-  return (
-    <div className="bg-background rounded-xl p-4 shadow-sm hover:shadow-lg transition-all duration-300 relative group">
-      {/* Header */}
-      <div className="flex justify-between items-start mb-3">
-        <div className="flex items-center gap-3">
-          <UserAvatar url={post.userOfPostResponse.urlAvatar} />
-          <div>
-            <p className="font-semibold text-sm">
-              {post.userOfPostResponse.name}
-            </p>
-            <p className="text-xs text-gray-500">
-              {formatDateVN(post.createAt)}
-            </p>
+      string | null
+
+    >(null);
+
+    const [editingCommentId, setEditingCommentId] = React.useState<string | null>(
+
+      null
+
+    );
+
+    const [editingCommentText, setEditingCommentText] =
+
+      React.useState<string>("");
+
+    const [editingCommentStars, setEditingCommentStars] =
+
+      React.useState<number>(0);
+
+  
+
+    const isOwner = currentUserId === post.userOfPostResponse.idUser;
+
+    const snapshot = post.snapshotResponse?.[0] ?? {};
+
+    const transactionData = snapshot.transactionOfPosts ?? null;
+
+    const assetData = snapshot.investmentAssetOfPosts ?? null;
+
+    const comments = post.evaluateResponse.evaluateResponses || [];
+
+    const visibleComments = isExpanded ? comments : comments.slice(0, 3);
+
+    const commentCount = post.evaluateResponse.totalComments ?? 0;
+
+  
+
+    const handleToggleFavorite = async () => {
+
+      if (!onToggleFavorite || !currentUserId) return;
+
+      setIsFavoriting(true);
+
+      try {
+
+        // Parent now handles the state update
+
+        await onToggleFavorite(post.idPost, post.isFavorited ?? false);
+
+      } catch (error) {
+
+        console.error("Error toggling favorite:", error);
+
+      } finally {
+
+        setIsFavoriting(false);
+
+      }
+
+    };
+
+  
+
+    const handleDeleteComment = async (idEvaluate: string) => {
+
+      if (!onDeleteComment) return;
+
+      setIsDeletingComment(idEvaluate);
+
+      try {
+
+        await onDeleteComment(post.idPost, idEvaluate);
+
+      } catch (error) {
+
+        console.error("Error deleting comment:", error);
+
+      } finally {
+
+        setIsDeletingComment(null);
+
+      }
+
+    };
+
+  
+
+    const handleStartEdit = (c: EvaluateResponse) => {
+
+      setEditingCommentId(c.idEvaluate);
+
+      setEditingCommentText(c.comment || "");
+
+      setEditingCommentStars(c.star || 0);
+
+    };
+
+  
+
+    const handleCancelEdit = () => {
+
+      setEditingCommentId(null);
+
+      setEditingCommentText("");
+
+      setEditingCommentStars(0);
+
+    };
+
+  
+
+    const handleSaveEdit = async (idEvaluate: string) => {
+
+      if (!onUpdateComment) return;
+
+      try {
+
+        await onUpdateComment(post.idPost, idEvaluate, {
+
+          star: editingCommentStars,
+
+          comment: editingCommentText,
+
+        });
+
+        handleCancelEdit();
+
+      } catch (error) {
+
+        console.error("Error updating comment:", error);
+
+      }
+
+    };
+
+  
+
+    const chartOptions: ApexOptions = {
+
+      chart: { toolbar: { show: false } },
+
+      colors: ["#22C55E", "#EF4444"],
+
+      stroke: { curve: "smooth", width: 2 },
+
+      xaxis: {
+
+        categories: transactionData?.map((t) => t.transactionDate) || [],
+
+        labels: { formatter: (val: string) => formatDateVN(val) },
+
+      },
+
+      tooltip: {
+
+        x: { formatter: (val) => formatDateVN(new Date(val).toISOString()) },
+
+      },
+
+    };
+
+  
+
+    return (
+
+      <div className="bg-background rounded-xl p-4 shadow-sm hover:shadow-lg transition-all duration-300 relative group">
+
+        {/* Header */}
+
+        <div className="flex justify-between items-start mb-3">
+
+          <div className="flex items-center gap-3">
+
+            <UserAvatar url={post.userOfPostResponse.urlAvatar} />
+
+            <div>
+
+              <p className="font-semibold text-sm">
+
+                {post.userOfPostResponse.name}
+
+              </p>
+
+              <p className="text-xs text-gray-500">
+
+                {formatDateVN(post.createAt)}
+
+              </p>
+
+            </div>
+
           </div>
-        </div>
-        {isOwner && (
-          <div className="relative post-menu-trigger">
-            <button
-              onClick={() =>
-                toggleMenu(activeMenuId === post.idPost ? null : post.idPost)
-              }
-              className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
-            >
-              <MoreVertical size={20} />
-            </button>
-            {activeMenuId === post.idPost && (
-              <div className="absolute right-0 top-full mt-1 w-32 bg-white dark:bg-gray-800 rounded-lg shadow-xl z-10 overflow-hidden">
-                <button
-                  onClick={() => onEdit(post)}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2"
-                >
-                  <Edit size={14} /> Sửa
-                </button>
-                <button
-                  onClick={() => onDelete(post.idPost)}
-                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-                >
-                  <Trash2 size={14} /> Xóa
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
 
-      {/* Content */}
-      <p className="text-sm mb-3 whitespace-pre-wrap">
-        {post.content || post.title}
-      </p>
-      {post.urlImage && (
-        <img
-          src={post.urlImage}
-          className="w-full h-auto max-h-96 object-cover rounded-xl mb-3"
-          alt="content"
-        />
-      )}
+          {isOwner && (
 
-      {/* Chart */}
-      {transactionData && transactionData.length > 0 && (
-        <div className="rounded-xl p-2 bg-foreground mb-3">
-          <Chart
-            options={chartOptions}
-            series={[
-              {
-                name: "Thu",
-                data: transactionData.map((t) =>
-                  t.transactionType === "Thu" ? t.amount : 0
-                ),
-              },
-              {
-                name: "Chi",
-                data: transactionData.map((t) =>
-                  t.transactionType === "Chi" ? t.amount : 0
-                ),
-              },
-            ]}
-            type="area"
-            height={200}
-          />
-        </div>
-      )}
+            <div className="relative post-menu-trigger">
 
-      {/* Asset Table */}
-      {assetData && assetData.length > 0 && (
-        <div className="overflow-x-auto rounded-xl mb-3 bg-foreground">
-          <table className="w-full text-sm">
-            <thead className="text-text bg-background">
-              <tr>
-                <th className="text-left p-2 pl-3">Token</th>
-                <th className="text-right p-2">Price</th>
-                <th className="text-right p-2 pr-3">24h</th>
-              </tr>
-            </thead>
-            <tbody>
-              {assetData.map((a, i) => (
-                <tr key={i} className="hover:bg-background/50">
-                  <td className="p-2 pl-3 flex items-center gap-2">
-                    <img
-                      src={a.url}
-                      className="w-5 h-5 rounded-full"
-                      alt={a.assetSymbol}
-                    />
-                    <span>{a.assetSymbol}</span>
-                  </td>
-                  <td className="text-right p-2">
-                    ${formatCurrency(a.currentPrice)}
-                  </td>
-                  <td
-                    className={`text-right p-2 pr-3 ${
-                      a.priceChangePercentage24h >= 0
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }`}
+              <button
+
+                onClick={() =>
+
+                  toggleMenu(activeMenuId === post.idPost ? null : post.idPost)
+
+                }
+
+                className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
+
+              >
+
+                <MoreVertical size={20} />
+
+              </button>
+
+              {activeMenuId === post.idPost && (
+
+                <div className="absolute right-0 top-full mt-1 w-32 bg-white dark:bg-gray-800 rounded-lg shadow-xl z-10 overflow-hidden">
+
+                  <button
+
+                    onClick={() => onEdit(post)}
+
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2"
+
                   >
-                    {a.priceChangePercentage24h.toFixed(2)}%
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
 
-      {/* Footer */}
-      <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700/50">
-        <div className="flex items-center gap-1 text-yellow-500">
-          <Star className="fill-yellow-500 w-4 h-4" />
-          <span className="text-sm font-bold">
-            {post.evaluateResponse.totalComments === 0
-              ? "Chưa có đánh giá"
-              : post.evaluateResponse.averageStars.toFixed(1)}
-          </span>
+                    <Edit size={14} /> Sửa
+
+                  </button>
+
+                  <button
+
+                    onClick={() => onDelete(post.idPost)}
+
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+
+                  >
+
+                    <Trash2 size={14} /> Xóa
+
+                  </button>
+
+                </div>
+
+              )}
+
+            </div>
+
+          )}
+
         </div>
-        <button
-          onClick={toggleCommentBox}
-          className="flex items-center gap-2 text-sm text-gray-600 hover:bg-gray-100 px-3 py-1.5 rounded-lg transition"
-        >
-          <MessageCircle size={18} /> Bình luận
-        </button>
-      </div>
+
+  
+
+        {/* Content */}
+
+        <p className="text-sm mb-3 whitespace-pre-wrap">
+
+          {post.content || post.title}
+
+        </p>
+
+        {post.urlImage && (
+
+          <img
+
+            src={post.urlImage}
+
+            className="w-full h-auto max-h-96 object-cover rounded-xl mb-3"
+
+            alt="content"
+
+          />
+
+        )}
+
+  
+
+        {/* Chart */}
+
+        {transactionData && transactionData.length > 0 && (
+
+          <div className="rounded-xl p-2 bg-foreground mb-3">
+
+            <Chart
+
+              options={chartOptions}
+
+              series={[
+
+                {
+
+                  name: "Thu",
+
+                  data: transactionData.map((t) =>
+
+                    t.transactionType === "Thu" ? t.amount : 0
+
+                  ),
+
+                },
+
+                {
+
+                  name: "Chi",
+
+                  data: transactionData.map((t) =>
+
+                    t.transactionType === "Chi" ? t.amount : 0
+
+                  ),
+
+                },
+
+              ]}
+
+              type="area"
+
+              height={200}
+
+            />
+
+          </div>
+
+        )}
+
+  
+
+        {/* Asset Table */}
+
+        {assetData && assetData.length > 0 && (
+
+          <div className="overflow-x-auto rounded-xl mb-3 bg-foreground">
+
+            <table className="w-full text-sm">
+
+              <thead className="text-text bg-background">
+
+                <tr>
+
+                  <th className="text-left p-2 pl-3">Token</th>
+
+                  <th className="text-right p-2">Price</th>
+
+                  <th className="text-right p-2 pr-3">24h</th>
+
+                </tr>
+
+              </thead>
+
+              <tbody>
+
+                {assetData.map((a, i) => (
+
+                  <tr key={i} className="hover:bg-background/50">
+
+                    <td className="p-2 pl-3 flex items-center gap-2">
+
+                      <img
+
+                        src={a.url}
+
+                        className="w-5 h-5 rounded-full"
+
+                        alt={a.assetSymbol}
+
+                      />
+
+                      <span>{a.assetSymbol}</span>
+
+                    </td>
+
+                    <td className="text-right p-2">
+
+                      ${formatCurrency(a.currentPrice)}
+
+                    </td>
+
+                    <td
+
+                      className={`text-right p-2 pr-3 ${
+
+                        a.priceChangePercentage24h >= 0
+
+                          ? "text-green-500"
+
+                          : "text-red-500"
+
+                      }`}
+
+                    >
+
+                      {a.priceChangePercentage24h.toFixed(2)}%
+
+                    </td>
+
+                  </tr>
+
+                ))}
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        )}
+
+  
+
+        {/* Footer */}
+
+        <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700/50 gap-2">
+
+          <div className="flex items-center gap-4">
+
+            <div className="flex items-center gap-1 text-yellow-500">
+
+              <Star className="fill-yellow-500 w-4 h-4" />
+
+              <span className="text-sm font-bold">
+
+                {post.evaluateResponse.totalComments === 0
+
+                  ? "Chưa có đánh giá"
+
+                  : post.evaluateResponse.averageStars.toFixed(1)}
+
+              </span>
+
+            </div>
+
+            <div className="text-xs text-gray-500">{commentCount} bình luận</div>
+
+          </div>
+
+          <div className="flex items-center gap-2">
+
+            <button
+
+              onClick={handleToggleFavorite}
+
+              disabled={isFavoriting}
+
+              className="flex items-center gap-2 text-sm px-3 py-1.5 rounded-lg transition hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50"
+
+            >
+
+              <Heart
+
+                size={18}
+
+                className={
+
+                  post.isFavorited
+
+                    ? "fill-red-500 text-red-500"
+
+                    : "text-gray-600"
+
+                }
+
+              />
+
+              <span
+
+                className={
+
+                  post.isFavorited ? "text-red-500" : "text-gray-600"
+
+                }
+
+              >
+
+                {post.isFavorited ? "Đã thích" : "Thích"}
+
+              </span>
+
+            </button>
+
+            <button
+
+              onClick={toggleCommentBox}
+
+              className="flex items-center gap-2 text-sm text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg transition"
+
+            >
+
+              <MessageCircle size={18} /> Bình luận
+
+            </button>
+
+          </div>
+
+        </div>
 
       {/* Comments */}
       {showCommentBox && (
@@ -555,30 +903,101 @@ export const PostItem = (props: PostItemProps) => {
       )}
       {visibleComments.length > 0 && (
         <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700/50 space-y-3">
-          {visibleComments.map((c: EvaluateResponse) => (
-            <div key={c.idEvaluate} className="flex gap-2">
-              <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex-shrink-0" />
-              <div className="p-2 rounded-lg flex-1">
-                <div className="flex justify-between items-start">
-                  <span className="text-xs font-bold">Người dùng</span>
-                  <div className="flex">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        size={10}
-                        className={
-                          i < c.star
-                            ? "text-yellow-500 fill-yellow-500"
-                            : "text-gray-300"
-                        }
-                      />
-                    ))}
+          {visibleComments.map((c: EvaluateResponse) => {
+            const isCommentOwner = currentUserId === c.idUser;
+            return (
+              <div key={c.idEvaluate} className="flex gap-2">
+                <UserAvatar url={c.urlAvatar} size="w-8 h-8" iconSize={16} />
+                <div className="flex-1 p-2 rounded-lg bg-foreground">
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="flex-1">
+                      <span className="text-xs font-bold block">{c.name}</span>
+                      {editingCommentId !== c.idEvaluate && (
+                        <div className="flex gap-1 mt-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              size={12}
+                              className={
+                                i < c.star
+                                  ? "text-yellow-500 fill-yellow-500"
+                                  : "text-gray-300"
+                              }
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {isCommentOwner && editingCommentId !== c.idEvaluate && (
+                        <>
+                          <button
+                            onClick={() => handleStartEdit(c)}
+                            className="p-1 text-gray-500 hover:text-gray-700 transition"
+                            title="Chỉnh sửa"
+                          >
+                            <Edit size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteComment(c.idEvaluate)}
+                            disabled={isDeletingComment === c.idEvaluate}
+                            className="p-1 text-gray-400 hover:text-red-500 transition disabled:opacity-50"
+                            title="Xóa bình luận"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
+                  {editingCommentId === c.idEvaluate ? (
+                    <div className="mt-2">
+                      <div className="flex gap-1 mb-2">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <Star
+                            key={s}
+                            className={`cursor-pointer w-5 h-5 ${
+                              s <= editingCommentStars
+                                ? "text-yellow-400 fill-yellow-400"
+                                : "text-gray-300"
+                            }`}
+                            onClick={() => setEditingCommentStars(s)}
+                          />
+                        ))}
+                      </div>
+                      <textarea
+                        className="w-full p-2 rounded-md bg-foreground text-sm resize-none"
+                        rows={3}
+                        value={editingCommentText}
+                        onChange={(e) => setEditingCommentText(e.target.value)}
+                      />
+                      <div className="flex gap-2 mt-2">
+                        <button
+                          onClick={() => handleSaveEdit(c.idEvaluate)}
+                          className="px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm"
+                        >
+                          Lưu
+                        </button>
+                        <button
+                          onClick={handleCancelEdit}
+                          className="px-3 py-1.5 bg-gray-200 text-gray-700 rounded-md text-sm"
+                        >
+                          Hủy
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-sm mt-1">{c.comment}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {formatDateVN(c.createAt)}
+                      </p>
+                    </>
+                  )}
                 </div>
-                <p className="text-sm mt-1">{c.comment}</p>
               </div>
-            </div>
-          ))}
+            );
+          })}
           {comments.length > 3 && (
             <button
               onClick={toggleExpanded}

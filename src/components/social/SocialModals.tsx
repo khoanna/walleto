@@ -419,16 +419,15 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
                     <div className="space-y-2">
                       {group.messages.map((msg, idx) => {
                         const isMe = isMyMessage(msg);
-                        const showAvatar = !isMe && (idx === 0 || isMyMessage(group.messages[idx - 1]));
                         
                         return (
                           <div 
                             key={msg.idMessage || idx} 
                             className={`flex items-center gap-2 ${isMe ? "justify-end" : "justify-start"}`}
                           >
-                            {/* Friend avatar - aligned center with message */}
+                            {/* Friend avatar - always visible for friend messages */}
                             {!isMe && (
-                              <div className={`shrink-0 self-center ${showAvatar ? "visible" : "invisible"}`}>
+                              <div className="shrink-0 self-center">
                                 <div className="w-7 h-7 rounded-full overflow-hidden">
                                   <UserAvatar url={user?.urlAvatar} size="w-7 h-7" />
                                 </div>

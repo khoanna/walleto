@@ -47,8 +47,10 @@ export const useChat = ({idFriendship, currentUserId, onMessageReceived}: UseCha
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(`${process.env.NEXT_PUBLIC_SOCKET}/hubs/message`, {
         accessTokenFactory: () => token,
-        skipNegotiation: true,
-        transport: signalR.HttpTransportType.WebSockets,
+        // Remove skipNegotiation to allow fallback transports
+        // skipNegotiation: true,
+        // Allow all transports: WebSockets -> Server-Sent Events -> Long Polling
+        transport: signalR.HttpTransportType.WebSockets | signalR.HttpTransportType.ServerSentEvents | signalR.HttpTransportType.LongPolling,
       })
       .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
       .configureLogging(signalR.LogLevel.Information)

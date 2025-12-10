@@ -143,6 +143,7 @@ export default function SocialPage() {
       const r = showUserPostsOnly
         ? ((await getListPostByUser(user.idUser)) as ApiResponse<Post[]>)
         : ((await getListPostApproved(user.idUser)) as ApiResponse<Post[]>);
+
       if (r?.success) setPosts(r.data);
     }
   };
@@ -595,17 +596,19 @@ export default function SocialPage() {
   ) => {
     if (!user?.idUser) return alert("Chưa đăng nhập!");
     try {
-      const res = (await updateEvaluate(idEvaluate, body)) as ApiResponse<
-        EvaluateResponse
-      >;
+      const res = (await updateEvaluate(
+        idEvaluate,
+        body
+      )) as ApiResponse<EvaluateResponse>;
       if (res?.success && res.data) {
         const updatedComment = res.data;
         setPosts((prevPosts) =>
           prevPosts.map((p) => {
             if (p.idPost === postId) {
-              const updatedEvaluations = p.evaluateResponse.evaluateResponses.map(
-                (e) => (e.idEvaluate === idEvaluate ? updatedComment : e)
-              );
+              const updatedEvaluations =
+                p.evaluateResponse.evaluateResponses.map((e) =>
+                  e.idEvaluate === idEvaluate ? updatedComment : e
+                );
               const newAverage =
                 p.evaluateResponse.totalComments > 0
                   ? updatedEvaluations.reduce(

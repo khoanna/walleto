@@ -175,12 +175,12 @@ export default function Sidebar() {
         {/* Brand + Theme + Notification */}
         <div className="flex text-xl sm:text-2xl mb-6 sm:mb-8 items-center justify-center gap-3 sm:gap-4 pt-12 lg:pt-0">
           <div className="font-semibold tracking-wide">Walleto</div>
-          
-          {/* Notification Bell */}
-          {userInfo?.idUser && (
+
+          {/* Notification Bell - only show if user has SOCIAL_NETWORK permission */}
+          {userInfo?.idUser && permissions?.includes("SOCIAL_NETWORK") && (
             <NotificationBell idUser={userInfo.idUser} />
           )}
-          
+
           {mounted ? (
             <button
               onClick={() => setTheme(isDark ? "light" : "dark")}

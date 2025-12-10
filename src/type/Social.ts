@@ -53,10 +53,12 @@ export interface InvestmentAssetOfPost {
 
 export interface EvaluateResponse {
   idEvaluate: string;
+  idUser: string;
+  name: string;
+  urlAvatar: string | null;
   star: number;
   comment: string;
   createAt: string;
-  userOfEvaluateResponse?: UserInfo;
 }
 
 export interface Post {

@@ -1,167 +1,150 @@
-'use client'
+"use client";
 
-import useCrypto from '@/services/useCrypto';
-import { Crypto } from '@/type/Crypto';
-import React, { useEffect, useState } from 'react'
-
+import useCrypto from "@/services/useCrypto";
+import { Crypto } from "@/type/Crypto";
+import React, { useEffect, useState } from "react";
 
 const CryptoTable = () => {
-    const { getCryptoList } = useCrypto();
-    const [cryptoData, setCryptoData] = useState<Crypto[]>([]);
-    const [searchQuery, setSearchQuery] = useState('');
+  const { getCryptoList } = useCrypto();
+  const [cryptoData, setCryptoData] = useState<Crypto[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const data = await getCryptoList();
-            setCryptoData(data?.data);
-        };
-        fetchData();
-    }, []);
-
-    const filteredCryptoData = cryptoData?.filter((crypto) =>
-        crypto.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        crypto.symbol.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    const formatPrice = (price: number) => {
-        // For mobile, use more compact format
-        if (window.innerWidth < 640 && price > 1000000) {
-            return new Intl.NumberFormat('vi-VN', {
-                notation: 'compact',
-                compactDisplay: 'short',
-                maximumFractionDigits: 1,
-            }).format(price) + ' đ';
-        }
-        return new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
-            maximumFractionDigits: 0,
-        }).format(price);
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getCryptoList();
+      setCryptoData(data?.data);
     };
+    fetchData();
+  }, []);
 
-    const formatNumber = (num: number) => {
-        return new Intl.NumberFormat('en-US', {
-            notation: 'compact',
-            compactDisplay: 'short',
-            maximumFractionDigits: 2,
-        }).format(num);
-    };
+  const filteredCryptoData = cryptoData?.filter(
+    (crypto) =>
+      crypto.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      crypto.symbol.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-   
+  const formatPrice = (price: number) => {
+    // Formatter đơn giản hóa
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: price < 1 ? 4 : 2,
+      maximumFractionDigits: price < 1 ? 6 : 2,
+    }).format(price);
+  };
 
-    return (
-        <div className='w-full h-full flex flex-col'>
-            {/* Header Section */}
-            <div className="flex-shrink-0 rounded-t-lg bg-background p-2 sm:p-3 lg:p-4 border border-b-0 border-text/10">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
-                    <div className='flex items-center justify-center md:justify-start w-full'>
-                        <p className="text-base sm:text-xl lg:text-2xl font-bold text-text">Top 100 cryptocurrencies</p>
-                    </div>
-                    <div className="relative w-full sm:w-64 lg:w-80">
-                        <input
-                            type="text"
-                            placeholder="Search..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full px-3 sm:px-4 py-2 sm:py-3 pl-9 sm:pl-11 bg-foreground text-text rounded-lg border border-text/20 
-                                     focus:outline-none focus:ring-2 focus:ring-text/30 focus:border-transparent
-                                     placeholder:text-text/50 transition-all shadow-md text-sm"
-                        />
-                        <svg
-                            className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-text opacity-50"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                            />
-                        </svg>
-                        {searchQuery && (
-                            <button
-                                onClick={() => setSearchQuery('')}
-                                className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-text opacity-50 hover:opacity-100 transition-opacity"
-                            >
-                                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        )}
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className="w-full h-full flex flex-col bg-background/50 backdrop-blur-sm">
+      {/* Header Section - Sticky */}
+      <div className="flex-shrink-0 p-3 sm:p-4 sticky top-0 z-20 bg-background/95 backdrop-blur border-b border-white/5">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold text-text">Market</h2>
+            <span className="text-xs text-text/50 bg-white/5 px-2 py-1 rounded-md">
+              {filteredCryptoData?.length || 0} coins
+            </span>
+          </div>
 
-            {/* Table Section */}
-            <div className="flex-1 bg-background rounded-lg rounded-t-none shadow-2xl overflow-hidden border border-t-0 border-text/10 flex flex-col min-h-0">
-                <div className="overflow-x-auto overflow-y-auto nice-scroll flex-1">
-                    <table className="w-full min-w-[640px]">
-                        <thead className="border-b border-text/10 sticky bg-background top-0 z-10">
-                            <tr>
-                                <th className="px-2 sm:px-3 lg:px-4 py-2 sm:py-3 lg:py-4 text-left text-[10px] sm:text-xs font-semibold text-text uppercase tracking-wider whitespace-nowrap">#</th>
-                                <th className="px-2 sm:px-3 lg:px-4 py-2 sm:py-3 lg:py-4 text-left text-[10px] sm:text-xs font-semibold text-text uppercase tracking-wider whitespace-nowrap">Coin</th>
-                                <th className="px-2 sm:px-3 lg:px-4 py-2 sm:py-3 lg:py-4 text-right text-[10px] sm:text-xs font-semibold text-text uppercase tracking-wider whitespace-nowrap">Price</th>
-                                <th className="px-2 sm:px-3 lg:px-4 py-2 sm:py-3 lg:py-4 text-right text-[10px] sm:text-xs font-semibold text-text uppercase tracking-wider whitespace-nowrap">24h %</th>
-                                <th className="hidden md:table-cell px-2 sm:px-3 lg:px-4 py-2 sm:py-3 lg:py-4 text-right text-[10px] sm:text-xs font-semibold text-text uppercase tracking-wider whitespace-nowrap">Market Cap</th>
-                                <th className="hidden lg:table-cell px-2 sm:px-3 lg:px-4 py-2 sm:py-3 lg:py-4 text-right text-[10px] sm:text-xs font-semibold text-text uppercase tracking-wider whitespace-nowrap">Volume</th>
-                                <th className="hidden xl:table-cell px-2 sm:px-3 lg:px-4 py-2 sm:py-3 lg:py-4 text-right text-[10px] sm:text-xs font-semibold text-text uppercase tracking-wider whitespace-nowrap">Circ. Supply</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-text/5">
-                            {filteredCryptoData?.map((crypto) => (
-                                <tr
-                                    key={crypto.id}
-                                    className="hover:bg-text/5 transition-colors cursor-pointer"
-                                >
-                                    <td className="px-2 sm:px-3 lg:px-4 py-2 sm:py-3 lg:py-4 whitespace-nowrap text-xs sm:text-sm text-text font-medium">
-                                        {crypto.market_cap_rank}
-                                    </td>
-                                    <td className="px-2 sm:px-3 lg:px-4 py-2 sm:py-3 lg:py-4 whitespace-nowrap">
-                                        <div className="flex items-center space-x-2 sm:space-x-3 overflow-hidden">
-                                            <img
-                                                src={crypto.image}
-                                                alt={crypto.name}
-                                                className="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex-shrink-0"
-                                            />
-                                            <div className="min-w-0">
-                                                <div className="text-xs sm:text-sm font-semibold text-text truncate">{crypto.name}</div>
-                                                <div className="text-[10px] sm:text-xs text-text opacity-60 uppercase">{crypto.symbol}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-2 sm:px-3 lg:px-4 py-2 sm:py-3 lg:py-4 whitespace-nowrap text-right text-xs sm:text-sm font-semibold text-text">
-                                        {formatPrice(crypto.current_price)}
-                                    </td>
-                                    <td className="px-2 sm:px-3 lg:px-4 py-2 sm:py-3 lg:py-4 whitespace-nowrap text-right text-xs sm:text-sm font-bold">
-                                        <span className={crypto.price_change_percentage_24h >= 0 ? 'text-green-500' : 'text-red-500'}>
-                                            {crypto.price_change_percentage_24h >= 0 ? '▲' : '▼'} {Math.abs(crypto.price_change_percentage_24h).toFixed(2)}%
-                                        </span>
-                                    </td>
-
-                                    <td className="hidden md:table-cell px-2 sm:px-3 lg:px-4 py-2 sm:py-3 lg:py-4 whitespace-nowrap text-right text-xs sm:text-sm text-text font-medium">
-                                        {formatNumber(crypto.market_cap)}
-                                    </td>
-                                    <td className="hidden lg:table-cell px-2 sm:px-3 lg:px-4 py-2 sm:py-3 lg:py-4 whitespace-nowrap text-right text-xs sm:text-sm text-text">
-                                        {formatNumber(crypto.total_volume)}
-                                    </td>
-                                    <td className="hidden xl:table-cell px-2 sm:px-3 lg:px-4 py-2 sm:py-3 lg:py-4 whitespace-nowrap text-right text-xs sm:text-sm text-text">
-                                        <div>{formatNumber(crypto.circulating_supply)} {crypto.symbol.toUpperCase()}</div>
-                                        {crypto.max_supply && (
-                                            <div className="text-[10px] sm:text-xs text-text opacity-50">
-                                                Max: {formatNumber(crypto.max_supply)}
-                                            </div>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+          {/* Search Bar - Modern Style */}
+          <div className="relative group">
+            <input
+              type="text"
+              placeholder="Tìm kiếm coin..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-text/5 text-text rounded-lg border border-transparent 
+                                     focus:outline-none focus:bg-background focus:border-text/20 focus:ring-1 focus:ring-text/20
+                                     placeholder:text-text/30 transition-all text-sm"
+            />
+            <svg
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text/40 group-focus-within:text-text/80 transition-colors"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
         </div>
-    )
-}
+      </div>
 
-export default CryptoTable
+      {/* Table Section */}
+      <div className="flex-1 overflow-auto nice-scroll">
+        <table className="w-full text-left border-collapse">
+          <thead className="sticky top-0 z-10 bg-background/95 backdrop-blur text-xs uppercase text-text/50 font-medium">
+            <tr>
+              <th className="px-4 py-3 w-10">#</th>
+              <th className="px-2 py-3">Name</th>
+              <th className="px-4 py-3 text-right">Price</th>
+              {/* Chỉ hiện 24h trên mọi màn hình, các cột khác ẩn khi là sidebar (lg) */}
+              <th className="px-4 py-3 text-right">24h</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-white/5 text-sm">
+            {filteredCryptoData?.map((crypto, index) => (
+              <tr
+                key={crypto.id}
+                className="hover:bg-text/5 transition-colors cursor-pointer group"
+              >
+                <td className="px-4 py-3 text-text/40 text-xs font-mono">
+                  {index + 1}
+                </td>
+                <td className="px-2 py-3">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={crypto.image}
+                      alt={crypto.name}
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-text group-hover:text-primary transition-colors">
+                        {crypto.symbol.toUpperCase()}
+                      </span>
+                      <span className="text-xs text-text/40 truncate max-w-[80px]">
+                        {crypto.name}
+                      </span>
+                    </div>
+                  </div>
+                </td>
+                <td className="px-4 py-3 text-right font-medium text-text">
+                  {formatPrice(crypto.current_price)}
+                </td>
+                <td
+                  className={`px-4 py-3 text-right font-medium ${
+                    crypto.price_change_percentage_24h >= 0
+                      ? "text-green-500"
+                      : "text-red-500"
+                  }`}
+                >
+                  <div
+                    className={`inline-flex items-center px-2 py-1 rounded text-xs ${
+                      crypto.price_change_percentage_24h >= 0
+                        ? "bg-green-500/10"
+                        : "bg-red-500/10"
+                    }`}
+                  >
+                    {crypto.price_change_percentage_24h >= 0 ? "↑" : "↓"}
+                    {Math.abs(crypto.price_change_percentage_24h).toFixed(2)}%
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {filteredCryptoData?.length === 0 && (
+          <div className="p-8 text-center text-text/40 text-sm">
+            Không tìm thấy kết quả nào
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default CryptoTable;

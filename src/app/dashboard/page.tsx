@@ -74,25 +74,34 @@ export default function DashBoard() {
   return (
     <div className="min-h-screen bg-foreground p-3 sm:p-4 lg:p-6">
       <div className="h-full flex flex-col gap-3 sm:gap-4">
-        {/* Top Row - Charts & Account */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3 sm:gap-4">
-          {/* Line Chart - Takes more space on large screens */}
-          <div className="md:col-span-2 lg:col-span-3 h-auto sm:min-h-[260px] lg:min-h-[340px]">
+        {/* --- ROW 1: Charts & Account --- */}
+        {/* Mobile (>640px): sm:grid-cols-2 (Chia đôi: Donut trái, Account phải)
+            Laptop (>1024px): lg:grid-cols-7 (Giữ nguyên layout cũ: 3-2-2) 
+        */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3 sm:gap-4">
+          {/* 1. Line Chart */}
+          {/* Mobile: sm:col-span-2 (Nằm trên cùng, full chiều ngang) */}
+          {/* Desktop: lg:col-span-3 (Nằm bên trái, chiếm 3 phần) */}
+          <div className="sm:col-span-2 lg:col-span-3 h-[280px] sm:min-h-[260px] lg:min-h-[340px]">
             <TwoLineChart transactions={transactionData?.data || []} />
           </div>
 
-          {/* Donut Chart */}
-          <div className="lg:col-span-2 h-auto sm:min-h-[260px] lg:min-h-[340px]">
+          {/* 2. Donut Chart */}
+          {/* Mobile: 1 cột (Nằm dưới chart, bên trái) */}
+          {/* Desktop: lg:col-span-2 (Nằm giữa) */}
+          <div className="lg:col-span-2 h-[280px] sm:min-h-[260px] lg:min-h-[340px]">
             <DonutChart financeData={financeData} />
           </div>
 
-          {/* Account Cards */}
-          <div className="lg:col-span-2 h-auto sm:min-h-[260px] lg:min-h-[340px]">
+          {/* 3. Account Cards */}
+          {/* Mobile: 1 cột (Nằm dưới chart, bên phải) */}
+          {/* Desktop: lg:col-span-2 (Nằm phải cùng) */}
+          <div className="lg:col-span-2 h-[280px] sm:min-h-[260px] lg:min-h-[340px]">
             <Account financeData={financeData} weekData={weekData} />
           </div>
         </div>
 
-        {/* Bottom Row - Portfolio & Activity */}
+        {/* --- ROW 2: Portfolio & Activity --- */}
         <div className="grid grid-cols-1 lg:grid-cols-7 gap-3 sm:gap-4 flex-1">
           {/* Portfolio Table */}
           <div className="lg:col-span-5 min-h-0 sm:min-h-[300px] lg:min-h-[420px]">

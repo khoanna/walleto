@@ -82,21 +82,21 @@ export default function DashBoard() {
           {/* 1. Line Chart */}
           {/* Mobile: sm:col-span-2 (Nằm trên cùng, full chiều ngang) */}
           {/* Desktop: lg:col-span-3 (Nằm bên trái, chiếm 3 phần) */}
-          <div className="sm:col-span-2 lg:col-span-3 h-[280px] sm:min-h-[260px] lg:min-h-[340px]">
+          <div className="sm:col-span-2 lg:col-span-3 h-[280px] sm:min-h-[260px] lg:min-h-[340px] order-3 lg:order-1">
             <TwoLineChart transactions={transactionData?.data || []} />
           </div>
 
           {/* 2. Donut Chart */}
           {/* Mobile: 1 cột (Nằm dưới chart, bên trái) */}
           {/* Desktop: lg:col-span-2 (Nằm giữa) */}
-          <div className="lg:col-span-2 h-[280px] sm:min-h-[260px] lg:min-h-[340px]">
+          <div className="lg:col-span-2 h-[280px] sm:min-h-[260px] lg:min-h-[340px] order-1 lg:order-2">
             <DonutChart financeData={financeData} />
           </div>
 
           {/* 3. Account Cards */}
           {/* Mobile: 1 cột (Nằm dưới chart, bên phải) */}
           {/* Desktop: lg:col-span-2 (Nằm phải cùng) */}
-          <div className="lg:col-span-2 h-[280px] sm:min-h-[260px] lg:min-h-[340px]">
+          <div className="lg:col-span-2 h-[280px] sm:min-h-[260px] lg:min-h-[340px] order-2 lg:order-3">
             <Account financeData={financeData} weekData={weekData} />
           </div>
         </div>

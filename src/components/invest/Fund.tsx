@@ -104,11 +104,11 @@ const Fund = () => {
 
         <button
           onClick={() => setIsCreateModalOpen(true)}
-          className="group flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 
+          className="group flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 
                      text-white font-medium rounded-lg shadow-lg shadow-blue-500/20 
-                     transition-all duration-200 text-sm active:scale-95"
+                     transition-all duration-200 text-base active:scale-95"
         >
-          <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
+          <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
           Tạo quỹ mới
         </button>
       </div>
@@ -129,9 +129,16 @@ const Fund = () => {
                   router.push(`/dashboard/portfolio/${fund.idFund}`)
                 }
                 className="group relative bg-background border border-border/50 hover:border-blue-500/50 
-                           rounded-xl p-5 cursor-pointer transition-all duration-300 
+                           rounded-xl pt-10 px-5 pb-5 cursor-pointer transition-all duration-300 
                            hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-1 overflow-hidden"
               >
+                {/* Date - Moved to top-left */}
+                <div className="absolute top-2 left-2 z-10 p-2 text-xs text-text/40 font-medium flex items-center gap-1 bg-background/70 backdrop-blur-sm rounded-md  ">
+                  <Calendar size={12} className="text-blue-500" />
+                  <span>
+                    {new Date(fund.createAt).toLocaleDateString("vi-VN")}
+                  </span>
+                </div>
                 {/* Decoration Gradient Background on Hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
@@ -176,24 +183,16 @@ const Fund = () => {
                   </p>
                 </div>
 
-                {/* --- Card Footer: Date & CTA Arrow --- */}
-                <div className="relative z-10 flex items-center justify-between pt-4 border-t border-dashed border-border/50">
-                  {/* Date */}
-                  <div className="flex items-center gap-2 text-xs text-text/40 font-medium">
-                    <Calendar size={14} />
-                    <span>
-                      {new Date(fund.createAt).toLocaleDateString("vi-VN")}
-                    </span>
-                  </div>
-
+                {/* --- Card Footer: CTA Arrow --- */}
+                <div className="relative z-10 flex items-center justify-end pt-4">
                   {/* CTA Button - Replaced Text with Icon to prevent overflow */}
                   <div
-                    className="flex items-center justify-center w-8 h-8 rounded-full 
+                    className="flex items-center justify-center w-10 h-10 rounded-full 
                                   bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400
                                   group-hover:bg-blue-600 group-hover:text-white transition-all duration-300"
                   >
                     <ArrowRight
-                      size={16}
+                      size={22}
                       className="-ml-0.5 group-hover:translate-x-0.5 transition-transform"
                     />
                   </div>

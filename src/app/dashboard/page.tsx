@@ -73,47 +73,37 @@ export default function DashBoard() {
 
   return (
     <div className="min-h-screen bg-foreground p-3 sm:p-4 lg:p-6">
-      <div className="h-full flex flex-col gap-3 sm:gap-4">
-        {/* --- ROW 1: Charts & Account --- */}
-        {/* Mobile (>640px): sm:grid-cols-2 (Chia đôi: Donut trái, Account phải)
-            Laptop (>1024px): lg:grid-cols-7 (Giữ nguyên layout cũ: 3-2-2) 
-        */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3 sm:gap-4">
-          {/* 1. Line Chart */}
-          {/* Mobile: sm:col-span-2 (Nằm trên cùng, full chiều ngang) */}
-          {/* Desktop: lg:col-span-3 (Nằm bên trái, chiếm 3 phần) */}
-          <div className="sm:col-span-2 lg:col-span-3 h-[280px] sm:min-h-[260px] lg:min-h-[340px] order-3 lg:order-1">
-            <TwoLineChart transactions={transactionData?.data || []} />
-          </div>
-
-          {/* 2. Donut Chart */}
-          {/* Mobile: 1 cột (Nằm dưới chart, bên trái) */}
-          {/* Desktop: lg:col-span-2 (Nằm giữa) */}
-          <div className="lg:col-span-2 h-[280px] sm:min-h-[260px] lg:min-h-[340px] order-1 lg:order-2">
-            <DonutChart financeData={financeData} />
-          </div>
-
-          {/* 3. Account Cards */}
-          {/* Mobile: 1 cột (Nằm dưới chart, bên phải) */}
-          {/* Desktop: lg:col-span-2 (Nằm phải cùng) */}
-          <div className="lg:col-span-2 h-[280px] sm:min-h-[260px] lg:min-h-[340px] order-2 lg:order-3">
-            <Account financeData={financeData} weekData={weekData} />
-          </div>
+      <div className="grid grid-cols-1 lg:grid-cols-7 gap-3 sm:gap-4">
+        {/* 1. Tài khoản hiện tại (Account) */}
+        {/* Mobile: Thứ 1 | Desktop: Góc phải hàng 1 */}
+        <div className="order-1 lg:order-3 lg:col-span-2 h-auto sm:min-h-[260px] lg:min-h-[340px]">
+          <Account financeData={financeData} weekData={weekData} />
         </div>
 
-        {/* --- ROW 2: Portfolio & Activity --- */}
-        <div className="grid grid-cols-1 lg:grid-cols-7 gap-3 sm:gap-4 flex-1">
-          {/* Portfolio Table */}
-          <div className="lg:col-span-5 min-h-0 sm:min-h-[300px] lg:min-h-[420px]">
-            <PortfolioTable assets={assetData?.data || []} />
-          </div>
+        {/* 2. Biểu đồ tròn (DonutChart) */}
+        {/* Mobile: Thứ 2 | Desktop: Giữa hàng 1 */}
+        <div className="order-2 lg:order-2 lg:col-span-2 h-auto sm:min-h-[260px] lg:min-h-[340px]">
+          <DonutChart financeData={financeData} />
+        </div>
 
-          {/* Activity List */}
-          <div className="lg:col-span-2 min-h-0 sm:min-h-[220px] lg:min-h-[420px]">
-            <BalanceActivity
-              transactions={weekData?.listBriefTransactionResponses || []}
-            />
-          </div>
+        {/* 3. Biểu đồ đường (TwoLineChart) */}
+        {/* Mobile: Thứ 3 | Desktop: Trái hàng 1 */}
+        <div className="order-3 lg:order-1 lg:col-span-3 h-auto sm:min-h-[260px] lg:min-h-[340px]">
+          <TwoLineChart transactions={transactionData?.data || []} />
+        </div>
+
+        {/* 4. Portfolio Table */}
+        {/* Mobile: Thứ 4 | Desktop: Trái hàng 2 */}
+        <div className="order-4 lg:order-4 lg:col-span-5 min-h-0 sm:min-h-[300px] lg:min-h-[420px]">
+          <PortfolioTable assets={assetData?.data || []} />
+        </div>
+
+        {/* 5. Giao dịch tuần này (BalanceActivity) */}
+        {/* Mobile: Thứ 5 (Cuối cùng) | Desktop: Phải hàng 2 */}
+        <div className="order-5 lg:order-5 lg:col-span-2 min-h-0 sm:min-h-[220px] lg:min-h-[420px]">
+          <BalanceActivity
+            transactions={weekData?.listBriefTransactionResponses || []}
+          />
         </div>
       </div>
     </div>

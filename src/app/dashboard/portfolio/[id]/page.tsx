@@ -1,9 +1,9 @@
 "use client";
 
 import useFund from "@/services/useFund";
-import {useParams, useRouter} from "next/navigation";
-import React, {useEffect, useState} from "react";
-import {Loader2} from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import AddCrypto from "@/components/invest/AddCrypto";
 import AddTransaction from "@/components/invest/AddTransaction";
 import CryptoDetail from "@/components/invest/CryptoDetail";
@@ -34,10 +34,45 @@ interface FundDetail {
     | null;
 }
 
+// --- HÀM RÚT GỌN TIỀN (Copy từ Account) ---
+function formatCompactMoney(amount: number) {
+  if (!amount && amount !== 0) return "0 đ";
+
+  const absAmount = Math.abs(amount);
+
+  const formatNumber = (num: number) => {
+    return num.toLocaleString("vi-VN", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    });
+  };
+
+  let formatted = "";
+
+  // 1.000.000.000.000.000: 1 Triệu Tỷ
+  if (absAmount >= 1_000_000_000_000_000) {
+    formatted = formatNumber(absAmount / 1_000_000_000_000_000) + " triệu tỷ";
+  }
+  // 1.000.000.000: 1 Tỷ
+  else if (absAmount >= 1_000_000_000) {
+    formatted = formatNumber(absAmount / 1_000_000_000) + " tỷ";
+  }
+  // 1.000.000: 1 Triệu
+  else if (absAmount >= 1_000_000) {
+    formatted = formatNumber(absAmount / 1_000_000) + " triệu";
+  }
+  // Nhỏ hơn 1 triệu
+  else {
+    formatted = absAmount.toLocaleString("vi-VN") + " đ";
+  }
+
+  return amount < 0 ? `-${formatted}` : formatted;
+}
+
 const DetailFund = () => {
   const id = useParams().id;
   const router = useRouter();
-  const {getDetailFund, addCrypto, deleteCrypto, addTransaction} = useFund();
+  const { getDetailFund, addCrypto, deleteCrypto, addTransaction } = useFund();
   const [fundDetail, setFundDetail] = useState<FundDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAddCryptoModalOpen, setIsAddCryptoModalOpen] = useState(false);
@@ -78,7 +113,7 @@ const DetailFund = () => {
       const refreshData = await getDetailFund(String(id));
       setFundDetail(refreshData?.data);
     } catch (error) {
-       alert((error as Error).message);
+      alert((error as Error).message);
     }
   };
 
@@ -125,14 +160,6 @@ const DetailFund = () => {
     setFundDetail(refreshData?.data);
   };
 
-  const formatNumber = (num: number) => {
-    return new Intl.NumberFormat("en-US", {
-      notation: "compact",
-      compactDisplay: "short",
-      maximumFractionDigits: 2,
-    }).format(num);
-  };
-
   const getChangeColor = (value: number) => {
     if (value > 0) return "text-green-500";
     if (value < 0) return "text-red-500";
@@ -171,12 +198,14 @@ const DetailFund = () => {
         <div className="flex gap-2 items-center">
           <button
             onClick={() => router.back()}
-            className="p-2 cursor-pointer hover:bg-background rounded-lg transition-colors">
+            className="p-2 cursor-pointer hover:bg-background rounded-lg transition-colors"
+          >
             <svg
               className="w-5 h-5 sm:w-6 sm:h-6 text-text"
               fill="none"
               stroke="currentColor"
-              viewBox="0 0 24 24">
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -193,12 +222,14 @@ const DetailFund = () => {
           onClick={() => setIsAddCryptoModalOpen(true)}
           className="px-4 sm:px-6 py-2 sm:py-2.5 bg-foreground text-text font-semibold rounded-full 
                              border border-text/20 hover:brightness-110 active:scale-[0.98] 
-                             transition-all shadow-lg cursor-pointer flex items-center gap-2 text-sm sm:text-base w-full sm:w-auto justify-center">
+                             transition-all shadow-lg cursor-pointer flex items-center gap-2 text-sm sm:text-base w-full sm:w-auto justify-center"
+        >
           <svg
             className="w-4 h-4 sm:w-5 sm:h-5"
             fill="none"
             stroke="currentColor"
-            viewBox="0 0 24 24">
+            viewBox="0 0 24 24"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -263,11 +294,14 @@ const DetailFund = () => {
                 {fundDetail.averageFinanceAssets.map((asset, index) => (
                   <div
                     key={asset.assetName}
-                    className="flex items-center justify-between">
+                    className="flex items-center justify-between"
+                  >
                     <div className="flex items-center gap-2">
                       <div
                         className="w-3 h-3 rounded-full"
-                        style={{backgroundColor: colors[index % colors.length]}}
+                        style={{
+                          backgroundColor: colors[index % colors.length],
+                        }}
                       />
                       <span className="text-xs sm:text-sm text-text">
                         {asset.assetName}
@@ -286,7 +320,8 @@ const DetailFund = () => {
                 className="w-16 h-16 sm:w-20 sm:h-20 text-text/20 mb-4"
                 fill="none"
                 stroke="currentColor"
-                viewBox="0 0 24 24">
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -312,7 +347,8 @@ const DetailFund = () => {
               Tổng tiền quỹ hiện tại
             </p>
             <p className="text-xl sm:text-2xl font-bold text-text">
-              {Number(fundDetail.totalFinanceCurrent).toLocaleString("vi-VN")}
+              {/* SỬ DỤNG HÀM MỚI Ở ĐÂY */}
+              {formatCompactMoney(fundDetail.totalFinanceCurrent)}
             </p>
           </div>
 
@@ -322,9 +358,8 @@ const DetailFund = () => {
               Số tiền vốn bỏ ra
             </p>
             <p className="text-xl sm:text-2xl font-bold text-text">
-              {Number(fundDetail.totalTransactionAmount).toLocaleString(
-                "vi-VN"
-              )}
+              {/* SỬ DỤNG HÀM MỚI Ở ĐÂY */}
+              {formatCompactMoney(fundDetail.totalTransactionAmount)}
             </p>
           </div>
 
@@ -336,9 +371,11 @@ const DetailFund = () => {
             <p
               className={`text-xl sm:text-2xl font-bold ${getChangeColor(
                 fundDetail.totalProfitAndLoss
-              )}`}>
+              )}`}
+            >
               {fundDetail.totalProfitAndLoss >= 0 ? "+" : ""}
-              {Number(fundDetail.totalProfitAndLoss).toLocaleString("vi-VN")}
+              {/* SỬ DỤNG HÀM MỚI Ở ĐÂY */}
+              {formatCompactMoney(fundDetail.totalProfitAndLoss)}
             </p>
           </div>
 
@@ -351,7 +388,8 @@ const DetailFund = () => {
                 <span
                   className={`font-semibold ${getChangeColor(
                     fundDetail.totalProfitAndLoss
-                  )}`}>
+                  )}`}
+                >
                   {fundDetail.totalTransactionAmount > 0
                     ? (
                         (fundDetail.totalProfitAndLoss /
@@ -394,10 +432,10 @@ const DetailFund = () => {
                     24g
                   </th>
                   <th className="hidden md:table-cell px-3 sm:px-6 py-3 sm:py-4 text-right text-xs font-semibold text-text uppercase tracking-wider whitespace-nowrap">
-                    7ng
+                    KLGD (24h)
                   </th>
                   <th className="hidden lg:table-cell px-3 sm:px-6 py-3 sm:py-4 text-right text-xs font-semibold text-text uppercase tracking-wider whitespace-nowrap">
-                    Vốn hóa thị trường
+                    Vốn hóa
                   </th>
                   <th className="hidden xl:table-cell px-3 sm:px-6 py-3 sm:py-4 text-center text-xs font-semibold text-text uppercase tracking-wider whitespace-nowrap">
                     7 ngày qua
@@ -411,7 +449,8 @@ const DetailFund = () => {
                 {fundDetail.listInvestmentAssetResponse.map((asset) => (
                   <tr
                     key={asset.idAsset}
-                    className="hover:bg-text/5 transition-colors">
+                    className="hover:bg-text/5 transition-colors"
+                  >
                     <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                       <div
                         className="flex items-center gap-2 sm:gap-3 cursor-pointer group"
@@ -422,7 +461,8 @@ const DetailFund = () => {
                             symbol: asset.assetSymbol,
                             price: asset.currentPrice,
                           })
-                        }>
+                        }
+                      >
                         <img
                           src={asset.url}
                           alt={asset.assetName}
@@ -439,20 +479,24 @@ const DetailFund = () => {
                       </div>
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-right font-semibold text-text whitespace-nowrap text-xs sm:text-sm">
+                      {/* Giá giữ nguyên hiển thị full số hoặc dùng toLocaleString cơ bản để xem chi tiết */}
                       {Number(asset.currentPrice).toLocaleString("vi-VN")}
                     </td>
                     <td
                       className={`px-3 sm:px-6 py-3 sm:py-4 text-right font-medium whitespace-nowrap text-xs sm:text-sm ${getChangeColor(
                         asset.priceChangePercentage24h
-                      )}`}>
+                      )}`}
+                    >
                       {asset.priceChangePercentage24h >= 0 ? "+" : ""}
                       {asset.priceChangePercentage24h.toFixed(2)}%
                     </td>
                     <td className="hidden md:table-cell px-3 sm:px-6 py-3 sm:py-4 text-right text-text whitespace-nowrap text-xs sm:text-sm">
-                      {formatNumber(asset.totalVolume)}
+                      {/* Áp dụng formatCompactMoney cho Volume */}
+                      {formatCompactMoney(asset.totalVolume)}
                     </td>
                     <td className="hidden lg:table-cell px-3 sm:px-6 py-3 sm:py-4 text-right text-text whitespace-nowrap text-xs sm:text-sm">
-                      {formatNumber(asset.marketCap)}
+                      {/* Áp dụng formatCompactMoney cho Vốn hóa */}
+                      {formatCompactMoney(asset.marketCap)}
                     </td>
                     <td className="hidden xl:table-cell px-3 sm:px-6 py-3 sm:py-4">
                       <div className="flex justify-center">
@@ -478,12 +522,14 @@ const DetailFund = () => {
                             })
                           }
                           className="p-1.5 sm:p-2 cursor-pointer hover:bg-green-500/10 rounded-lg transition-colors group"
-                          title="Thêm giao dịch">
+                          title="Thêm giao dịch"
+                        >
                           <svg
                             className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 group-hover:scale-110 transition-transform"
                             fill="none"
                             stroke="currentColor"
-                            viewBox="0 0 24 24">
+                            viewBox="0 0 24 24"
+                          >
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -495,12 +541,14 @@ const DetailFund = () => {
                         <button
                           onClick={() => handleDeleteCrypto(asset.idAsset)}
                           className="p-1.5 sm:p-2 cursor-pointer hover:bg-red-500/10 rounded-lg transition-colors group"
-                          title="Xóa khỏi quỹ">
+                          title="Xóa khỏi quỹ"
+                        >
                           <svg
                             className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 group-hover:scale-110 transition-transform"
                             fill="none"
                             stroke="currentColor"
-                            viewBox="0 0 24 24">
+                            viewBox="0 0 24 24"
+                          >
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -522,7 +570,8 @@ const DetailFund = () => {
               className="w-24 h-24 text-text/20 mb-4"
               fill="none"
               stroke="currentColor"
-              viewBox="0 0 24 24">
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -540,7 +589,7 @@ const DetailFund = () => {
         )}
       </div>
 
-      {/* Add Crypto Modal */}
+      {/* Modals giữ nguyên */}
       <AddCrypto
         isOpen={isAddCryptoModalOpen}
         onClose={() => setIsAddCryptoModalOpen(false)}
@@ -549,7 +598,6 @@ const DetailFund = () => {
         fundId={String(id)}
       />
 
-      {/* Add Transaction Modal */}
       {selectedAsset && (
         <AddTransaction
           isOpen={isAddTransactionModalOpen}
@@ -566,7 +614,6 @@ const DetailFund = () => {
         />
       )}
 
-      {/* Crypto Detail Modal */}
       {selectedAsset && (
         <CryptoDetail
           isOpen={isCryptoDetailModalOpen}

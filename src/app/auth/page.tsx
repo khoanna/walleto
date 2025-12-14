@@ -135,6 +135,8 @@ const Button = ({
   </button>
 );
 
+// (Using browser alert(), no custom alert prop needed)
+
 /* ---------------- SIGN IN ---------------- */
 function SignIn({setMode}: {setMode: (m: AuthMode) => void}) {
   const [email, setEmail] = useState("");
@@ -193,14 +195,21 @@ function SignIn({setMode}: {setMode: (m: AuthMode) => void}) {
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
+        window.alert(error.message);
       } else {
         setError("Login failed");
+        window.alert("Đăng nhập thất bại");
       }
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleLogin();
+  };
+
   return (
-    <div className="w-full max-w-sm text-center">
+    <form onSubmit={handleSubmit} className="w-full max-w-sm text-center">
       <h2 className="text-2xl font-bold mb-2">Chào mừng trở lại!</h2>
       <p className="text-sm opacity-80 mb-6">
         Vui lòng nhập thông tin xác thực của bạn để đăng nhập
@@ -214,7 +223,7 @@ function SignIn({setMode}: {setMode: (m: AuthMode) => void}) {
         Quên mật khẩu?
       </p>
       <Button label="Đăng nhập" onClick={handleLogin} loading={authLoading} />
-    </div>
+    </form>
   );
 }
 
@@ -247,18 +256,26 @@ function SignUp({
       setError("");
       setCurrentEmail(email);
 
+      window.alert("Đăng ký thành công. Vui lòng kiểm tra email để nhận OTP.");
       setMode("verify");
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
+        window.alert(err.message);
       } else {
         setError("Registration failed");
+        window.alert("Đăng ký thất bại");
       }
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSignup();
+  };
+
   return (
-    <div className="w-full max-w-sm text-center">
+    <form onSubmit={handleSubmit} className="w-full max-w-sm text-center">
       <h2 className="text-2xl font-bold mb-2">Đăng ký</h2>
       <p className="text-sm opacity-80 mb-6">Nhập thông tin để đăng ký.</p>
       <Input placeholder="Tên" value={name} onChange={setName} />
@@ -272,7 +289,7 @@ function SignUp({
       />
       {error && <p className="text-xs text-red-500 mb-2">{error}</p>}
       <Button label="SIGN UP" onClick={handleSignup} loading={authLoading} />
-    </div>
+    </form>
   );
 }
 
@@ -293,25 +310,33 @@ function ForgotPassword({
       await forgotPassword(email);
       setEmail("");
       setError("");
-      setMode("reset");
       setCurrentEmail(email);
+      window.alert("OTP đã được gửi. Vui lòng kiểm tra email.");
+      setMode("reset");
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
+        window.alert(error.message);
       } else {
         setError("Forgot password request failed");
+        window.alert("Yêu cầu quên mật khẩu thất bại");
       }
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleForgotPassword();
+  };
+
   return (
-    <div className="w-full max-w-sm text-center">
+    <form onSubmit={handleSubmit} className="w-full max-w-sm text-center">
       <h2 className="text-2xl font-bold mb-2">Quên mật khẩu</h2>
       <p className="text-sm opacity-80 mb-6">Vui lòng nhập email để đặt lại mật khẩu</p>
       <Input placeholder="Email" type="email" value={email} onChange={setEmail} />
       {error && <p className="text-xs text-red-500 mb-2">{error}</p>}
       <Button label="QUÊN MẬT KHẨU" onClick={handleForgotPassword} loading={authLoading} />
-    </div>
+    </form>
   );
 }
 
@@ -327,24 +352,32 @@ function VerifyOtp({email, setMode}: {email?: string; setMode: (m: AuthMode) => 
       await confirmOTPRegister(email, otp.trim());
       setOtp("");
       setError("");
+      window.alert("Xác thực thành công. Bạn có thể đăng nhập.");
       setMode("signIn");
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
+        window.alert(error.message);
       } else {
         setError("Verification failed");
+        window.alert("Xác thực thất bại");
       }
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleVerify();
+  };
+
   return (
-    <div className="w-full max-w-sm text-center">
+    <form onSubmit={handleSubmit} className="w-full max-w-sm text-center">
       <h2 className="text-2xl font-bold mb-2">Kiểm tra hộp thư của bạn</h2>
       <p className="text-sm opacity-80 mb-6">Vui lòng nhập OTP để tiếp tục</p>
       <Input placeholder="OTP" value={otp} onChange={setOtp} />
       {error && <p className="text-xs text-red-500 mb-2">{error}</p>}
       <Button label="XÁC NHẬN" loading={authLoading} onClick={handleVerify} />
-    </div>
+    </form>
   );
 }
 
@@ -374,18 +407,26 @@ function ResetPassword({
       setConfirmPassword("");
       setOtp("");
       setError("");
+      window.alert("Đặt lại mật khẩu thành công. Vui lòng đăng nhập.");
       setMode("signIn");
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
+        window.alert(error.message);
       } else {
         setError("Reset password failed");
+        window.alert("Đặt lại mật khẩu thất bại");
       }
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleReset();
+  };
+
   return (
-    <div className="w-full max-w-sm text-center">
+    <form onSubmit={handleSubmit} className="w-full max-w-sm text-center">
       <h2 className="text-2xl font-bold mb-2">Đặt lại mật khẩu</h2>
       <p className="text-sm opacity-80 mb-6">Nhập mật khẩu mới</p>
       <Input
@@ -403,6 +444,6 @@ function ResetPassword({
       <Input placeholder="OTP" value={otp} onChange={setOtp} />
       {error && <p className="text-xs text-red-500 mb-2">{error}</p>}
       <Button label="ĐẶT LẠI" onClick={handleReset} loading={authLoading} />
-    </div>
+    </form>
   );
 }

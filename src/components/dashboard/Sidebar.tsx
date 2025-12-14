@@ -14,14 +14,15 @@ import {
   Star,
   Crown,
   Shield,
+  Bitcoin,
 } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import {usePathname, useRouter} from "next/navigation";
+import {useTheme} from "next-themes";
+import {useEffect, useState} from "react";
 import useAuth from "@/services/useAuth";
-import { useUserContext } from "@/context";
-import { getToken } from "@/services/Token";
-import { decodeJWT } from "@/services/JwtDecoder";
+import {useUserContext} from "@/context";
+import {getToken} from "@/services/Token";
+import {decodeJWT} from "@/services/JwtDecoder";
 import NotificationBell from "./NotificationBell";
 
 // Interface riêng cho Context (chỉ cần 3 field)
@@ -31,7 +32,7 @@ interface ContextUser {
   email: string;
 }
 
-type Item = { label: string; href: string; icon: React.ReactNode };
+type Item = {label: string; href: string; icon: React.ReactNode};
 
 const NAV: Item[] = [
   {
@@ -42,14 +43,18 @@ const NAV: Item[] = [
   {
     label: "Danh mục đầu tư",
     href: "/dashboard/portfolio",
-    icon: <Search className="size-5" />,
+    icon: <Bitcoin className="size-5" />,
   },
   {
     label: "Quản lý tài chính",
     href: "/dashboard/wallet",
     icon: <Wallet2 className="size-5" />,
   },
-
+  {
+    label: "Thống kê",
+    href: "/dashboard/compare",
+    icon: <Search className="size-5" />,
+  },
   {
     label: "Báo chí",
     href: "/dashboard/news",
@@ -70,7 +75,7 @@ const NAV: Item[] = [
     href: "/admin",
     icon: <Shield className="size-5 text-red-400" />,
   },
-  { label: "Đăng xuất", href: "", icon: <LogOut className="size-5" /> },
+  {label: "Đăng xuất", href: "", icon: <LogOut className="size-5" />},
 ];
 
 const WIDTH = 260;
@@ -81,7 +86,7 @@ export default function Sidebar() {
   const activePath = usePathname();
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { resolvedTheme, setTheme } = useTheme();
+  const {resolvedTheme, setTheme} = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -102,7 +107,7 @@ export default function Sidebar() {
     }
   }, []);
 
-  const { logout } = useAuth();
+  const {logout} = useAuth();
 
   // Lọc NAV items dựa trên permissions
   const filteredNAV = NAV.filter((item) => {
@@ -136,13 +141,8 @@ export default function Sidebar() {
       <button
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-xl bg-[#0B162C]/95 dark:bg-[#0A1226]/95 backdrop-blur-md border border-white/10 shadow-lg text-slate-200"
-        aria-label="Toggle menu"
-      >
-        {isMobileMenuOpen ? (
-          <X className="size-6" />
-        ) : (
-          <Menu className="size-6" />
-        )}
+        aria-label="Toggle menu">
+        {isMobileMenuOpen ? <X className="size-6" /> : <Menu className="size-6" />}
       </button>
 
       {/* Mobile Overlay */}
@@ -155,7 +155,7 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        style={{ ["--sbw" as string]: `${WIDTH}px` }}
+        style={{["--sbw" as string]: `${WIDTH}px`}}
         className={[
           "h-[100dvh] w-[var(--sbw)]",
           "bg-[#0B162C]/95 dark:bg-[#0A1226]/95 text-slate-200",
@@ -165,13 +165,10 @@ export default function Sidebar() {
           "lg:sticky lg:top-0",
           "fixed top-0 z-40",
           "transition-transform duration-300 ease-in-out",
-          isMobileMenuOpen
-            ? "translate-x-0"
-            : "-translate-x-full lg:translate-x-0",
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
           "rounded-r-3xl",
         ].join(" ")}
-        aria-label="Sidebar"
-      >
+        aria-label="Sidebar">
         {/* Brand + Theme + Notification */}
         <div className="flex text-xl sm:text-2xl mb-6 sm:mb-8 items-center justify-center gap-3 sm:gap-4 pt-12 lg:pt-0">
           <div className="font-semibold tracking-wide">Walleto</div>
@@ -184,16 +181,14 @@ export default function Sidebar() {
           {mounted ? (
             <button
               onClick={() => setTheme(isDark ? "light" : "dark")}
-              className="group relative h-6 w-12 sm:w-14 rounded-full cursor-pointer ring-1 ring-white/15 bg-gradient-to-br from-white/10 via-white/5 to-white/10 dark:from-blue-500/25 dark:via-blue-400/20 dark:to-blue-500/25 before:absolute before:inset-0 before:rounded-full before:blur-md before:bg-white/10 dark:before:bg-blue-500/20 overflow-hidden backdrop-blur-sm transition-[background,box-shadow] duration-300 hover:ring-white/25 hover:shadow-[0_10px_30px_rgba(0,0,0,0.28)] active:scale-[0.98]"
-            >
+              className="group relative h-6 w-12 sm:w-14 rounded-full cursor-pointer ring-1 ring-white/15 bg-gradient-to-br from-white/10 via-white/5 to-white/10 dark:from-blue-500/25 dark:via-blue-400/20 dark:to-blue-500/25 before:absolute before:inset-0 before:rounded-full before:blur-md before:bg-white/10 dark:before:bg-blue-500/20 overflow-hidden backdrop-blur-sm transition-[background,box-shadow] duration-300 hover:ring-white/25 hover:shadow-[0_10px_30px_rgba(0,0,0,0.28)] active:scale-[0.98]">
               <span className="pointer-events-none absolute -inset-x-10 inset-y-0 bg-[linear-gradient(100deg,transparent,rgba(255,255,255,0.12),transparent)] translate-x-[-60%] group-hover:translate-x-[60%] transition-transform duration-700 ease-out" />
               <span
                 className={[
                   "absolute top-1/2 -translate-y-1/2 h-5 w-5 rounded-full grid place-items-center bg-white/95 shadow-[0_6px_18px_rgba(0,0,0,0.25)] ring-1 ring-white/60 transition-transform duration-300 group-active:scale-95",
                   isDark ? "translate-x-7 sm:translate-x-8" : "translate-x-1",
                   "before:absolute before:inset-[-1px] before:rounded-full before:content-[''] before:bg-[conic-gradient(from_220deg_at_50%_50%,rgba(255,255,255,0.65),rgba(255,255,255,0)_60%)]",
-                ].join(" ")}
-              >
+                ].join(" ")}>
                 {isDark ? (
                   <svg viewBox="0 0 24 24" className="h-4 w-4 text-blue-600">
                     <path
@@ -236,14 +231,11 @@ export default function Sidebar() {
                       active
                         ? "bg-white/10 ring-1 ring-white/10 text-white"
                         : "hover:bg-white/6 text-slate-300 hover:text-white"
-                    }`}
-                  >
+                    }`}>
                     <span className="shrink-0 grid place-items-center size-9 rounded-xl border border-white/10 bg-white/6 transition-transform motion-safe:group-hover:scale-[1.03]">
                       {it.icon}
                     </span>
-                    <span className="text-[13px] font-medium tracking-wide">
-                      {it.label}
-                    </span>
+                    <span className="text-[13px] font-medium tracking-wide">{it.label}</span>
                   </Link>
                 </li>
               );
@@ -255,8 +247,7 @@ export default function Sidebar() {
         <div className="absolute inset-x-0 bottom-5 px-4">
           <div
             onClick={handleOpenProfile}
-            className="rounded-3xl border border-white/10 bg-white/[0.04] p-4 cursor-pointer hover:bg-white/[0.08] transition"
-          >
+            className="rounded-3xl border border-white/10 bg-white/[0.04] p-4 cursor-pointer hover:bg-white/[0.08] transition">
             <div className="flex items-center gap-3 justify-between">
               <div className="flex items-center gap-3">
                 <div>
@@ -274,12 +265,9 @@ export default function Sidebar() {
                 {(() => {
                   const perms = context?.permissions;
                   const hasPremium = !!(
-                    perms?.includes("AI_CHATTING") ||
-                    perms?.includes("SOCIAL_NETWORK")
+                    perms?.includes("AI_CHATTING") || perms?.includes("SOCIAL_NETWORK")
                   );
-                  return hasPremium ? (
-                    <Crown className="h-5 w-5 text-yellow-400" />
-                  ) : null;
+                  return hasPremium ? <Crown className="h-5 w-5 text-yellow-400" /> : null;
                 })()}
               </div>
             </div>

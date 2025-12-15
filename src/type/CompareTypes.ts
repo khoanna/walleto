@@ -73,4 +73,5 @@ export interface InvestmentAsset {
   idAsset: string;
   assetName: string;
   assetSymbol: string;
+  url: string;
 }

@@ -19,11 +19,12 @@ import {
   TrendingDown,
   Info,
   Filter,
-  Coins,
   Search,
   FileX2,
   Download,
   Loader2,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 
 import {
@@ -46,6 +47,7 @@ const formatCurrency = (amount: number) => {
   }).format(safeAmount);
 };
 
+// Component con: Card So sánh
 interface ComparisonCardProps {
   data: TransactionSummary | InvestmentSummary | undefined | null;
   type: "transaction" | "investment";
@@ -62,25 +64,29 @@ const ComparisonCard = ({
   const [expandIncome, setExpandIncome] = useState(false);
   const [expandExpense, setExpandExpense] = useState(false);
 
+  // Loading State
   if (loading) {
     return (
-      <div className="p-4 border rounded-xl animate-pulse bg-slate-100 h-80 flex flex-col gap-4">
-        <div className="h-6 bg-slate-200 rounded w-1/3"></div>
-        <div className="flex-1 bg-slate-200 rounded"></div>
-        <div className="flex-1 bg-slate-200 rounded"></div>
+      <div className="p-4 border border-slate-100 dark:border-navy-border rounded-2xl animate-pulse bg-white dark:bg-navy-800 h-80 flex flex-col gap-4 shadow-sm">
+        <div className="h-6 bg-slate-200 dark:bg-navy-700 rounded w-1/3"></div>
+        <div className="flex-1 bg-slate-200 dark:bg-navy-700 rounded"></div>
+        <div className="flex-1 bg-slate-200 dark:bg-navy-700 rounded"></div>
       </div>
     );
   }
 
+  // Empty State
   if (!data) {
     return (
-      <div className="border border-dashed border-slate-300 rounded-xl bg-slate-50 h-80 flex flex-col items-center justify-center text-slate-500 gap-3 animate-in fade-in duration-500">
-        <div className="p-3 bg-slate-100 rounded-full">
+      <div className="border border-dashed border-slate-300 dark:border-navy-border rounded-2xl bg-slate-50 dark:bg-navy-800/50 h-80 flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 gap-3 animate-in fade-in duration-500">
+        <div className="p-3 bg-slate-100 dark:bg-navy-700 rounded-full">
           <FileX2 size={32} className="opacity-50" />
         </div>
         <div className="text-center">
-          <p className="font-semibold text-sm">{title}</p>
-          <p className="text-xs mt-1">Không có dữ liệu giao dịch</p>
+          <p className="font-semibold text-sm text-slate-700 dark:text-white">
+            {title}
+          </p>
+          <p className="text-xs mt-1">Không có dữ liệu</p>
         </div>
       </div>
     );
@@ -128,14 +134,14 @@ const ComparisonCard = ({
     if ("transactionName" in item) {
       return (
         <>
-          <span className="truncate max-w-[65%] text-slate-600">
+          <span className="truncate max-w-[65%] text-slate-600 dark:text-slate-400">
             {item.transactionName}
           </span>
           <span
             className={`font-medium ${
               item.transactionType === "Thu"
-                ? "text-emerald-600"
-                : "text-red-600"
+                ? "text-emerald-600 dark:text-emerald-400"
+                : "text-red-600 dark:text-red-400"
             }`}
           >
             {formatCurrency(item.amount)}
@@ -145,10 +151,10 @@ const ComparisonCard = ({
     } else {
       return (
         <>
-          <span className="truncate max-w-[65%] text-slate-600">
+          <span className="truncate max-w-[65%] text-slate-600 dark:text-slate-400">
             {item.type} (SL: {item.quantity})
           </span>
-          <span className="font-medium text-slate-800">
+          <span className="font-medium text-slate-800 dark:text-slate-200">
             {formatCurrency(item.price)}
           </span>
         </>
@@ -157,36 +163,38 @@ const ComparisonCard = ({
   };
 
   return (
-    <div className="border border-slate-200 rounded-xl shadow-sm flex flex-col h-full animate-in fade-in duration-300">
-      <div className="p-4 border-b border-slate-100 bg-slate-50/50 rounded-t-xl">
-        <h3 className="font-bold text-slate-700">{title}</h3>
+    <div className="border border-slate-200 dark:border-navy-border bg-white dark:bg-navy-800 rounded-2xl shadow-sm flex flex-col h-full animate-in fade-in duration-300">
+      {/* Header Card: Đã bỏ nền riêng ở dark mode để liền mạch */}
+      <div className="p-4 border-b border-slate-100 dark:border-navy-border bg-slate-50/50 dark:bg-transparent rounded-t-2xl">
+        <h3 className="font-bold text-slate-700 dark:text-white">{title}</h3>
       </div>
 
       <div className="p-4 flex-1 flex flex-col gap-4">
-        <div className="p-3 rounded-lg border border-emerald-100 ">
+        {/* Thu / Mua */}
+        <div className="p-3 rounded-xl border border-emerald-100 dark:border-emerald-500/20 bg-emerald-50/30 dark:bg-emerald-500/5">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
               {incomeLabel}
             </span>
             <TrendingUp className="w-5 h-5 text-emerald-500" />
           </div>
-          <div className="text-xl sm:text-2xl font-bold text-emerald-700 break-all">
+          <div className="text-xl sm:text-2xl font-bold text-emerald-700 dark:text-emerald-400 break-all">
             {formatCurrency(incomeValue)}
           </div>
           <div className="mt-3">
             <button
               onClick={() => setExpandIncome(!expandIncome)}
-              className="flex items-center gap-1 text-xs text-slate-500 hover:text-emerald-600 transition-colors w-full"
+              className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors w-full"
             >
               {expandIncome ? "Thu gọn" : "Xem chi tiết"} <Info size={14} />
             </button>
             {expandIncome && (
-              <div className="mt-2 space-y-2 max-h-40 overflow-y-auto pr-1 scrollbar-thin">
+              <div className="mt-2 space-y-2 max-h-40 overflow-y-auto pr-1 nice-scroll">
                 {incomeDetails.length > 0 ? (
                   incomeDetails.map((item, idx) => (
                     <div
                       key={idx}
-                      className="flex justify-between text-xs border-b border-slate-100 pb-1 last:border-0"
+                      className="flex justify-between text-xs border-b border-slate-100 dark:border-navy-border pb-1 last:border-0"
                     >
                       {renderDetailItem(item)}
                     </div>
@@ -201,30 +209,31 @@ const ComparisonCard = ({
           </div>
         </div>
 
-        <div className="p-3 rounded-lg border border-red-100 ">
+        {/* Chi / Bán */}
+        <div className="p-3 rounded-xl border border-red-100 dark:border-red-500/20 bg-red-50/30 dark:bg-red-500/5">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-xs font-semibold text-red-600 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">
               {expenseLabel}
             </span>
             <TrendingDown className="w-5 h-5 text-red-500" />
           </div>
-          <div className="text-xl sm:text-2xl font-bold text-red-700 break-all">
+          <div className="text-xl sm:text-2xl font-bold text-red-700 dark:text-red-400 break-all">
             {formatCurrency(expenseValue)}
           </div>
           <div className="mt-3">
             <button
               onClick={() => setExpandExpense(!expandExpense)}
-              className="flex items-center gap-1 text-xs text-slate-500 hover:text-red-600 transition-colors w-full"
+              className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors w-full"
             >
               {expandExpense ? "Thu gọn" : "Xem chi tiết"} <Info size={14} />
             </button>
             {expandExpense && (
-              <div className="mt-2 space-y-2 max-h-40 overflow-y-auto pr-1 scrollbar-thin">
+              <div className="mt-2 space-y-2 max-h-40 overflow-y-auto pr-1 nice-scroll">
                 {expenseDetails.length > 0 ? (
                   expenseDetails.map((item, idx) => (
                     <div
                       key={idx}
-                      className="flex justify-between text-xs border-b border-slate-100 pb-1 last:border-0"
+                      className="flex justify-between text-xs border-b border-slate-100 dark:border-navy-border pb-1 last:border-0"
                     >
                       {renderDetailItem(item)}
                     </div>
@@ -240,11 +249,16 @@ const ComparisonCard = ({
         </div>
       </div>
 
-      <div className="p-4 border-t border-slate-100 rounded-b-xl">
-        <p className="text-xs mb-1">Chênh lệch</p>
+      {/* Footer Card: Đã bỏ nền riêng ở dark mode */}
+      <div className="p-4 border-t border-slate-100 dark:border-navy-border rounded-b-2xl bg-slate-50/50 dark:bg-transparent">
+        <p className="text-xs mb-1 text-slate-500 dark:text-slate-400">
+          Chênh lệch
+        </p>
         <p
           className={`text-lg font-bold ${
-            spread >= 0 ? "text-slate-800" : "text-red-500"
+            spread >= 0
+              ? "text-slate-800 dark:text-white"
+              : "text-red-500 dark:text-red-400"
           }`}
         >
           {formatCurrency(spread)}
@@ -295,8 +309,13 @@ export default function Compare() {
 
   const [assets, setAssets] = useState<InvestmentAsset[]>([]);
   const [selectedAssetId, setSelectedAssetId] = useState<string>("");
+  const [isAssetDropdownOpen, setIsAssetDropdownOpen] = useState(false);
 
-  // SỬA: Dùng Generic Type <T> thay vì any
+  const selectedAsset = useMemo(
+    () => assets.find((a) => a.idAsset === selectedAssetId),
+    [assets, selectedAssetId]
+  );
+
   const processResponse = <T,>(
     res: ApiResponse<T> | undefined | void
   ): T | null => {
@@ -326,7 +345,6 @@ export default function Compare() {
             idUser: userId,
           });
         }
-        // TypeScript sẽ tự hiểu res là ApiResponse<TransactionCompareData>
         setTransactionData(processResponse(res));
       } else {
         if (!selectedAssetId) return;
@@ -347,7 +365,6 @@ export default function Compare() {
             idAsset: selectedAssetId,
           });
         }
-        // TypeScript sẽ tự hiểu res là ApiResponse<InvestmentCompareData>
         setInvestmentData(processResponse(res));
       }
     } catch (error) {
@@ -424,9 +441,7 @@ export default function Compare() {
         }
       );
 
-      // SỬA: Thay 'any' bằng 'unknown' để an toàn hơn khi ép kiểu
       getInvesmentAsset(userId).then(async (res: unknown) => {
-        // Ép kiểu res (từ unknown) về ApiResponse chuẩn
         const typedRes = res as ApiResponse<InvestmentAsset[]>;
         if (typedRes.success && typedRes.data.length > 0) {
           const assetList = typedRes.data;
@@ -499,17 +514,19 @@ export default function Compare() {
   return (
     <div
       ref={contentRef}
-      className="w-full space-y-8 pb-10 px-4 sm:px-6 lg:px-8 bg-background"
+      className="w-full space-y-8 pb-10 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-navy-900 text-slate-900 dark:text-white transition-colors duration-300 min-h-screen"
     >
       {/* LỊCH SỬ GIAO DỊCH */}
-      <section className=" rounded-2xl p-6 shadow-sm border border-slate-100">
+      <section className="bg-white dark:bg-navy-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-navy-border">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold ">Chi tiết dòng tiền</h2>
+          <h2 className="text-xl font-bold text-slate-800 dark:text-white">
+            Chi tiết dòng tiền
+          </h2>
 
           <button
             onClick={handleExportPDF}
             disabled={isExporting}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-xs font-bold rounded-lg hover:bg-slate-200 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-navy-700 text-slate-700 dark:text-white text-xs font-bold rounded-lg hover:bg-slate-200 dark:hover:bg-navy-700/80 transition-colors disabled:opacity-50"
           >
             {isExporting ? (
               <>
@@ -525,39 +542,40 @@ export default function Compare() {
           </button>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto nice-scroll pb-2">
           <table className="w-full min-w-[800px] table-fixed">
             <thead>
-              <tr className="border-b border-slate-100">
-                <th className="pb-3 text-left text-xs font-semibold uppercase w-[35%]">
+              <tr className="border-b border-slate-100 dark:border-navy-border">
+                <th className="pb-3 text-left text-xs font-semibold uppercase w-[35%] text-slate-500 dark:text-slate-400">
                   Tên giao dịch
                 </th>
-                <th className="pb-3 text-left text-xs font-semibold uppercase w-[15%]">
+                <th className="pb-3 text-left text-xs font-semibold uppercase w-[15%] text-slate-500 dark:text-slate-400">
                   Loại
                 </th>
-                <th className="pb-3 text-right text-xs font-semibold uppercase w-[25%]">
+                <th className="pb-3 text-right text-xs font-semibold uppercase w-[25%] text-slate-500 dark:text-slate-400">
                   Số tiền
                 </th>
-                <th className="pb-3 text-right text-xs font-semibold uppercase w-[25%]">
+                <th className="pb-3 text-right text-xs font-semibold uppercase w-[25%] text-slate-500 dark:text-slate-400">
                   Thời điểm
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-slate-50 dark:divide-navy-border">
               {historyList.map((item) => (
                 <tr
                   key={item.idTransaction}
-                  className="group hover:bg-slate-50/50 transition-colors"
+                  // Hover row: Sử dụng navy-700
+                  className="group hover:bg-slate-50 dark:hover:bg-navy-700 transition-colors"
                 >
-                  <td className="py-4 text-sm font-medium text-slate-700 truncate pr-2">
+                  <td className="py-4 text-sm font-medium text-slate-700 dark:text-slate-200 truncate pr-2">
                     {item.transactionName}
                   </td>
                   <td className="py-4">
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         item.transactionType === "Thu"
-                          ? "bg-emerald-100 text-emerald-800"
-                          : "bg-red-100 text-red-800"
+                          ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-400"
+                          : "bg-red-100 text-red-800 dark:bg-red-500/20 dark:text-red-400"
                       }`}
                     >
                       {item.transactionType}
@@ -566,14 +584,14 @@ export default function Compare() {
                   <td
                     className={`py-4 text-sm font-bold text-right ${
                       item.transactionType === "Thu"
-                        ? "text-emerald-600"
-                        : "text-red-600"
+                        ? "text-emerald-600 dark:text-emerald-400"
+                        : "text-red-600 dark:text-red-400"
                     }`}
                   >
                     {item.transactionType === "Chi" && "-"}
                     {formatCurrency(item.amount)}
                   </td>
-                  <td className="py-4 text-sm text-slate-500 text-right">
+                  <td className="py-4 text-sm text-slate-500 dark:text-slate-400 text-right">
                     {new Date(item.transactionDate).toLocaleDateString("vi-VN")}
                   </td>
                 </tr>
@@ -595,67 +613,140 @@ export default function Compare() {
 
       {/* SO SÁNH */}
       <section className="space-y-6">
-        <h2 className="text-2xl font-bold ">So sánh</h2>
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-white">
+          So sánh
+        </h2>
 
         {/* Controls */}
         <div
           data-html2canvas-ignore
-          className="flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between p-4 rounded-xl  shadow-sm"
+          className="flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between p-4 rounded-2xl shadow-sm bg-white dark:bg-navy-800 border border-slate-100 dark:border-navy-border"
         >
           <div className="flex flex-wrap gap-2 items-center">
-            <div className=" p-1 rounded-lg flex items-center">
+            {/* Chuyển đổi Mode: Sử dụng navy-700 cho nền chứa */}
+            <div className="p-1 rounded-xl flex items-center bg-slate-100 dark:bg-navy-700">
               <button
                 onClick={() => setCompareMode("transaction")}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   compareMode === "transaction"
-                    ? "bg-slate-900 text-white shadow-sm"
-                    : "text-slate-500 hover:text-slate-700"
+                    ? "bg-white dark:bg-navy-800 text-slate-900 dark:text-white shadow-sm"
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                 }`}
               >
                 Theo thu chi
               </button>
               <button
                 onClick={() => setCompareMode("investment")}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   compareMode === "investment"
-                    ? "bg-slate-900 text-white shadow-sm"
-                    : "text-slate-500 hover:text-slate-700"
+                    ? "bg-white dark:bg-navy-800 text-slate-900 dark:text-white shadow-sm"
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                 }`}
               >
                 Theo đầu tư
               </button>
             </div>
 
+            {/* Custom Asset Selector: Sử dụng navy-700 cho nút bấm */}
             {compareMode === "investment" && (
               <div className="relative">
-                <select
-                  value={selectedAssetId}
-                  onChange={(e) => setSelectedAssetId(e.target.value)}
-                  className="appearance-none text-slate-700 py-2 pl-3 pr-8 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 h-[40px]"
+                <button
+                  onClick={() => setIsAssetDropdownOpen(!isAssetDropdownOpen)}
+                  className="flex items-center justify-between gap-2 px-3 py-2 bg-slate-100 dark:bg-navy-700 border border-transparent dark:border-navy-border rounded-xl min-w-[180px] h-[40px] text-sm text-slate-700 dark:text-white hover:bg-slate-200 dark:hover:bg-navy-700/80 transition-colors"
                 >
-                  {assets.map((asset) => (
-                    <option key={asset.idAsset} value={asset.idAsset}>
-                      {asset.assetName} ({asset.assetSymbol.toUpperCase()})
-                    </option>
-                  ))}
-                </select>
-                <Coins className="absolute right-2 top-2.5 h-4 w-4 text-slate-400 pointer-events-none" />
+                  <div className="flex items-center gap-2 overflow-hidden">
+                    {selectedAsset ? (
+                      <>
+                        <img
+                          src={selectedAsset.url}
+                          alt={selectedAsset.assetSymbol}
+                          className="w-5 h-5 rounded-full object-cover bg-white"
+                        />
+                        <span className="truncate font-medium">
+                          {selectedAsset.assetName}
+                        </span>
+                        <span className="text-xs text-slate-400 uppercase">
+                          {selectedAsset.assetSymbol}
+                        </span>
+                      </>
+                    ) : (
+                      <span>Chọn tài sản</span>
+                    )}
+                  </div>
+                  <ChevronDown size={14} className="text-slate-400" />
+                </button>
+
+                {/* Danh sách thả xuống: Nền navy-800, hover navy-700 */}
+                {isAssetDropdownOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setIsAssetDropdownOpen(false)}
+                    ></div>
+                    <div className="absolute top-full mt-2 left-0 w-full min-w-[220px] bg-white dark:bg-navy-800 border border-slate-100 dark:border-navy-border rounded-xl shadow-xl z-20 max-h-[300px] overflow-y-auto nice-scroll py-1 animate-in fade-in zoom-in-95 duration-200">
+                      {assets.map((asset) => (
+                        <button
+                          key={asset.idAsset}
+                          onClick={() => {
+                            setSelectedAssetId(asset.idAsset);
+                            setIsAssetDropdownOpen(false);
+                          }}
+                          className={`w-full text-left px-3 py-2.5 flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-navy-700 transition-colors ${
+                            selectedAssetId === asset.idAsset
+                              ? "bg-slate-50 dark:bg-navy-700"
+                              : ""
+                          }`}
+                        >
+                          <img
+                            src={asset.url}
+                            alt={asset.assetSymbol}
+                            className="w-6 h-6 rounded-full object-cover bg-white shadow-sm"
+                          />
+                          <div className="flex flex-col leading-none">
+                            <span className="text-sm font-medium text-slate-700 dark:text-white">
+                              {asset.assetName}
+                            </span>
+                            <span className="text-[10px] text-slate-400 uppercase mt-1">
+                              {asset.assetSymbol}
+                            </span>
+                          </div>
+                          {selectedAssetId === asset.idAsset && (
+                            <Check
+                              size={14}
+                              className="ml-auto text-emerald-500"
+                            />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>
 
           <div className="flex flex-wrap gap-2 items-center w-full xl:w-auto">
-            <button
-              onClick={() =>
-                setTimeRange(timeRange === "month" ? "year" : "month")
-              }
-              className="bg-slate-800 text-white px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 h-[40px]"
-            >
-              {timeRange === "month" ? "Tháng" : "Năm"} <Filter size={14} />
-            </button>
+            {/* Toggle Tháng/Năm: Sử dụng navy-700 */}
+            <div className="relative h-[40px]">
+              <select
+                value={timeRange}
+                onChange={(e) =>
+                  setTimeRange(e.target.value as "month" | "year")
+                }
+                className="appearance-none h-full pl-3 pr-8 bg-slate-800 dark:bg-navy-700 text-white rounded-xl text-sm font-medium focus:outline-none border border-transparent dark:border-navy-border hover:bg-slate-700 dark:hover:bg-navy-700/80 cursor-pointer transition-colors"
+              >
+                <option value="month">Theo Tháng</option>
+                <option value="year">Theo Năm</option>
+              </select>
+              <Filter
+                size={14}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none"
+              />
+            </div>
 
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm  h-[40px]">
-              <span className="text-slate-500 text-xs font-semibold whitespace-nowrap">
+            {/* Input Kỳ 1: Sử dụng navy-700 */}
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm h-[40px] bg-slate-50 dark:bg-navy-700 border border-slate-200 dark:border-navy-border">
+              <span className="text-slate-500 dark:text-slate-400 text-xs font-semibold whitespace-nowrap">
                 Kỳ 1:
               </span>
               <input
@@ -664,7 +755,7 @@ export default function Compare() {
                 max={12}
                 value={p1Month}
                 onChange={(e) => setP1Month(Number(e.target.value))}
-                className={`bg-transparent w-16 text-center focus:outline-none font-bold ${
+                className={`bg-transparent w-10 text-center focus:outline-none font-bold text-slate-700 dark:text-white ${
                   timeRange === "year" ? "hidden" : ""
                 }`}
                 placeholder="MM"
@@ -676,13 +767,14 @@ export default function Compare() {
                 type="number"
                 value={p1Year}
                 onChange={(e) => setP1Year(Number(e.target.value))}
-                className="bg-transparent w-24 text-center focus:outline-none font-bold"
+                className="bg-transparent w-14 text-center focus:outline-none font-bold text-slate-700 dark:text-white"
                 placeholder="YYYY"
               />
             </div>
 
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm  h-[40px]">
-              <span className="text-slate-500 text-xs font-semibold whitespace-nowrap">
+            {/* Input Kỳ 2: Sử dụng navy-700 */}
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm h-[40px] bg-slate-50 dark:bg-navy-700 border border-slate-200 dark:border-navy-border">
+              <span className="text-slate-500 dark:text-slate-400 text-xs font-semibold whitespace-nowrap">
                 Kỳ 2:
               </span>
               <input
@@ -691,7 +783,7 @@ export default function Compare() {
                 max={12}
                 value={p2Month}
                 onChange={(e) => setP2Month(Number(e.target.value))}
-                className={`bg-transparent w-16 text-center focus:outline-none font-bold ${
+                className={`bg-transparent w-10 text-center focus:outline-none font-bold text-slate-700 dark:text-white ${
                   timeRange === "year" ? "hidden" : ""
                 }`}
                 placeholder="MM"
@@ -703,7 +795,7 @@ export default function Compare() {
                 type="number"
                 value={p2Year}
                 onChange={(e) => setP2Year(Number(e.target.value))}
-                className="bg-transparent w-24 text-center focus:outline-none font-bold"
+                className="bg-transparent w-14 text-center focus:outline-none font-bold text-slate-700 dark:text-white"
                 placeholder="YYYY"
               />
             </div>
@@ -711,7 +803,7 @@ export default function Compare() {
             <button
               onClick={handleCompare}
               disabled={compareLoading}
-              className="ml-auto xl:ml-2 bg-slate-900 hover:bg-slate-700 text-white px-5 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all h-[40px] disabled:opacity-70 disabled:cursor-not-allowed whitespace-nowrap"
+              className="ml-auto xl:ml-2 bg-slate-900 dark:bg-blue-600 hover:bg-slate-700 dark:hover:bg-blue-700 text-white px-5 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all h-[40px] disabled:opacity-70 disabled:cursor-not-allowed whitespace-nowrap shadow-sm"
             >
               {compareLoading ? "Đang tải..." : "So sánh"}
               {!compareLoading && <Search size={16} />}
@@ -721,9 +813,9 @@ export default function Compare() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative min-h-[300px]">
           {compareLoading && currentData && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center backdrop-blur-sm rounded-2xl">
-              <div className="px-4 py-2 rounded-full shadow-lg border text-sm font-medium animate-bounce flex items-center gap-2">
-                <div className="w-2 h-2 bg-slate-900 rounded-full animate-ping"></div>
+            <div className="absolute inset-0 z-10 flex items-center justify-center backdrop-blur-[2px] bg-white/50 dark:bg-navy-900/50 rounded-2xl">
+              <div className="px-4 py-2 rounded-full shadow-lg border border-slate-100 dark:border-white/10 bg-white dark:bg-navy-800 text-slate-900 dark:text-white text-sm font-medium animate-bounce flex items-center gap-2">
+                <div className="w-2 h-2 bg-slate-900 dark:bg-blue-500 rounded-full animate-ping"></div>
                 Đang cập nhật...
               </div>
             </div>

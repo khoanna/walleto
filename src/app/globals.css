@@ -5,6 +5,12 @@
   --color-foreground: var(--foreground);
   --color-text: var(--text);
   --color-border: var(--border);
+
+  /* --- BỘ MÀU NAVY MỚI (ĐỒNG NHẤT VỚI DASHBOARD) --- */
+  --color-navy-900: #020617; /* Nền chính (Tối nhất) */
+  --color-navy-800: #0f172a; /* Nền Card */
+  --color-navy-700: #1e293b; /* Nền Input, Button, Hover */
+  --color-navy-border: rgba(255, 255, 255, 0.03); /* Viền siêu mờ */
 }
 
 :root {

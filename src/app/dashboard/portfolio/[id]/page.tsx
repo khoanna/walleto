@@ -84,6 +84,7 @@ const DetailFund = () => {
     name: string;
     symbol: string;
     price: number;
+    image: string;
   } | null>(null);
 
   useEffect(() => {
@@ -130,6 +131,7 @@ const DetailFund = () => {
     name: string;
     symbol: string;
     price: number;
+    image: string;
   }) => {
     setSelectedAsset(asset);
     setIsAddTransactionModalOpen(true);
@@ -140,6 +142,7 @@ const DetailFund = () => {
     name: string;
     symbol: string;
     price: number;
+    image: string;
   }) => {
     setSelectedAsset(asset);
     setIsCryptoDetailModalOpen(true);
@@ -460,6 +463,7 @@ const DetailFund = () => {
                             name: asset.assetName,
                             symbol: asset.assetSymbol,
                             price: asset.currentPrice,
+                            image: asset.url,
                           })
                         }
                       >
@@ -519,6 +523,7 @@ const DetailFund = () => {
                               name: asset.assetName,
                               symbol: asset.assetSymbol,
                               price: asset.currentPrice,
+                              image: asset.url,
                             })
                           }
                           className="p-1.5 sm:p-2 cursor-pointer hover:bg-green-500/10 rounded-lg transition-colors group"
@@ -611,6 +616,7 @@ const DetailFund = () => {
           assetName={selectedAsset.name}
           assetSymbol={selectedAsset.symbol}
           currentPrice={selectedAsset.price}
+          assetImage={selectedAsset.image}
         />
       )}
 
@@ -624,6 +630,7 @@ const DetailFund = () => {
           idAsset={selectedAsset.id}
           assetName={selectedAsset.name}
           assetSymbol={selectedAsset.symbol}
+          assetImage={selectedAsset.image}
         />
       )}
     </div>

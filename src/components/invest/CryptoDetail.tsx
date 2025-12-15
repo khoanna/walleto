@@ -27,9 +27,10 @@ interface CryptoDetailProps {
     idAsset: string;
     assetName: string;
     assetSymbol: string;
+    assetImage: string;
 }
 
-const CryptoDetail = ({ isOpen, onClose, idAsset, assetName, assetSymbol }: CryptoDetailProps) => {
+const CryptoDetail = ({ isOpen, onClose, idAsset, assetName, assetSymbol, assetImage }: CryptoDetailProps) => {
     const { getDetailAsset, fundLoading } = useFund();
     const [assetDetail, setAssetDetail] = useState<AssetDetail | null>(null);
 
@@ -102,7 +103,8 @@ const CryptoDetail = ({ isOpen, onClose, idAsset, assetName, assetSymbol }: Cryp
                         {/* Header */}
                         <div className="p-8 pb-4 border-b border-text/10">
                             <h2 className="text-2xl font-bold text-text mb-2">Chi tiết tài sản</h2>
-                            <p className="text-text/60">
+                            <p className="text-text/60 flex items-center gap-3">
+                                <img src={assetImage} className='w-6 h-6 rounded-full' alt="Asset Image" />
                                 {assetName} ({assetSymbol.toUpperCase()})
                             </p>
                         </div>

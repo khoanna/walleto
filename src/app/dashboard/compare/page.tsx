@@ -74,7 +74,7 @@ const ComparisonCard = ({
 
   if (!data) {
     return (
-      <div className="border border-dashed border-slate-300 rounded-xl bg-slate-50 h-80 flex flex-col items-center justify-center text-slate-500 gap-3 animate-in fade-in duration-500">
+      <div className="border border-dashed border-foreground rounded-xl bg-foreground h-80 flex flex-col items-center justify-center text-text gap-3 animate-in fade-in duration-500">
         <div className="p-3 bg-slate-100 rounded-full">
           <FileX2 size={32} className="opacity-50" />
         </div>
@@ -157,13 +157,13 @@ const ComparisonCard = ({
   };
 
   return (
-    <div className="border border-slate-200 rounded-xl shadow-sm flex flex-col h-full animate-in fade-in duration-300">
-      <div className="p-4 border-b border-slate-100 bg-slate-50/50 rounded-t-xl">
-        <h3 className="font-bold text-slate-700">{title}</h3>
+    <div className="border border-foreground rounded-xl shadow-sm flex flex-col h-full animate-in fade-in duration-300">
+      <div className="p-4 border-b border-foreground bg-background rounded-t-xl">
+        <h3 className="font-bold text-text">{title}</h3>
       </div>
 
       <div className="p-4 flex-1 flex flex-col gap-4">
-        <div className="p-3 rounded-lg border border-emerald-100 ">
+        <div className="p-3 rounded-lg ">
           <div className="flex justify-between items-center mb-2">
             <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">
               {incomeLabel}
@@ -176,7 +176,7 @@ const ComparisonCard = ({
           <div className="mt-3">
             <button
               onClick={() => setExpandIncome(!expandIncome)}
-              className="flex items-center gap-1 text-xs text-slate-500 hover:text-emerald-600 transition-colors w-full"
+              className="flex items-center gap-1 text-xs text-text hover:text-emerald-600 transition-colors w-full"
             >
               {expandIncome ? "Thu gọn" : "Xem chi tiết"} <Info size={14} />
             </button>
@@ -186,7 +186,7 @@ const ComparisonCard = ({
                   incomeDetails.map((item, idx) => (
                     <div
                       key={idx}
-                      className="flex justify-between text-xs border-b border-slate-100 pb-1 last:border-0"
+                      className="flex justify-between text-xs border-b border-foreground pb-1 last:border-0"
                     >
                       {renderDetailItem(item)}
                     </div>
@@ -201,7 +201,7 @@ const ComparisonCard = ({
           </div>
         </div>
 
-        <div className="p-3 rounded-lg border border-red-100 ">
+        <div className="p-3 rounded-lg ">
           <div className="flex justify-between items-center mb-2">
             <span className="text-xs font-semibold text-red-600 uppercase tracking-wider">
               {expenseLabel}
@@ -214,7 +214,7 @@ const ComparisonCard = ({
           <div className="mt-3">
             <button
               onClick={() => setExpandExpense(!expandExpense)}
-              className="flex items-center gap-1 text-xs text-slate-500 hover:text-red-600 transition-colors w-full"
+              className="flex items-center gap-1 text-xs text-text hover:text-red-600 transition-colors w-full"
             >
               {expandExpense ? "Thu gọn" : "Xem chi tiết"} <Info size={14} />
             </button>
@@ -224,7 +224,7 @@ const ComparisonCard = ({
                   expenseDetails.map((item, idx) => (
                     <div
                       key={idx}
-                      className="flex justify-between text-xs border-b border-slate-100 pb-1 last:border-0"
+                      className="flex justify-between text-xs border-b border-foreground pb-1 last:border-0"
                     >
                       {renderDetailItem(item)}
                     </div>
@@ -240,7 +240,7 @@ const ComparisonCard = ({
         </div>
       </div>
 
-      <div className="p-4 border-t border-slate-100 rounded-b-xl">
+      <div className="p-4 border-t border-foreground rounded-b-xl">
         <p className="text-xs mb-1">Chênh lệch</p>
         <p
           className={`text-lg font-bold ${
@@ -282,6 +282,8 @@ export default function Compare() {
     "transaction"
   );
   const [timeRange, setTimeRange] = useState<"month" | "year">("month");
+  const [timeRangeOpen, setTimeRangeOpen] = useState(false);
+  const timeRangeRef = useRef<HTMLDivElement | null>(null);
 
   const now = new Date();
   const [p1Month, setP1Month] = useState(now.getMonth() + 1);
@@ -472,6 +474,28 @@ export default function Compare() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
+  // Close timeRange dropdown when clicking outside or pressing Escape
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (!timeRangeRef.current) return;
+      if (!(e.target instanceof Node)) return;
+      if (!timeRangeRef.current.contains(e.target)) {
+        setTimeRangeOpen(false);
+      }
+    };
+
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setTimeRangeOpen(false);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, []);
+
   const currentData = useMemo(() => {
     return compareMode === "transaction" ? transactionData : investmentData;
   }, [compareMode, transactionData, investmentData]);
@@ -502,7 +526,7 @@ export default function Compare() {
       className="w-full space-y-8 pb-10 px-4 sm:px-6 lg:px-8 bg-background"
     >
       {/* LỊCH SỬ GIAO DỊCH */}
-      <section className=" rounded-2xl p-6 shadow-sm border border-slate-100">
+      <section className=" rounded-2xl p-6 shadow-sm">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold ">Chi tiết dòng tiền</h2>
 
@@ -528,7 +552,7 @@ export default function Compare() {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[800px] table-fixed">
             <thead>
-              <tr className="border-b border-slate-100">
+              <tr className="border-b border-foreground">
                 <th className="pb-3 text-left text-xs font-semibold uppercase w-[35%]">
                   Tên giao dịch
                 </th>
@@ -543,13 +567,13 @@ export default function Compare() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-foreground">
               {historyList.map((item) => (
                 <tr
                   key={item.idTransaction}
-                  className="group hover:bg-slate-50/50 transition-colors"
+                  className="group hover:bg-foreground/10 transition-colors"
                 >
-                  <td className="py-4 text-sm font-medium text-slate-700 truncate pr-2">
+                  <td className="py-4 text-sm font-medium text-text truncate pr-2">
                     {item.transactionName}
                   </td>
                   <td className="py-4">
@@ -573,7 +597,7 @@ export default function Compare() {
                     {item.transactionType === "Chi" && "-"}
                     {formatCurrency(item.amount)}
                   </td>
-                  <td className="py-4 text-sm text-slate-500 text-right">
+                  <td className="py-4 text-sm text-text text-right">
                     {new Date(item.transactionDate).toLocaleDateString("vi-VN")}
                   </td>
                 </tr>
@@ -609,7 +633,7 @@ export default function Compare() {
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
                   compareMode === "transaction"
                     ? "bg-slate-900 text-white shadow-sm"
-                    : "text-slate-500 hover:text-slate-700"
+                    : "text-text hover:text-slate-700"
                 }`}
               >
                 Theo thu chi
@@ -619,7 +643,7 @@ export default function Compare() {
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
                   compareMode === "investment"
                     ? "bg-slate-900 text-white shadow-sm"
-                    : "text-slate-500 hover:text-slate-700"
+                    : "text-text hover:text-slate-700"
                 }`}
               >
                 Theo đầu tư
@@ -631,7 +655,7 @@ export default function Compare() {
                 <select
                   value={selectedAssetId}
                   onChange={(e) => setSelectedAssetId(e.target.value)}
-                  className="appearance-none text-slate-700 py-2 pl-3 pr-8 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 h-[40px]"
+                  className="appearance-none cursor-pointer text-text py-2 pl-3 pr-8 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 h-[40px]"
                 >
                   {assets.map((asset) => (
                     <option key={asset.idAsset} value={asset.idAsset}>
@@ -645,17 +669,54 @@ export default function Compare() {
           </div>
 
           <div className="flex flex-wrap gap-2 items-center w-full xl:w-auto">
-            <button
-              onClick={() =>
-                setTimeRange(timeRange === "month" ? "year" : "month")
-              }
-              className="bg-slate-800 text-white px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 h-[40px]"
-            >
-              {timeRange === "month" ? "Tháng" : "Năm"} <Filter size={14} />
-            </button>
+            <div className="relative" ref={timeRangeRef}>
+              <button
+                type="button"
+                aria-haspopup="menu"
+                aria-expanded={timeRangeOpen}
+                onClick={() => setTimeRangeOpen((s) => !s)}
+                className="bg-slate-800 text-white px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 h-[40px]"
+              >
+                <span className="truncate">{timeRange === "month" ? "Tháng" : "Năm"}</span>
+                <Filter size={14} />
+                <svg
+                  className={`w-3 h-3 transition-transform ${timeRangeOpen ? "rotate-180" : "rotate-0"}`}
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 011.08 1.04l-4.25 4.25a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" />
+                </svg>
+              </button>
+
+              {timeRangeOpen && (
+                <div className="absolute right-0 mt-2 w-36 bg-background border border-foreground rounded-lg shadow-lg z-50 py-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTimeRange("month");
+                      setTimeRangeOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 text-sm ${timeRange === "month" ? "bg-foreground/5 font-semibold" : "hover:bg-foreground/5"}`}
+                  >
+                    Tháng
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTimeRange("year");
+                      setTimeRangeOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 text-sm ${timeRange === "year" ? "bg-foreground/5 font-semibold" : "hover:bg-foreground/5"}`}
+                  >
+                    Năm
+                  </button>
+                </div>
+              )}
+            </div>
 
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm  h-[40px]">
-              <span className="text-slate-500 text-xs font-semibold whitespace-nowrap">
+              <span className="text-text text-xs font-semibold whitespace-nowrap">
                 Kỳ 1:
               </span>
               <input
@@ -682,7 +743,7 @@ export default function Compare() {
             </div>
 
             <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm  h-[40px]">
-              <span className="text-slate-500 text-xs font-semibold whitespace-nowrap">
+              <span className="text-text text-xs font-semibold whitespace-nowrap">
                 Kỳ 2:
               </span>
               <input

@@ -78,8 +78,8 @@ const ComparisonCard = ({
   // Empty State
   if (!data) {
     return (
-      <div className="border border-dashed border-slate-300 dark:border-navy-border rounded-2xl bg-slate-50 dark:bg-navy-800/50 h-80 flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 gap-3 animate-in fade-in duration-500">
-        <div className="p-3 bg-slate-100 dark:bg-navy-700 rounded-full">
+      <div className="border border-dashed border-foreground rounded-xl bg-foreground h-80 flex flex-col items-center justify-center text-text gap-3 animate-in fade-in duration-500">
+        <div className="p-3 bg-slate-100 rounded-full">
           <FileX2 size={32} className="opacity-50" />
         </div>
         <div className="text-center">
@@ -163,15 +163,13 @@ const ComparisonCard = ({
   };
 
   return (
-    <div className="border border-slate-200 dark:border-navy-border bg-white dark:bg-navy-800 rounded-2xl shadow-sm flex flex-col h-full animate-in fade-in duration-300">
-      {/* Header Card: Đã bỏ nền riêng ở dark mode để liền mạch */}
-      <div className="p-4 border-b border-slate-100 dark:border-navy-border bg-slate-50/50 dark:bg-transparent rounded-t-2xl">
-        <h3 className="font-bold text-slate-700 dark:text-white">{title}</h3>
+    <div className="border border-foreground rounded-xl shadow-sm flex flex-col h-full animate-in fade-in duration-300">
+      <div className="p-4 border-b border-foreground bg-background rounded-t-xl">
+        <h3 className="font-bold text-text">{title}</h3>
       </div>
 
       <div className="p-4 flex-1 flex flex-col gap-4">
-        {/* Thu / Mua */}
-        <div className="p-3 rounded-xl border border-emerald-100 dark:border-emerald-500/20 bg-emerald-50/30 dark:bg-emerald-500/5">
+        <div className="p-3 rounded-lg ">
           <div className="flex justify-between items-center mb-2">
             <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
               {incomeLabel}
@@ -184,7 +182,7 @@ const ComparisonCard = ({
           <div className="mt-3">
             <button
               onClick={() => setExpandIncome(!expandIncome)}
-              className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors w-full"
+              className="flex items-center gap-1 text-xs text-text hover:text-emerald-600 transition-colors w-full"
             >
               {expandIncome ? "Thu gọn" : "Xem chi tiết"} <Info size={14} />
             </button>
@@ -194,7 +192,7 @@ const ComparisonCard = ({
                   incomeDetails.map((item, idx) => (
                     <div
                       key={idx}
-                      className="flex justify-between text-xs border-b border-slate-100 dark:border-navy-border pb-1 last:border-0"
+                      className="flex justify-between text-xs border-b border-foreground pb-1 last:border-0"
                     >
                       {renderDetailItem(item)}
                     </div>
@@ -209,8 +207,7 @@ const ComparisonCard = ({
           </div>
         </div>
 
-        {/* Chi / Bán */}
-        <div className="p-3 rounded-xl border border-red-100 dark:border-red-500/20 bg-red-50/30 dark:bg-red-500/5">
+        <div className="p-3 rounded-lg ">
           <div className="flex justify-between items-center mb-2">
             <span className="text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">
               {expenseLabel}
@@ -223,7 +220,7 @@ const ComparisonCard = ({
           <div className="mt-3">
             <button
               onClick={() => setExpandExpense(!expandExpense)}
-              className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors w-full"
+              className="flex items-center gap-1 text-xs text-text hover:text-red-600 transition-colors w-full"
             >
               {expandExpense ? "Thu gọn" : "Xem chi tiết"} <Info size={14} />
             </button>
@@ -233,7 +230,7 @@ const ComparisonCard = ({
                   expenseDetails.map((item, idx) => (
                     <div
                       key={idx}
-                      className="flex justify-between text-xs border-b border-slate-100 dark:border-navy-border pb-1 last:border-0"
+                      className="flex justify-between text-xs border-b border-foreground pb-1 last:border-0"
                     >
                       {renderDetailItem(item)}
                     </div>
@@ -249,11 +246,8 @@ const ComparisonCard = ({
         </div>
       </div>
 
-      {/* Footer Card: Đã bỏ nền riêng ở dark mode */}
-      <div className="p-4 border-t border-slate-100 dark:border-navy-border rounded-b-2xl bg-slate-50/50 dark:bg-transparent">
-        <p className="text-xs mb-1 text-slate-500 dark:text-slate-400">
-          Chênh lệch
-        </p>
+      <div className="p-4 border-t border-foreground rounded-b-xl">
+        <p className="text-xs mb-1">Chênh lệch</p>
         <p
           className={`text-lg font-bold ${
             spread >= 0
@@ -296,6 +290,8 @@ export default function Compare() {
     "transaction"
   );
   const [timeRange, setTimeRange] = useState<"month" | "year">("month");
+  const [timeRangeOpen, setTimeRangeOpen] = useState(false);
+  const timeRangeRef = useRef<HTMLDivElement | null>(null);
 
   const now = new Date();
   const [p1Month, setP1Month] = useState(now.getMonth() + 1);
@@ -487,6 +483,28 @@ export default function Compare() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
+  // Close timeRange dropdown when clicking outside or pressing Escape
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (!timeRangeRef.current) return;
+      if (!(e.target instanceof Node)) return;
+      if (!timeRangeRef.current.contains(e.target)) {
+        setTimeRangeOpen(false);
+      }
+    };
+
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setTimeRangeOpen(false);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, []);
+
   const currentData = useMemo(() => {
     return compareMode === "transaction" ? transactionData : investmentData;
   }, [compareMode, transactionData, investmentData]);
@@ -517,7 +535,8 @@ export default function Compare() {
       className="w-full space-y-8 pb-10 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-navy-900 text-slate-900 dark:text-white transition-colors duration-300 min-h-screen"
     >
       {/* LỊCH SỬ GIAO DỊCH */}
-      <section className="bg-white dark:bg-navy-800 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-navy-border">
+
+      <section className=" rounded-2xl p-6 shadow-sm">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-slate-800 dark:text-white">
             Chi tiết dòng tiền
@@ -545,8 +564,8 @@ export default function Compare() {
         <div className="overflow-x-auto nice-scroll pb-2">
           <table className="w-full min-w-[800px] table-fixed">
             <thead>
-              <tr className="border-b border-slate-100 dark:border-navy-border">
-                <th className="pb-3 text-left text-xs font-semibold uppercase w-[35%] text-slate-500 dark:text-slate-400">
+              <tr className="border-b border-foreground">
+                <th className="pb-3 text-left text-xs font-semibold uppercase w-[35%]">
                   Tên giao dịch
                 </th>
                 <th className="pb-3 text-left text-xs font-semibold uppercase w-[15%] text-slate-500 dark:text-slate-400">
@@ -560,14 +579,14 @@ export default function Compare() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50 dark:divide-navy-border">
+
+            <tbody className="divide-y divide-foreground">
               {historyList.map((item) => (
                 <tr
                   key={item.idTransaction}
-                  // Hover row: Sử dụng navy-700
-                  className="group hover:bg-slate-50 dark:hover:bg-navy-700 transition-colors"
+                  className="group hover:bg-foreground/10 transition-colors"
                 >
-                  <td className="py-4 text-sm font-medium text-slate-700 dark:text-slate-200 truncate pr-2">
+                  <td className="py-4 text-sm font-medium text-text truncate pr-2">
                     {item.transactionName}
                   </td>
                   <td className="py-4">
@@ -591,7 +610,8 @@ export default function Compare() {
                     {item.transactionType === "Chi" && "-"}
                     {formatCurrency(item.amount)}
                   </td>
-                  <td className="py-4 text-sm text-slate-500 dark:text-slate-400 text-right">
+
+                  <td className="py-4 text-sm text-text text-right">
                     {new Date(item.transactionDate).toLocaleDateString("vi-VN")}
                   </td>
                 </tr>
@@ -629,8 +649,8 @@ export default function Compare() {
                 onClick={() => setCompareMode("transaction")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   compareMode === "transaction"
-                    ? "bg-white dark:bg-navy-800 text-slate-900 dark:text-white shadow-sm"
-                    : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                    ? "bg-slate-900 text-white shadow-sm"
+                    : "text-text hover:text-slate-700"
                 }`}
               >
                 Theo thu chi
@@ -639,8 +659,8 @@ export default function Compare() {
                 onClick={() => setCompareMode("investment")}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   compareMode === "investment"
-                    ? "bg-white dark:bg-navy-800 text-slate-900 dark:text-white shadow-sm"
-                    : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+                    ? "bg-slate-900 text-white shadow-sm"
+                    : "text-text hover:text-slate-700"
                 }`}
               >
                 Theo đầu tư
@@ -651,8 +671,9 @@ export default function Compare() {
             {compareMode === "investment" && (
               <div className="relative">
                 <button
+                  type="button"
                   onClick={() => setIsAssetDropdownOpen(!isAssetDropdownOpen)}
-                  className="flex items-center justify-between gap-2 px-3 py-2 bg-slate-100 dark:bg-navy-700 border border-transparent dark:border-navy-border rounded-xl min-w-[180px] h-[40px] text-sm text-slate-700 dark:text-white hover:bg-slate-200 dark:hover:bg-navy-700/80 transition-colors"
+                  className="appearance-none cursor-pointer text-text py-2 pl-3 pr-8 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 h-[40px] flex items-center justify-between w-full border border-slate-200 dark:border-navy-600 bg-white dark:bg-navy-800"
                 >
                   <div className="flex items-center gap-2 overflow-hidden">
                     {selectedAsset ? (
@@ -726,27 +747,66 @@ export default function Compare() {
           </div>
 
           <div className="flex flex-wrap gap-2 items-center w-full xl:w-auto">
-            {/* Toggle Tháng/Năm: Sử dụng navy-700 */}
-            <div className="relative h-[40px]">
-              <select
-                value={timeRange}
-                onChange={(e) =>
-                  setTimeRange(e.target.value as "month" | "year")
-                }
-                className="appearance-none h-full pl-3 pr-8 bg-slate-800 dark:bg-navy-700 text-white rounded-xl text-sm font-medium focus:outline-none border border-transparent dark:border-navy-border hover:bg-slate-700 dark:hover:bg-navy-700/80 cursor-pointer transition-colors"
+            <div className="relative" ref={timeRangeRef}>
+              <button
+                type="button"
+                aria-haspopup="menu"
+                aria-expanded={timeRangeOpen}
+                onClick={() => setTimeRangeOpen((s) => !s)}
+                className="bg-slate-800 text-white px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2 h-[40px]"
               >
-                <option value="month">Theo Tháng</option>
-                <option value="year">Theo Năm</option>
-              </select>
-              <Filter
-                size={14}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none"
-              />
+                <span className="truncate">
+                  {timeRange === "month" ? "Tháng" : "Năm"}
+                </span>
+                <Filter size={14} />
+                <svg
+                  className={`w-3 h-3 transition-transform ${
+                    timeRangeOpen ? "rotate-180" : "rotate-0"
+                  }`}
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 011.08 1.04l-4.25 4.25a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" />
+                </svg>
+              </button>
+
+              {timeRangeOpen && (
+                <div className="absolute right-0 mt-2 w-36 bg-background border border-foreground rounded-lg shadow-lg z-50 py-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTimeRange("month");
+                      setTimeRangeOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 text-sm ${
+                      timeRange === "month"
+                        ? "bg-foreground/5 font-semibold"
+                        : "hover:bg-foreground/5"
+                    }`}
+                  >
+                    Tháng
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTimeRange("year");
+                      setTimeRangeOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 text-sm ${
+                      timeRange === "year"
+                        ? "bg-foreground/5 font-semibold"
+                        : "hover:bg-foreground/5"
+                    }`}
+                  >
+                    Năm
+                  </button>
+                </div>
+              )}
             </div>
 
-            {/* Input Kỳ 1: Sử dụng navy-700 */}
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm h-[40px] bg-slate-50 dark:bg-navy-700 border border-slate-200 dark:border-navy-border">
-              <span className="text-slate-500 dark:text-slate-400 text-xs font-semibold whitespace-nowrap">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm  h-[40px]">
+              <span className="text-text text-xs font-semibold whitespace-nowrap">
                 Kỳ 1:
               </span>
               <input
@@ -772,9 +832,8 @@ export default function Compare() {
               />
             </div>
 
-            {/* Input Kỳ 2: Sử dụng navy-700 */}
-            <div className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm h-[40px] bg-slate-50 dark:bg-navy-700 border border-slate-200 dark:border-navy-border">
-              <span className="text-slate-500 dark:text-slate-400 text-xs font-semibold whitespace-nowrap">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm  h-[40px]">
+              <span className="text-text text-xs font-semibold whitespace-nowrap">
                 Kỳ 2:
               </span>
               <input

@@ -14,7 +14,6 @@ import {
   Trash2,
   ArrowRight,
   Calendar,
-  Clock,
 } from "lucide-react";
 
 const Fund = () => {
@@ -38,7 +37,7 @@ const Fund = () => {
       }
     };
     fetchFunds();
-  }, []);
+  }, [userContext?.user?.idUser]);
 
   const handleCreateFund = async (data: {
     fundName: string;
@@ -89,7 +88,7 @@ const Fund = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col p-2 sm:p-4">
+    <div className="w-full h-full flex flex-col p-3 sm:p-4 lg:p-6">
       {/* --- Header Area --- */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
@@ -97,18 +96,18 @@ const Fund = () => {
             <FolderOpen className="w-6 h-6 text-blue-500" />
             Quản lý quỹ
           </h1>
-          <p className="text-text/50 text-xs sm:text-sm mt-1">
+          <p className="text-text/50 text-sm mt-1">
             Theo dõi hiệu suất và phân bổ tài sản của bạn
           </p>
         </div>
 
         <button
           onClick={() => setIsCreateModalOpen(true)}
-          className="w-full sm:w-auto group flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 
+          className="w-full sm:w-auto group flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 
                      text-white font-medium rounded-lg shadow-lg shadow-blue-500/20 
-                     transition-all duration-200 text-sm sm:text-base active:scale-95"
+                     transition-all duration-200 text-sm active:scale-95"
         >
-          <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+          <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
           Tạo quỹ mới
         </button>
       </div>
@@ -121,14 +120,7 @@ const Fund = () => {
             <p className="text-sm">Chưa có quỹ nào được tạo.</p>
           </div>
         ) : (
-          /* FIX GRID:
-             - grid-cols-1: Mặc định (Mobile).
-             - md:grid-cols-2: Tablet dọc (nếu không gian đủ).
-             - lg:grid-cols-1: Desktop nhỏ (Vì có Sidebar 480px chiếm chỗ, nên cột còn lại hẹp -> về 1 cột).
-             - xl:grid-cols-2: Desktop lớn (>= 1280px) -> Đủ chỗ cho 2 cột.
-             - 2xl:grid-cols-3: Màn hình cực lớn -> 3 cột.
-          */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
             {funds.map((fund) => (
               <div
                 key={fund.idFund}
@@ -137,14 +129,14 @@ const Fund = () => {
                 }
                 className="group relative bg-background border border-border/50 hover:border-blue-500/50 
                            rounded-xl p-4 sm:p-5 cursor-pointer transition-all duration-300 
-                           hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-1 flex flex-col h-full"
+                           hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-1 flex flex-col h-full overflow-hidden"
               >
-                {/* Decoration Gradient */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl" />
+                {/* Decoration Gradient Background on Hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                 {/* --- Card Header: Icon & Actions --- */}
                 <div className="relative flex justify-between items-start mb-4 z-10">
-                  {/* Avatar */}
+                  {/* Fund Icon / Avatar */}
                   <div
                     className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 
                                 border border-border flex items-center justify-center text-lg sm:text-xl font-bold text-blue-600 shadow-sm flex-shrink-0"
@@ -156,7 +148,7 @@ const Fund = () => {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={(e) => handleEditFund(e, fund)}
-                      className="p-1.5 sm:p-2 text-text/40 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                      className="p-2 text-text/40 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
                       title="Chỉnh sửa"
                     >
                       <Edit3 size={16} />
@@ -165,7 +157,7 @@ const Fund = () => {
                       onClick={(e) =>
                         handleDeleteFund(e, fund.idFund, fund.fundName)
                       }
-                      className="p-1.5 sm:p-2 text-text/40 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                      className="p-2 text-text/40 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                       title="Xóa quỹ"
                     >
                       <Trash2 size={16} />
@@ -174,33 +166,33 @@ const Fund = () => {
                 </div>
 
                 {/* --- Card Body: Info --- */}
-                <div className="relative z-10 flex-1 min-h-[60px]">
-                  <h3 className="text-base sm:text-lg font-bold text-text mb-1 group-hover:text-blue-500 transition-colors line-clamp-1 break-all">
+                <div className="relative z-10 flex-1 mb-2">
+                  <h3 className="text-base sm:text-lg font-bold text-text mb-1 group-hover:text-blue-500 transition-colors line-clamp-1">
                     {fund.fundName}
                   </h3>
-                  <p className="text-xs sm:text-sm text-text/50 line-clamp-2 leading-relaxed">
+                  <p className="text-sm text-text/50 line-clamp-2 h-10 leading-relaxed">
                     {fund.description || "Chưa có mô tả cho quỹ này."}
                   </p>
                 </div>
 
-                {/* --- Card Footer: Date & Arrow --- */}
-                <div className="relative z-10 flex items-center justify-between pt-4 mt-2 border-t border-border/30">
-                  {/* Date - Moved here to avoid overlapping */}
-                  <div className="flex items-center gap-1.5 text-xs text-text/40 font-medium">
-                    <Clock size={12} className="text-blue-500" />
+                {/* --- Card Footer: Date & CTA Arrow --- */}
+                <div className="relative z-10 flex items-center justify-between pt-4 border-t border-dashed border-border/50">
+                  {/* Date */}
+                  <div className="flex items-center gap-2 text-xs text-text/40 font-medium">
+                    <Calendar size={14} />
                     <span>
                       {new Date(fund.createAt).toLocaleDateString("vi-VN")}
                     </span>
                   </div>
 
-                  {/* CTA Arrow */}
+                  {/* CTA Button */}
                   <div
-                    className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full 
-                                  bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400
-                                  group-hover:bg-blue-600 group-hover:text-white transition-all duration-300"
+                    className="flex items-center justify-center w-8 h-8 rounded-full 
+                               bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400
+                               group-hover:bg-blue-600 group-hover:text-white transition-all duration-300"
                   >
                     <ArrowRight
-                      size={18}
+                      size={16}
                       className="-ml-0.5 group-hover:translate-x-0.5 transition-transform"
                     />
                   </div>

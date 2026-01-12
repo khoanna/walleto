@@ -18,7 +18,7 @@ const Portfolio = () => {
   }
 
   return (
-    <div className="min-h-screen p-4 sm:p-6 lg:p-8 bg-foreground">
+    <div className="min-h-screen p-4 sm:p-6 lg:p-8 bg-background">
       <div className="max-w-7xl mx-auto h-[calc(100vh-2rem)] lg:h-[calc(100vh-3rem)] flex flex-col">
         {/* Header */}
         <header className="mb-4">
@@ -27,7 +27,7 @@ const Portfolio = () => {
               <h1 className="text-lg sm:text-2xl font-semibold">
                 Danh mục đầu tư
               </h1>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 Tổng quan crypto và quỹ của bạn
               </p>
             </div>
@@ -41,10 +41,10 @@ const Portfolio = () => {
                 - Thêm border/shadow để tách biệt khu vực này cho dễ nhìn.
             */}
           <aside className="flex-shrink-1 w-full lg:w-[480px] xl:w-[600px] h-[44vh] sm:h-[50vh] lg:h-full">
-            <div className="h-full w-full rounded-lg bg-background/60 shadow-sm border border-gray-800/20 overflow-hidden flex flex-col">
-              <div className="px-4 py-3 border-b border-gray-800/10 bg-background">
+            <div className="h-full w-full rounded-lg bg-card shadow-sm border border-border overflow-hidden flex flex-col">
+              <div className="px-4 py-3 border-b border-border bg-card">
                 <h2 className="text-sm font-medium">Thị trường Crypto</h2>
-                <p className="text-xs text-gray-500">Bảng giá và thay đổi</p>
+                <p className="text-xs text-muted-foreground">Bảng giá và thay đổi</p>
               </div>
               <div className="flex-1 overflow-auto p-3">
                 <CryptoTable />
@@ -52,15 +52,10 @@ const Portfolio = () => {
             </div>
           </aside>
 
-          {/* Fund Section 
-                - Mobile: Chiếm phần còn lại (flex-1).
-                - Desktop: Cũng chiếm phần còn lại của chiều ngang (flex-1).
-            */}
+          {/* Fund Section */}
           <main className="flex-1 min-h-0 overflow-hidden">
-            <div className="h-full w-full overflow-y-auto">
-              <div className="p-4 rounded-lg bg-background/60 shadow-sm border border-gray-800/10">
-                <Fund />
-              </div>
+            <div className="h-full w-full rounded-lg bg-card shadow-sm border border-border flex flex-col p-4 sm:p-5">
+              <Fund />
             </div>
           </main>
         </div>

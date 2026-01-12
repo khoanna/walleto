@@ -124,29 +124,42 @@ export default function ChatBoxPage() {
     };
 
     return (
-        <div className="flex flex-col h-[calc(100vh-2rem)] sm:h-[calc(100vh-2rem)] bg-background rounded-xl border border-[var(--color-border)]/10 shadow-sm overflow-hidden">
+        <div className="flex flex-col h-[calc(100vh-2rem)] bg-[#111318] rounded-2xl border border-gray-800 shadow-xl overflow-hidden">
             {/* Header */}
-            <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-[var(--color-border)]/10 flex items-center justify-between">
-                <h2 className="text-base sm:text-lg font-semibold">Chatbot Walleto</h2>
+            <div className="px-6 py-4 border-b border-gray-800 flex items-center gap-3 bg-[#111318]">
+                <div className="p-2 rounded-lg bg-primary/10">
+                    <Bot className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                    <h2 className="text-lg font-bold text-white">Walleto AI Assistant</h2>
+                    <p className="text-xs text-gray-400">Trợ lý tài chính thông minh của bạn</p>
+                </div>
             </div>
 
             {/* Chat messages */}
             <div
                 ref={scrollRef}
-                className="flex-1 overflow-y-auto nice-scroll px-4 sm:px-6 py-3 sm:py-4 space-y-3 sm:space-y-4"
+                className="flex-1 overflow-y-auto px-6 py-6 space-y-6 bg-[#111318]"
             >
                 {messages.map((msg) => (
                     <div
                         key={msg.id}
-                        className={`flex items-center ${msg.sender === "user" ? "justify-end" : "justify-start"
-                            }`}
+                        className={`flex items-start gap-3 ${msg.sender === "user" ? "flex-row-reverse" : "flex-row"}`}
                     >
+                        {/* Avatar */}
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                            msg.sender === "user" ? "bg-gray-700" : "bg-primary/20"
+                        }`}>
+                            {msg.sender === "user" ? <User size={14} className="text-gray-300" /> : <Bot size={14} className="text-primary" />}
+                        </div>
 
+                        {/* Message Bubble */}
                         <div
-                            className={`max-w-[85%] sm:max-w-[70%] px-3 sm:px-4 py-2 sm:py-3 bg-foreground rounded-2xl shadow-sm text-xs sm:text-sm leading-relaxed transition-all whitespace-pre-wrap ${msg.sender === "user"
-                                ? " rounded-br-none"
-                                : "  rounded-bl-none"
-                                }`}
+                            className={`max-w-[80%] px-5 py-3 rounded-2xl text-sm leading-relaxed shadow-sm whitespace-pre-wrap ${
+                                msg.sender === "user"
+                                    ? "bg-gray-800 text-white border border-gray-700 rounded-tr-none"
+                                    : "bg-primary/10 text-gray-200 border border-primary/10 rounded-tl-none"
+                            }`}
                         >
                             {msg.sender === "model" ? (
                                 // Format bot messages with markdown-like styling
@@ -180,12 +193,15 @@ export default function ChatBoxPage() {
                 
                 {/* Loading indicator */}
                 {isLoadingResponse && (
-                    <div className="flex items-center justify-start">
-                        <div className="max-w-[85%] sm:max-w-[70%] px-3 sm:px-4 py-2 sm:py-3 bg-foreground rounded-2xl rounded-bl-none shadow-sm">
-                            <div className="flex items-center gap-1">
-                                <div className="w-2 h-2 bg-[var(--color-text)] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                                <div className="w-2 h-2 bg-[var(--color-text)] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                                <div className="w-2 h-2 bg-[var(--color-text)] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                            <Bot size={14} className="text-primary" />
+                        </div>
+                        <div className="bg-primary/10 border border-primary/10 px-5 py-4 rounded-2xl rounded-tl-none shadow-sm">
+                            <div className="flex items-center gap-1.5">
+                                <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                                <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                                <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                             </div>
                         </div>
                     </div>
@@ -193,22 +209,24 @@ export default function ChatBoxPage() {
             </div>
 
             {/* Input box */}
-            <div className="p-3 sm:p-4 border-t border-[var(--color-border)]/10 flex items-center gap-2 sm:gap-3 bg-background">
-                <input
-                    type="text"
-                    placeholder="Hỏi gì đó..."
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                    disabled={isLoadingResponse}
-                    className="flex-1 px-3 sm:px-4 py-2 rounded-full bg-background text-xs sm:text-sm focus:outline-none border border-[var(--color-border)]/10 focus:ring-1 focus:ring-[#0066FF]/40 disabled:opacity-50 disabled:cursor-not-allowed"
-                />
+            <div className="p-4 border-t border-gray-800 flex items-center gap-3 bg-[#111318]">
+                <div className="flex-1 bg-gray-800 rounded-full flex items-center px-4 border border-gray-700 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/50 transition-all">
+                    <input
+                        type="text"
+                        placeholder="Hỏi tôi về thị trường, danh mục đầu tư..."
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                        disabled={isLoadingResponse}
+                        className="w-full py-3 bg-transparent text-sm text-white focus:outline-none placeholder-gray-500 disabled:opacity-50"
+                    />
+                </div>
                 <button
                     onClick={handleSend}
                     disabled={isLoadingResponse || !input.trim()}
-                    className="bg-[#0066FF] hover:bg-[#3385ff] p-2 rounded-full cursor-pointer transition-transform active:scale-95 shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#0066FF]"
+                    className="bg-primary hover:bg-primary-hover text-white p-3 rounded-full cursor-pointer transition-all active:scale-95 shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
                 >
-                    <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <Send className="w-5 h-5" />
                 </button>
             </div>
         </div>

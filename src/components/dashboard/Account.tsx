@@ -71,7 +71,7 @@ const Account = ({ financeData, weekData }: AccountProps) => {
       <div className="shadow-xl flex-1 bg-background/90 rounded-2xl border border-white/10 p-4 sm:p-5 flex items-center justify-between min-h-[90px] sm:min-h-0">
         <div className="flex flex-col gap-1 sm:gap-3">
           <div className="flex items-center gap-2">
-            <span className="grid place-items-center size-8 sm:size-9 rounded-full bg-[#0B162C] text-white shadow-inner flex-shrink-0">
+            <span className="grid place-items-center size-8 sm:size-9 rounded-full bg-muted text-text shadow-inner flex-shrink-0">
               <ArrowUpRight className="size-4" />
             </span>
             <div>

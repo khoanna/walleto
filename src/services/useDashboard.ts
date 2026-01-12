@@ -16,6 +16,8 @@ export default function useDashboard() {
         }
       );
       const data = await res.json();
+      console.log('Finance Info:', data.data);
+      
       return data.data as unknown as FinanceDasboard;
     } catch (error) {
       throw error;

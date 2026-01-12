@@ -49,7 +49,7 @@ export const UserAvatar = ({
   }
   return (
     <div
-      className={`${size} rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400`}
+      className={`${size} rounded-full bg-muted flex items-center justify-center text-muted-foreground`}
     >
       <User size={iconSize} />
     </div>
@@ -137,7 +137,7 @@ export const PostForm = (props: PostFormProps) => {
     <div className="space-y-4">
       <textarea
         placeholder="Chia sẻ suy nghĩ..."
-        className="w-full p-3 border-1 rounded-lg bg-foreground text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full p-4 border border-gray-700 rounded-xl bg-gray-800 text-sm resize-none focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary text-white placeholder-gray-500"
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={3}
@@ -145,8 +145,8 @@ export const PostForm = (props: PostFormProps) => {
 
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-2">
-        <label className="px-4 py-2 text-xs text-gray-200 font-medium bg-gray-100 dark:bg-gray-800 rounded-full cursor-pointer hover:bg-gray-700 transition">
-          📷 {isEditMode ? "Đổi ảnh" : "Upload ảnh"}
+        <label className="px-4 py-2 text-xs text-white font-medium bg-gray-800 border border-gray-700 rounded-full cursor-pointer hover:bg-gray-700 transition flex items-center gap-2">
+          <span>📷</span> {isEditMode ? "Đổi ảnh" : "Upload ảnh"}
           <input
             type="file"
             accept="image/*"
@@ -158,26 +158,26 @@ export const PostForm = (props: PostFormProps) => {
           <button
             onClick={onSharePortfolio}
             disabled={isEditMode && shareType !== "portfolio"}
-            className={`px-4 py-2 text-xs font-medium rounded-full transition ${
+            className={`px-4 py-2 text-xs font-medium rounded-full transition flex items-center gap-2 border ${
               shareType === "portfolio"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-200 hover:bg-gray-700"
+                ? "bg-primary border-primary text-white shadow-lg shadow-primary/20"
+                : "bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-700 hover:text-white"
             }`}
           >
-            📈 {isEditMode ? "Chọn lại Coin" : "Chia sẻ Portfolio"}
+            <span>📈</span> {isEditMode ? "Chọn lại Coin" : "Chia sẻ Portfolio"}
           </button>
         )}
         {(!isEditMode || shareType === "cashflow") && (
           <button
             onClick={onShareCashflow}
             disabled={isEditMode && shareType !== "cashflow"}
-            className={`px-4 py-2 text-xs font-medium rounded-full transition ${
+            className={`px-4 py-2 text-xs font-medium rounded-full transition flex items-center gap-2 border ${
               shareType === "cashflow"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100 dark:bg-gray-800 text-gray-200 hover:bg-gray-700"
+                ? "bg-primary border-primary text-white shadow-lg shadow-primary/20"
+                : "bg-gray-800 border-gray-700 text-gray-400 hover:bg-gray-700 hover:text-white"
             }`}
           >
-            💰 {isEditMode ? "Sửa Timeline" : "Chia sẻ Dòng tiền"}
+            <span>💰</span> {isEditMode ? "Sửa Timeline" : "Chia sẻ Dòng tiền"}
           </button>
         )}
       </div>
@@ -187,12 +187,12 @@ export const PostForm = (props: PostFormProps) => {
         <div className="mt-3 relative w-40">
           <img
             src={selectedImage}
-            className="rounded-lg shadow-sm"
+            className="rounded-lg shadow-lg border border-gray-700"
             alt="preview"
           />
           <button
             onClick={onRemoveImage}
-            className="absolute -top-2 -right-2 bg-white dark:bg-gray-800 text-red-500 p-1 rounded-full shadow-md"
+            className="absolute -top-2 -right-2 bg-gray-800 border border-gray-700 text-red-500 p-1.5 rounded-full shadow-md hover:bg-gray-700 transition"
           >
             <X size={14} />
           </button>
@@ -201,17 +201,17 @@ export const PostForm = (props: PostFormProps) => {
 
       {/* Cashflow Section - ĐÃ FIX LỖI HỦY */}
       {shareType === "cashflow" && (
-        <div className="mt-4 bg-foreground rounded-xl p-4">
+        <div className="mt-4 bg-gray-800 rounded-xl p-4 border border-gray-700">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
-            <p className="font-semibold text-sm">Dữ liệu dòng tiền</p>
-            <div className="flex items-center gap-2 text-sm bg-background p-1.5 rounded-lg shadow-sm">
+            <p className="font-bold text-sm text-white">Dữ liệu dòng tiền</p>
+            <div className="flex items-center gap-2 text-sm bg-[#111318] p-2 rounded-lg border border-gray-700">
               <input
                 type="date"
                 value={dateFilter.from}
                 onChange={(e) =>
                   setDateFilter({ ...dateFilter, from: e.target.value })
                 }
-                className="bg-transparent focus:outline-none text-xs"
+                className="bg-transparent focus:outline-none text-xs text-gray-300 pointer-cursor"
               />
               <span className="text-gray-500">-</span>
               <input
@@ -220,7 +220,7 @@ export const PostForm = (props: PostFormProps) => {
                 onChange={(e) =>
                   setDateFilter({ ...dateFilter, to: e.target.value })
                 }
-                className="bg-transparent focus:outline-none text-xs"
+                className="bg-transparent focus:outline-none text-xs text-gray-300 pointer-cursor"
               />
             </div>
             {!isEditMode && (
@@ -229,16 +229,16 @@ export const PostForm = (props: PostFormProps) => {
                   setChartData(null);
                   setShareType("none"); // <--- FIX LỖI: Reset shareType để ẩn thanh thời gian
                 }}
-                className="text-xs text-red-500 hover:underline"
+                className="text-xs text-red-500 hover:underline p-1 hover:bg-white/5 rounded"
               >
-                <X />
+                <X size={16} />
               </button>
             )}
           </div>
           {chartData && (
-            <div className="rounded-xl p-2 bg-background mb-3">
+            <div className="rounded-xl p-2 bg-[#111318] mb-3 border border-gray-700">
               <Chart
-                options={chartOptions}
+                options={{ ...chartOptions, grid: { borderColor: '#333' }, theme: { mode: 'dark' } }}
                 series={[
                   {
                     name: "Thu",
@@ -263,17 +263,17 @@ export const PostForm = (props: PostFormProps) => {
 
       {/* Portfolio Section */}
       {shareType === "portfolio" && assetData && (
-        <div className="mt-4 bg-foreground rounded-xl p-4">
+        <div className="mt-4 bg-gray-800 rounded-xl p-4 border border-gray-700">
           <div className="flex justify-between items-center mb-2">
-            <p className="font-semibold text-sm">
+            <p className="font-bold text-sm text-white">
               Danh mục ({assetData.length} coin)
             </p>
             <div className="flex gap-2">
               <button
                 onClick={onSelectAssets}
-                className="text-xs text-blue-600 hover:underline"
+                className="text-xs text-primary hover:underline font-medium"
               >
-                <Edit />
+                <Edit size={16} />
               </button>
               {!isEditMode && (
                 <button
@@ -283,7 +283,7 @@ export const PostForm = (props: PostFormProps) => {
                   }}
                   className="text-xs text-red-500 hover:underline"
                 >
-                  <X />
+                  <X size={16} />
                 </button>
               )}
             </div>
@@ -292,11 +292,11 @@ export const PostForm = (props: PostFormProps) => {
             {assetData.map((a) => (
               <div
                 key={a.assetSymbol}
-                className="flex items-center gap-1 bg-background px-2 py-1 rounded-lg text-xs shadow-sm"
+                className="flex items-center gap-2 bg-[#111318] px-3 py-1.5 rounded-lg text-xs shadow-sm border border-gray-700"
               >
                 <img
                   src={a.url}
-                  className="w-4 h-4 rounded-full"
+                  className="w-5 h-5 rounded-full"
                   alt={a.assetSymbol}
                 />
                 <span className="font-medium">{a.assetSymbol}</span>
@@ -311,7 +311,7 @@ export const PostForm = (props: PostFormProps) => {
         <button
           onClick={onSubmit}
           disabled={isLoading}
-          className="flex items-center gap-2 bg-[#022d6d] text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-[#034091] disabled:opacity-70 transition-colors shadow-sm"
+          className="flex items-center gap-2 bg-primary text-white px-5 py-2 rounded-lg text-sm font-bold hover:bg-primary-hover disabled:opacity-70 transition-colors shadow-lg shadow-primary/20"
         >
           <Send size={16} />{" "}
           {isLoading ? "Đang xử lý..." : isEditMode ? "Cập nhật" : "Đăng bài"}
@@ -463,39 +463,44 @@ export const PostItem = (props: PostItemProps) => {
   };
 
   const chartOptions: ApexOptions = {
-    chart: { toolbar: { show: false } },
-
+    chart: { toolbar: { show: false }, fontFamily: "inherit" },
     colors: ["#22C55E", "#EF4444"],
-
     stroke: { curve: "smooth", width: 2 },
-
+    theme: { mode: 'dark' },
+    grid: { borderColor: '#333' },
     xaxis: {
       categories: transactionData?.map((t) => t.transactionDate) || [],
-
-      labels: { formatter: (val: string) => formatDateVN(val) },
+      labels: { formatter: (val: string) => formatDateVN(val), style: { colors: '#9CA3AF' } },
     },
-
+    yaxis: {
+        labels: { style: { colors: '#9CA3AF' } }
+    },
     tooltip: {
+      theme: 'dark',
       x: { formatter: (val) => formatDateVN(new Date(val).toISOString()) },
     },
   };
 
   return (
-    <div className="bg-background rounded-xl p-4 shadow-sm hover:shadow-lg transition-all duration-300 relative group">
+    <div className="bg-[#111318] rounded-2xl p-6 shadow-lg border border-gray-800 hover:border-gray-700 transition-all duration-300 relative group">
       {/* Header */}
 
-      <div className="flex justify-between items-start mb-3">
+      <div className="flex justify-between items-start mb-4">
         <div className="flex items-center gap-3">
           <UserAvatar url={post.userOfPostResponse.urlAvatar} />
 
           <div>
-            <p className="font-semibold text-sm">
+            <p className="font-bold text-sm text-white">
               {post.userOfPostResponse.name}
             </p>
 
-            <p className="text-xs text-gray-500">
-              {formatDateVN(post.createAt)}
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="text-xs text-gray-400">
+                {formatDateVN(post.createAt)}
+              </p>
+              <div className="w-1 h-1 rounded-full bg-gray-600"></div>
+              <p className="text-xs text-primary font-medium">Public</p>
+            </div>
           </div>
         </div>
 
@@ -505,23 +510,23 @@ export const PostItem = (props: PostItemProps) => {
               onClick={() =>
                 toggleMenu(activeMenuId === post.idPost ? null : post.idPost)
               }
-              className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
+              className="p-1.5 rounded-full hover:bg-gray-800 text-gray-400 hover:text-white transition-colors"
             >
               <MoreVertical size={20} />
             </button>
 
             {activeMenuId === post.idPost && (
-              <div className="absolute right-0 top-full mt-1 w-32 bg-white dark:bg-gray-800 rounded-lg shadow-xl z-10 overflow-hidden">
+              <div className="absolute right-0 top-full mt-1 w-32 bg-[#1A1D24] border border-gray-700 rounded-lg shadow-xl z-10 overflow-hidden">
                 <button
                   onClick={() => onEdit(post)}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2"
+                  className="w-full text-left px-4 py-2 text-sm text-white hover:bg-white/5 flex items-center gap-2"
                 >
                   <Edit size={14} /> Sửa
                 </button>
 
                 <button
                   onClick={() => onDelete(post.idPost)}
-                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                  className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-500/10 flex items-center gap-2"
                 >
                   <Trash2 size={14} /> Xóa
                 </button>
@@ -533,14 +538,14 @@ export const PostItem = (props: PostItemProps) => {
 
       {/* Content */}
 
-      <p className="text-sm mb-3 whitespace-pre-wrap">
+      <p className="text-sm mb-3 whitespace-pre-wrap text-gray-200">
         {post.content || post.title}
       </p>
 
       {post.urlImage && (
         <img
           src={post.urlImage}
-          className="w-full h-auto max-h-96 object-cover rounded-xl mb-3"
+          className="w-full h-auto max-h-96 object-cover rounded-xl mb-3 border border-gray-800"
           alt="content"
         />
       )}
@@ -548,7 +553,7 @@ export const PostItem = (props: PostItemProps) => {
       {/* Chart */}
 
       {transactionData && transactionData.length > 0 && (
-        <div className="rounded-xl p-2 bg-foreground mb-3">
+        <div className="rounded-xl p-2 bg-[#111318] mb-3 border border-gray-700">
           <Chart
             options={chartOptions}
             series={[
@@ -577,9 +582,9 @@ export const PostItem = (props: PostItemProps) => {
       {/* Asset Table */}
 
       {assetData && assetData.length > 0 && (
-        <div className="overflow-x-auto rounded-xl mb-3 bg-foreground">
+        <div className="overflow-x-auto rounded-xl mb-3 border border-gray-700">
           <table className="w-full text-sm">
-            <thead className="text-text bg-background">
+            <thead className="text-gray-400 bg-gray-800 text-xs font-semibold uppercase">
               <tr>
                 <th className="text-left p-2 pl-3">Token</th>
 
@@ -589,10 +594,10 @@ export const PostItem = (props: PostItemProps) => {
               </tr>
             </thead>
 
-            <tbody>
+            <tbody className="divide-y divide-gray-800">
               {assetData.map((a, i) => (
-                <tr key={i} className="hover:bg-background/50">
-                  <td className="p-2 pl-3 flex items-center gap-2">
+                <tr key={i} className="hover:bg-gray-800/50 transition-colors">
+                  <td className="p-2 pl-3 flex items-center gap-2 text-white">
                     <img
                       src={a.url}
                       className="w-5 h-5 rounded-full"
@@ -602,12 +607,12 @@ export const PostItem = (props: PostItemProps) => {
                     <span>{a.assetSymbol}</span>
                   </td>
 
-                  <td className="text-right p-2">
+                  <td className="text-right p-2 text-gray-300">
                     ${formatCurrency(a.currentPrice)}
                   </td>
 
                   <td
-                    className={`text-right p-2 pr-3 ${
+                    className={`text-right p-2 pr-3 font-medium ${
                       a.priceChangePercentage24h >= 0
                         ? "text-green-500"
                         : "text-red-500"
@@ -624,7 +629,7 @@ export const PostItem = (props: PostItemProps) => {
 
       {/* Footer */}
 
-      <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700/50 gap-2">
+      <div className="flex justify-between items-center pt-4 border-t border-gray-800 gap-2">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1 text-yellow-500">
             <Star className="fill-yellow-500 w-4 h-4" />
@@ -636,32 +641,32 @@ export const PostItem = (props: PostItemProps) => {
             </span>
           </div>
 
-          <div className="text-xs text-gray-500">{commentCount} bình luận</div>
+          <div className="text-xs text-gray-500 font-medium">{commentCount} bình luận</div>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={handleToggleFavorite}
             disabled={isFavoriting}
-            className="flex items-center gap-2 text-sm px-3 py-1.5 rounded-lg transition hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50"
+            className={`flex items-center gap-2 text-sm px-3 py-1.5 rounded-full transition-all ${
+              post.isFavorited
+                ? "bg-red-500/10 text-red-500"
+                : "text-gray-400 hover:bg-[#1A1D24] hover:text-white"
+            } disabled:opacity-50`}
           >
             <Heart
               size={18}
-              className={
-                post.isFavorited ? "fill-red-500 text-red-500" : "text-gray-600"
-              }
+              className={post.isFavorited ? "fill-red-500 text-red-500" : ""}
             />
 
-            <span
-              className={post.isFavorited ? "text-red-500" : "text-gray-600"}
-            >
+            <span>
               {post.isFavorited ? "Đã thích" : "Thích"}
             </span>
           </button>
 
           <button
             onClick={toggleCommentBox}
-            className="flex items-center gap-2 text-sm text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 px-3 py-1.5 rounded-lg transition"
+            className="flex items-center gap-2 text-sm text-gray-400 hover:bg-[#1A1D24] hover:text-white px-3 py-1.5 rounded-full transition-all"
           >
             <MessageCircle size={18} /> Bình luận
           </button>
@@ -670,15 +675,15 @@ export const PostItem = (props: PostItemProps) => {
 
       {/* Comments */}
       {showCommentBox && (
-        <div className="mt-3 p-3 rounded-lg animate-in slide-in-from-top-2">
+        <div className="mt-3 p-3 bg-[#1A1D24] rounded-xl animate-in slide-in-from-top-2 border border-gray-800">
           <div className="flex gap-1 mb-2">
             {[1, 2, 3, 4, 5].map((s) => (
               <Star
                 key={s}
-                className={`cursor-pointer w-6 h-6 ${
+                className={`cursor-pointer w-6 h-6 transition-colors ${
                   s <= starRating
-                    ? "text-yellow-400 fill-yellow-400"
-                    : "text-gray-300"
+                    ? "text-yellow-500 fill-yellow-500"
+                    : "text-gray-600 hover:text-yellow-500/50"
                 }`}
                 onClick={() => setStarRating(s)}
               />
@@ -686,7 +691,7 @@ export const PostItem = (props: PostItemProps) => {
           </div>
           <div className="flex gap-2">
             <textarea
-              className="flex-1 p-2 rounded-lg bg-foreground text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 p-3 rounded-xl bg-[#111318] border border-gray-800 text-white placeholder-gray-500 text-sm resize-none focus:outline-none focus:border-blue-500 transition-all"
               placeholder="Viết đánh giá..."
               rows={1}
               value={commentText}
@@ -694,7 +699,7 @@ export const PostItem = (props: PostItemProps) => {
             />
             <button
               onClick={onSubmitComment}
-              className="bg-blue-600 text-white px-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition"
+              className="bg-blue-600 hover:bg-blue-500 text-white px-4 rounded-xl text-sm font-medium transition-all"
             >
               Gửi
             </button>
@@ -702,18 +707,18 @@ export const PostItem = (props: PostItemProps) => {
         </div>
       )}
       {visibleComments.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700/50 space-y-3">
+        <div className="mt-4 pt-4 border-t border-gray-800 space-y-3">
           {visibleComments.map((c: EvaluateResponse) => {
             const isCommentOwner = currentUserId === c.idUser;
             return (
-              <div key={c.idEvaluate} className="flex gap-2">
+              <div key={c.idEvaluate} className="flex gap-3">
                 <UserAvatar url={c.urlAvatar} size="w-8 h-8" iconSize={16} />
-                <div className="flex-1 p-2 rounded-lg bg-foreground">
+                <div className="flex-1 p-3 rounded-xl bg-[#1A1D24] border border-gray-800/50">
                   <div className="flex justify-between items-start gap-2">
                     <div className="flex-1">
-                      <span className="text-xs font-bold block">{c.name}</span>
+                      <span className="text-sm font-semibold text-white block">{c.name}</span>
                       {editingCommentId !== c.idEvaluate && (
-                        <div className="flex gap-1 mt-1">
+                        <div className="flex gap-0.5 mt-1">
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
@@ -721,19 +726,19 @@ export const PostItem = (props: PostItemProps) => {
                               className={
                                 i < c.star
                                   ? "text-yellow-500 fill-yellow-500"
-                                  : "text-gray-300"
+                                  : "text-gray-700"
                               }
                             />
                           ))}
                         </div>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
                       {isCommentOwner && editingCommentId !== c.idEvaluate && (
                         <>
                           <button
                             onClick={() => handleStartEdit(c)}
-                            className="p-1 text-gray-500 hover:text-gray-700 transition"
+                            className="p-1.5 text-gray-500 hover:text-white hover:bg-gray-800 rounded-lg transition-all"
                             title="Chỉnh sửa"
                           >
                             <Edit size={14} />
@@ -741,7 +746,7 @@ export const PostItem = (props: PostItemProps) => {
                           <button
                             onClick={() => handleDeleteComment(c.idEvaluate)}
                             disabled={isDeletingComment === c.idEvaluate}
-                            className="p-1 text-gray-400 hover:text-red-500 transition disabled:opacity-50"
+                            className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all disabled:opacity-50"
                             title="Xóa bình luận"
                           >
                             <Trash2 size={14} />
@@ -756,17 +761,17 @@ export const PostItem = (props: PostItemProps) => {
                         {[1, 2, 3, 4, 5].map((s) => (
                           <Star
                             key={s}
-                            className={`cursor-pointer w-5 h-5 ${
+                            className={`cursor-pointer w-5 h-5 transition-colors ${
                               s <= editingCommentStars
-                                ? "text-yellow-400 fill-yellow-400"
-                                : "text-gray-300"
+                                ? "text-yellow-500 fill-yellow-500"
+                                : "text-gray-700 hover:text-yellow-500/50"
                             }`}
                             onClick={() => setEditingCommentStars(s)}
                           />
                         ))}
                       </div>
                       <textarea
-                        className="w-full p-2 rounded-md bg-foreground text-sm resize-none"
+                        className="w-full p-2 rounded-lg bg-[#111318] border border-gray-800 text-white text-sm resize-none focus:outline-none focus:border-blue-500 transition-all"
                         rows={3}
                         value={editingCommentText}
                         onChange={(e) => setEditingCommentText(e.target.value)}
@@ -774,13 +779,13 @@ export const PostItem = (props: PostItemProps) => {
                       <div className="flex gap-2 mt-2">
                         <button
                           onClick={() => handleSaveEdit(c.idEvaluate)}
-                          className="px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm"
+                          className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-all"
                         >
                           Lưu
                         </button>
                         <button
                           onClick={handleCancelEdit}
-                          className="px-3 py-1.5 bg-gray-200 text-gray-700 rounded-md text-sm"
+                          className="px-3 py-1.5 bg-[#111318] hover:bg-gray-800 text-gray-300 rounded-lg text-sm transition-all"
                         >
                           Hủy
                         </button>
@@ -788,7 +793,7 @@ export const PostItem = (props: PostItemProps) => {
                     </div>
                   ) : (
                     <>
-                      <p className="text-sm mt-1">{c.comment}</p>
+                      <p className="text-sm mt-1 text-gray-300">{c.comment}</p>
                       <p className="text-xs text-gray-500 mt-1">
                         {formatDateVN(c.createAt)}
                       </p>
@@ -801,7 +806,7 @@ export const PostItem = (props: PostItemProps) => {
           {comments.length > 3 && (
             <button
               onClick={toggleExpanded}
-              className="text-xs font-medium text-gray-500 hover:text-blue-600 hover:underline w-full text-left pl-10"
+              className="text-xs font-medium text-gray-400 hover:text-blue-500 hover:underline w-full text-left pl-12 transition-colors"
             >
               {isExpanded
                 ? "Thu gọn bình luận"

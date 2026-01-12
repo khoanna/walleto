@@ -717,16 +717,16 @@ export default function SocialPage() {
 
   // --- RENDER ---
   return (
-    <div className="min-h-screen p-4 sm:p-6">
+    <div className="min-h-screen p-4 sm:p-6 bg-background">
       {/* TAB SWITCHER - MOBILE ONLY */}
       <div className="lg:hidden mb-6">
-        <div className="flex p-1 bg-gray-200 dark:bg-gray-800 rounded-xl shadow-inner">
+        <div className="flex p-1 bg-[#111318] rounded-xl border border-gray-800">
           <button
             onClick={() => setMobileTab("feed")}
             className={`flex-1 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
               mobileTab === "feed"
-                ? "bg-white dark:bg-gray-700 text-blue-600 shadow-sm"
-                : "text-gray-500 hover:text-gray-700 dark:text-gray-400"
+                ? "bg-primary text-white shadow-sm"
+                : "text-gray-400 hover:text-white"
             }`}
           >
             <Newspaper size={16} /> Bảng tin
@@ -735,8 +735,8 @@ export default function SocialPage() {
             onClick={() => setMobileTab("friends")}
             className={`flex-1 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
               mobileTab === "friends"
-                ? "bg-white dark:bg-gray-700 text-blue-600 shadow-sm"
-                : "text-gray-500 hover:text-gray-700 dark:text-gray-400"
+                ? "bg-primary text-white shadow-sm"
+                : "text-gray-400 hover:text-white"
             }`}
           >
             <Users size={16} /> Bạn bè & Tìm kiếm
@@ -744,7 +744,7 @@ export default function SocialPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* LEFT COL: FEED */}
         <div
           className={`lg:col-span-8 space-y-6 ${
@@ -752,8 +752,8 @@ export default function SocialPage() {
           }`}
         >
           {hasPostPermission && (
-            <div className="bg-background/70 rounded-xl p-4 space-y-4 relative shadow-md">
-              <h3 className="text-sm font-bold text-gray-500">TẠO BÀI VIẾT</h3>
+            <div className="bg-[#111318] rounded-2xl p-6 space-y-4 relative shadow-lg border border-gray-800">
+              <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider">Tạo bài viết</h3>
               <PostForm
                 content={postContent}
                 setContent={setPostContent}
@@ -786,24 +786,24 @@ export default function SocialPage() {
               />
             </div>
           )}
-          <div className="flex gap-2 items-center mb-4">
-            <span className="text-sm text-gray-600">Hiển thị:</span>
+          <div className="flex gap-2 items-center mb-6">
+            <span className="text-sm text-gray-400">Hiển thị:</span>
             <button
               onClick={() => setShowUserPostsOnly(false)}
-              className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
+              className={`px-4 py-1.5 text-sm rounded-full transition-all border ${
                 !showUserPostsOnly
-                  ? "bg-blue-600 text-white font-medium"
-                  : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300"
+                  ? "bg-primary border-primary text-white font-bold"
+                  : "bg-[#111318] border-gray-800 text-gray-400 hover:border-gray-600"
               }`}
             >
               Tất cả bài viết
             </button>
             <button
               onClick={() => setShowUserPostsOnly(true)}
-              className={`px-3 py-1.5 text-sm rounded-lg transition-all ${
+              className={`px-4 py-1.5 text-sm rounded-full transition-all border ${
                 showUserPostsOnly
-                  ? "bg-blue-600 text-white font-medium"
-                  : "bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300"
+                  ? "bg-primary border-primary text-white font-bold"
+                  : "bg-[#111318] border-gray-800 text-gray-400 hover:border-gray-600"
               }`}
             >
               Bài viết của tôi
@@ -812,7 +812,7 @@ export default function SocialPage() {
           <div className="space-y-6">
             {isFetching ? (
               <div className="flex justify-center items-center py-10">
-                <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
               </div>
             ) : (
               posts.map((post) => (

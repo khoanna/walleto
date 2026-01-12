@@ -195,7 +195,7 @@ const DetailFund = () => {
   }
 
   return (
-    <div className="w-full min-h-screen p-4 sm:p-6">
+    <div className="w-full min-h-screen p-4 sm:p-6 bg-background text-text">
       {/* Header */}
       <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
         <div className="flex gap-2 items-center">
@@ -247,7 +247,7 @@ const DetailFund = () => {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
         {/* Pie Chart Section */}
-        <div className="lg:col-span-1 bg-background rounded-2xl p-4 sm:p-6 shadow-xl border border-text/10">
+        <div className="lg:col-span-1 bg-card rounded-2xl p-4 sm:p-6 shadow-xl border border-border">
           <h2 className="text-base sm:text-lg font-semibold text-text mb-4">
             Tổng tài sản
           </h2>
@@ -345,7 +345,7 @@ const DetailFund = () => {
         {/* Stats Cards */}
         <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Total Current Finance - Tổng tiền quỹ hiện tại */}
-          <div className="bg-background rounded-2xl p-4 sm:p-6 shadow-xl border border-text/10">
+          <div className="bg-card rounded-2xl p-4 sm:p-6 shadow-xl border border-border">
             <p className="text-xs sm:text-sm text-text/60 mb-2">
               Tổng tiền quỹ hiện tại
             </p>
@@ -356,7 +356,7 @@ const DetailFund = () => {
           </div>
 
           {/* Total Transaction Amount - Số tiền vốn bỏ ra */}
-          <div className="bg-background rounded-2xl p-4 sm:p-6 shadow-xl border border-text/10">
+          <div className="bg-card rounded-2xl p-4 sm:p-6 shadow-xl border border-border">
             <p className="text-xs sm:text-sm text-text/60 mb-2">
               Số tiền vốn bỏ ra
             </p>
@@ -367,7 +367,7 @@ const DetailFund = () => {
           </div>
 
           {/* Profit/Loss - Lãi/Lỗ */}
-          <div className="bg-background rounded-2xl p-4 sm:p-6 shadow-xl border border-text/10">
+          <div className="bg-card rounded-2xl p-4 sm:p-6 shadow-xl border border-border">
             <p className="text-xs sm:text-sm text-text/60 mb-2">
               {fundDetail.totalProfitAndLoss >= 0 ? "Lãi" : "Lỗ"}
             </p>
@@ -383,7 +383,7 @@ const DetailFund = () => {
           </div>
 
           {/* Empty placeholder or additional info */}
-          <div className="bg-background rounded-2xl p-4 sm:p-6 shadow-xl border border-text/10">
+          <div className="bg-card rounded-2xl p-4 sm:p-6 shadow-xl border border-border">
             <p className="text-xs sm:text-sm text-text/60 mb-4">Tổng quan</p>
             <div className="space-y-2">
               <div className="flex justify-between text-xs sm:text-sm">
@@ -415,15 +415,15 @@ const DetailFund = () => {
       </div>
 
       {/* Assets Table */}
-      <div className="bg-background rounded-2xl shadow-xl border border-text/10 overflow-hidden">
-        <div className="p-4 sm:p-6 border-b border-text/10">
+      <div className="bg-card rounded-2xl shadow-xl border border-border overflow-hidden">
+        <div className="p-4 sm:p-6 border-b border-border">
           <h2 className="text-lg sm:text-xl font-bold text-text">Tiền ảo</h2>
         </div>
         {fundDetail.listInvestmentAssetResponse &&
         fundDetail.listInvestmentAssetResponse.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-background border-b border-text/10">
+              <thead className="bg-card border-b border-border">
                 <tr>
                   <th className="px-3 sm:px-6 py-3 sm:py-4 text-left text-xs font-semibold text-text uppercase tracking-wider whitespace-nowrap">
                     Tiền ảo

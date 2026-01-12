@@ -25,15 +25,16 @@ export const AssetSelectionModal = ({
   onClose,
   onCancel,
 }: AssetSelectionModalProps) => (
-  <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
-    <div className="bg-white dark:bg-[#1C253A] w-full max-w-md rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700/50 flex justify-between items-center rounded-t-xl">
-        <h3 className="font-bold">Chọn tài sản chia sẻ</h3>
+  <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in zoom-in duration-200">
+    <div className="bg-[#111318] w-full max-w-md rounded-2xl shadow-2xl flex flex-col max-h-[90vh] border border-gray-800">
+      <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-[#111318] rounded-t-2xl">
+        <h3 className="font-bold text-white">Chọn tài sản chia sẻ</h3>
         <button
           onClick={() => {
             if (onCancel) onCancel();
             onClose();
           }}
+          className="text-gray-400 hover:text-white transition-colors"
         >
           <X size={20} />
         </button>
@@ -43,26 +44,26 @@ export const AssetSelectionModal = ({
           <div
             key={asset.idAsset}
             onClick={() => onToggle(asset.idAsset)}
-            className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer ${
+            className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
               selectedIds.has(asset.idAsset)
-                ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                : ""
+                ? "border-blue-500 bg-blue-500/10"
+                : "border-gray-800 hover:bg-[#1A1D24]"
             }`}
           >
             <div className="flex items-center gap-3">
               {selectedIds.has(asset.idAsset) ? (
-                <CheckCircle className="text-blue-600" size={20} />
+                <CheckCircle className="text-blue-500" size={20} />
               ) : (
-                <Circle className="text-gray-300" size={20} />
+                <Circle className="text-gray-600" size={20} />
               )}
               {/* Note: Ideally use Next/Image here if domains are configured */}
               <img
                 src={asset.url}
-                className="w-8 h-8 rounded-full bg-white"
+                className="w-8 h-8 rounded-full bg-white transition-transform group-hover:scale-105"
                 alt={asset.assetSymbol}
               />
               <div>
-                <p className="font-bold text-sm">{asset.assetName}</p>
+                <p className="font-bold text-sm text-white">{asset.assetName}</p>
                 <p className="text-xs text-gray-500">
                   {asset.assetSymbol.toUpperCase()}
                 </p>
@@ -71,13 +72,13 @@ export const AssetSelectionModal = ({
           </div>
         ))}
       </div>
-      <div className="p-3 border-t">
+      <div className="p-3 border-t border-gray-800">
         <button
           onClick={() => {
             onConfirm();
             onClose();
           }}
-          className="w-full bg-[#022d6d] text-white py-2.5 rounded-lg font-medium"
+          className="w-full bg-[#022d6d] hover:bg-[#033a8a] text-white py-3 rounded-xl font-medium transition-all"
         >
           Xác nhận ({selectedIds.size})
         </button>
@@ -98,26 +99,26 @@ export const DeleteFriendModal = ({
   onCancel,
   onConfirm,
 }: DeleteFriendModalProps) => (
-  <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
-    <div className="bg-white dark:bg-[#1C253A] rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
-      <div className="mx-auto w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
-        <UserX className="text-red-600" size={24} />
+  <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="bg-[#111318] border border-gray-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
+      <div className="mx-auto w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
+        <UserX className="text-red-500" size={24} />
       </div>
-      <h3 className="text-lg font-bold mb-2">Hủy kết bạn?</h3>
-      <p className="text-sm text-gray-500 mb-6">
-        Bạn có chắc chắn muốn xóa <span className="font-bold">{name}</span> khỏi
+      <h3 className="text-lg font-bold mb-2 text-white">Hủy kết bạn?</h3>
+      <p className="text-sm text-gray-400 mb-6">
+        Bạn có chắc chắn muốn xóa <span className="font-bold text-white">{name}</span> khỏi
         danh sách bạn bè?
       </p>
       <div className="flex gap-3">
         <button
           onClick={onCancel}
-          className="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-medium rounded-xl text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+          className="flex-1 px-4 py-2.5 bg-gray-800 text-gray-300 font-medium rounded-xl text-sm hover:bg-gray-700 transition"
         >
           Hủy bỏ
         </button>
         <button
           onClick={onConfirm}
-          className="flex-1 px-4 py-2.5 bg-red-600 text-white font-medium rounded-xl text-sm shadow-md shadow-red-200 dark:shadow-red-900/30 hover:bg-red-700 transition"
+          className="flex-1 px-4 py-2.5 bg-red-600 text-white font-medium rounded-xl text-sm shadow-lg shadow-red-900/20 hover:bg-red-700 transition"
         >
           Xóa bạn
         </button>
@@ -252,14 +253,13 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
 
   return (
     <div 
-      className={`fixed bottom-4 right-4 bg-foreground rounded-2xl flex flex-col z-40 overflow-hidden transition-all duration-300 ease-in-out
+      className={`fixed bottom-4 right-4 bg-[#111318] rounded-2xl flex flex-col z-40 overflow-hidden transition-all duration-300 ease-in-out border border-gray-800
         ${isMinimized ? "w-72 h-16" : "w-[360px] h-[520px]"}
-        shadow-[0_10px_40px_rgba(0,0,0,0.15)] dark:shadow-[0_10px_50px_rgba(0,0,0,0.5)]
-        ring-1 ring-black/5 dark:ring-white/10`}
+        shadow-2xl shadow-black/50`}
     >
       {/* Header */}
       <div 
-        className="relative bg-foreground text-text px-4 py-3 flex justify-between items-center cursor-pointer"
+        className="relative bg-[#111318] text-white px-4 py-3 flex justify-between items-center cursor-pointer border-b border-gray-800"
         onClick={() => setIsMinimized(!isMinimized)}
       >
         <div className="flex items-center gap-3 relative z-10">
@@ -268,17 +268,17 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
             <div className="w-10 h-10 rounded-full overflow-hidden">
               <UserAvatar url={user?.urlAvatar} size="w-10 h-10" />
             </div>
-            <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-background 
-              ${isConnected ? "bg-emerald-400" : isConnecting ? "bg-amber-400 animate-pulse" : "bg-gray-400"}`} 
+            <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#111318] 
+              ${isConnected ? "bg-emerald-500" : isConnecting ? "bg-amber-500 animate-pulse" : "bg-gray-500"}`} 
             />
           </div>
           
           <div className="flex flex-col">
-            <span className="font-semibold text-[15px] leading-tight">
+            <span className="font-semibold text-[15px] leading-tight text-white">
               {hasUser ? user!.name : "Không thể tải dữ liệu"}
             </span>
             {hasUser && (
-              <span className="text-[11px] text-text/60 flex items-center gap-1">
+              <span className="text-[11px] text-gray-400 flex items-center gap-1">
                 {isConnected ? "Đang hoạt động" : isConnecting ? "Đang kết nối..." : "Offline"}
               </span>
             )}
@@ -290,22 +290,22 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
           <div className="relative" ref={menuRef}>
             <button 
               onClick={() => setShowMenu(!showMenu)} 
-              className="w-8 h-8 flex items-center justify-center hover:bg-background rounded-full transition-all duration-200"
+              className="w-8 h-8 flex items-center justify-center hover:bg-[#1A1D24] text-gray-400 hover:text-white rounded-full transition-all duration-200"
             >
               <MoreVertical size={18} />
             </button>
             
             {/* Dropdown Menu */}
             {showMenu && (
-              <div className="absolute right-0 top-full mt-2 w-52 bg-background rounded-xl shadow-2xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="absolute right-0 top-full mt-2 w-52 bg-[#1A1D24] border border-gray-800 rounded-xl shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                 <button
                   onClick={() => {
                     setShowDeleteConfirm(true);
                     setShowMenu(false);
                   }}
-                  className="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 transition-colors"
+                  className="w-full px-4 py-2.5 text-left text-sm text-red-500 hover:bg-red-500/10 flex items-center gap-3 transition-colors"
                 >
-                  <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center">
                     <Trash2 size={14} />
                   </div>
                   <span>Xóa lịch sử tin nhắn</span>
@@ -316,7 +316,7 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
           
           <button 
             onClick={onClose} 
-            className="w-8 h-8 flex items-center justify-center hover:bg-background rounded-full transition-all duration-200"
+            className="w-8 h-8 flex items-center justify-center hover:bg-[#1A1D24] text-gray-400 hover:text-white rounded-full transition-all duration-200"
           >
             <X size={18} />
           </button>
@@ -326,20 +326,20 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 rounded-2xl animate-in fade-in duration-200">
-          <div className="bg-background rounded-2xl p-5 m-4 shadow-2xl max-w-[300px] animate-in zoom-in-95 duration-200">
+          <div className="bg-[#1A1D24] border border-gray-800 rounded-2xl p-5 m-4 shadow-2xl max-w-[300px] animate-in zoom-in-95 duration-200">
             <div className="flex justify-center mb-4">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-red-100 to-red-200 dark:from-red-900/40 dark:to-red-800/40 flex items-center justify-center">
-                <Trash2 className="text-red-600" size={24} />
+              <div className="w-14 h-14 rounded-full bg-red-500/10 flex items-center justify-center">
+                <Trash2 className="text-red-500" size={24} />
               </div>
             </div>
-            <h4 className="font-bold text-center mb-2 text-base">Xóa lịch sử tin nhắn?</h4>
-            <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-5">
+            <h4 className="font-bold text-center mb-2 text-base text-white">Xóa lịch sử tin nhắn?</h4>
+            <p className="text-sm text-gray-400 text-center mb-5">
               Tất cả tin nhắn sẽ bị xóa vĩnh viễn và không thể khôi phục.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 px-4 py-2.5 bg-foreground text-text rounded-xl text-sm font-medium hover:opacity-80 transition-all duration-200"
+                className="flex-1 px-4 py-2.5 bg-gray-800 text-gray-300 rounded-xl text-sm font-medium hover:bg-gray-700 transition-all duration-200"
               >
                 Hủy
               </button>
@@ -349,7 +349,7 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
                   setShowDeleteConfirm(false);
                 }}
                 disabled={isLoading}
-                className="flex-1 px-4 py-2.5 bg-red-500 text-white rounded-xl text-sm font-medium hover:bg-red-600 transition-all duration-200 disabled:opacity-50"
+                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl text-sm font-medium hover:bg-red-700 transition-all duration-200 disabled:opacity-50"
               >
                 {isLoading ? "Đang xóa..." : "Xóa"}
               </button>
@@ -360,7 +360,7 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
 
       {/* Error Banner */}
       {error && !isMinimized && (
-        <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-xs px-4 py-2 flex justify-between items-center">
+        <div className="bg-red-500/10 text-red-500 text-xs px-4 py-2 flex justify-between items-center border-b border-red-500/20">
           <div className="flex items-center gap-2">
             <AlertTriangle size={14} />
             <span>{error}</span>
@@ -372,12 +372,12 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
       {/* Messages Area */}
       {!isMinimized && (
         <>
-          <div className="flex-1 bg-background px-4 py-3 overflow-y-auto">
+          <div className="flex-1 bg-[#0C0E12] px-4 py-3 overflow-y-auto">
             {!hasUser ? (
-              <div className="flex items-center justify-center h-full text-sm text-text/60">
+              <div className="flex items-center justify-center h-full text-sm text-gray-500">
                 <div className="text-center">
-                  <div className="w-16 h-16 rounded-full bg-foreground flex items-center justify-center mx-auto mb-3">
-                    <AlertTriangle size={24} className="text-text/40" />
+                  <div className="w-16 h-16 rounded-full bg-[#1A1D24] flex items-center justify-center mx-auto mb-3">
+                    <AlertTriangle size={24} className="text-gray-600" />
                   </div>
                   <p>Không thể tải thông tin người dùng.</p>
                 </div>
@@ -386,21 +386,21 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
                   <div className="relative w-12 h-12 mx-auto mb-3">
-                    <div className="absolute inset-0 rounded-full border-2 border-foreground"></div>
+                    <div className="absolute inset-0 rounded-full border-2 border-gray-800"></div>
                     <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-blue-500 animate-spin"></div>
                   </div>
-                  <p className="text-sm text-text/60">Đang tải tin nhắn...</p>
+                  <p className="text-sm text-gray-500">Đang tải tin nhắn...</p>
                 </div>
               </div>
             ) : !Array.isArray(messages) || messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center px-4">
-                <div className="w-20 h-20 rounded-full bg-foreground flex items-center justify-center mb-4">
+                <div className="w-20 h-20 rounded-full bg-[#1A1D24] flex items-center justify-center mb-4">
                   <Send size={28} className="text-blue-500" />
                 </div>
                 <p className="text-base font-medium text-text mb-1">
                   Bắt đầu cuộc trò chuyện
                 </p>
-                <p className="text-sm text-text/60">
+                <p className="text-sm text-gray-500">
                   Gửi tin nhắn đầu tiên đến {user!.name}
                 </p>
               </div>
@@ -410,7 +410,7 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
                   <div key={groupIdx}>
                     {/* Date separator */}
                     <div className="flex items-center justify-center my-4">
-                      <div className="px-3 py-1 rounded-full bg-foreground text-xs text-text/60 font-medium">
+                      <div className="px-3 py-1 rounded-full bg-[#1A1D24] border border-gray-800 text-xs text-gray-400 font-medium">
                         {formatDateLabel(group.date)}
                       </div>
                     </div>
@@ -438,14 +438,14 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
                               <div
                                 className={`px-4 py-2 text-[14px] leading-relaxed
                                   ${isMe
-                                    ? "bg-blue-500 text-white rounded-2xl rounded-br-md"
-                                    : "bg-foreground text-text rounded-2xl rounded-bl-md"
+                                    ? "bg-blue-600 text-white rounded-2xl rounded-br-md"
+                                    : "bg-[#1A1D24] text-gray-200 rounded-2xl rounded-bl-md border border-gray-800"
                                   }`}
                               >
                                 {msg.content}
                               </div>
                               {msg.sendAt && (
-                                <p className={`text-[10px] text-text/40 mt-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${isMe ? "text-right" : "text-left"}`}>
+                                <p className={`text-[10px] text-gray-500 mt-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${isMe ? "text-right" : "text-left"}`}>
                                   {formatTime(msg.sendAt)}
                                 </p>
                               )}
@@ -462,13 +462,13 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
           </div>
 
           {/* Input Area */}
-          <div className="p-4 bg-background">
+          <div className="p-4 bg-[#111318] border-t border-gray-800">
             <div className="flex gap-3 items-center">
               <div className="flex-1 relative">
                 <input
-                  className="w-full px-4 py-3 bg-foreground rounded-2xl text-sm outline-none 
-                    focus:ring-2 focus:ring-blue-500/30 
-                    transition-all duration-200 disabled:opacity-50 placeholder:text-text/40"
+                  className="w-full px-4 py-3 bg-[#1A1D24] border border-gray-800 rounded-2xl text-sm outline-none text-white
+                    focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                    transition-all duration-200 disabled:opacity-50 placeholder:text-gray-500"
                   placeholder={hasUser ? "Nhập tin nhắn..." : "Không thể gửi"}
                   disabled={!hasUser}
                   value={inputMessage}
@@ -479,8 +479,8 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
               <button
                 onClick={handleSend}
                 disabled={!hasUser || isSending || !inputMessage.trim()}
-                className="w-11 h-11 flex items-center justify-center bg-blue-500 
-                  text-white rounded-xl hover:bg-blue-600 
+                className="w-11 h-11 flex items-center justify-center bg-blue-600 
+                  text-white rounded-xl hover:bg-blue-500 
                   transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed
                   hover:scale-105 active:scale-95"
                 title={hasUser ? "Gửi tin nhắn" : "Không có dữ liệu người dùng"}
@@ -494,8 +494,8 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
             </div>
             {!isConnected && hasUser && (
               <div className="flex items-center justify-center gap-2 mt-2">
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                <p className="text-xs text-amber-600 dark:text-amber-400">
+                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                <p className="text-xs text-amber-500">
                   {isConnecting ? "Đang kết nối..." : "Mất kết nối. Đang thử lại..."}
                 </p>
               </div>
@@ -515,10 +515,10 @@ interface EditPostModalProps {
 
 export const EditPostModal = ({ onClose, children }: EditPostModalProps) => (
   <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in slide-in-from-bottom-5">
-    <div className="bg-gray-200 w-full max-w-2xl rounded-xl shadow-2xl flex flex-col max-h-[90vh]">
-      <div className="p-4 border-b flex justify-between items-center">
-        <h3 className="font-bold text-black text-lg">Chỉnh sửa bài viết</h3>
-        <button onClick={onClose}>
+    <div className="bg-[#111318] border border-gray-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+      <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-[#111318] rounded-t-2xl">
+        <h3 className="font-bold text-white text-lg">Chỉnh sửa bài viết</h3>
+        <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
           <X size={24} />
         </button>
       </div>
@@ -551,17 +551,17 @@ export const EditCommentModal = ({
   // The 'Star' icon wasn't being used (emojis were used instead), so it's safe to remove.
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in">
-      <div className="bg-white dark:bg-[#1C253A] rounded-xl shadow-2xl w-full max-w-sm">
-        <div className="p-4 border-b flex justify-between items-center">
-          <h3 className="font-bold">Sửa bình luận</h3>
-          <button onClick={onCancel} disabled={isLoading}>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
+      <div className="bg-[#111318] border border-gray-800 rounded-2xl shadow-2xl w-full max-w-sm">
+        <div className="p-4 border-b border-gray-800 flex justify-between items-center">
+          <h3 className="font-bold text-white">Sửa bình luận</h3>
+          <button onClick={onCancel} disabled={isLoading} className="text-gray-400 hover:text-white transition-colors">
             <X size={20} />
           </button>
         </div>
         <div className="p-4 space-y-3">
           <div>
-            <p className="text-xs font-medium text-gray-600 mb-2">Đánh giá</p>
+            <p className="text-xs font-medium text-gray-400 mb-2">Đánh giá</p>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((s) => (
                 <button
@@ -576,9 +576,9 @@ export const EditCommentModal = ({
             </div>
           </div>
           <div>
-            <p className="text-xs font-medium text-gray-600 mb-2">Bình luận</p>
+            <p className="text-xs font-medium text-gray-400 mb-2">Bình luận</p>
             <textarea
-              className="w-full p-2 border rounded-lg text-sm resize-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full p-2 bg-[#1A1D24] border border-gray-800 rounded-lg text-sm text-white resize-none focus:outline-none focus:border-blue-500 transition-all"
               placeholder="Viết bình luận..."
               rows={3}
               value={commentText}
@@ -587,18 +587,18 @@ export const EditCommentModal = ({
             />
           </div>
         </div>
-        <div className="p-4 border-t flex gap-2">
+        <div className="p-4 border-t border-gray-800 flex gap-2">
           <button
             onClick={onCancel}
             disabled={isLoading}
-            className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg text-sm font-medium hover:bg-gray-300 transition disabled:opacity-50"
+            className="flex-1 px-4 py-2 bg-gray-800 text-gray-300 rounded-xl text-sm font-medium hover:bg-gray-700 transition disabled:opacity-50"
           >
             Hủy
           </button>
           <button
             onClick={onConfirm}
             disabled={isLoading}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition disabled:opacity-50"
+            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-500 transition disabled:opacity-50"
           >
             {isLoading ? "Đang xử lý..." : "Cập nhật"}
           </button>

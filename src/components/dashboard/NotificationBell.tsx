@@ -85,13 +85,13 @@ export default function NotificationBell({ idUser }: NotificationBellProps) {
         top: dropdownPosition.top,
         left: dropdownPosition.left,
       }}
-      className="w-80 sm:w-96 bg-[#0B162C] dark:bg-[#0A1226] border border-white/10 rounded-2xl shadow-2xl shadow-black/50 z-[9999] overflow-hidden animate-in slide-in-from-top-2 fade-in duration-200"
+      className="w-80 sm:w-96 bg-card border border-border rounded-2xl shadow-2xl shadow-black/50 z-[9999] overflow-hidden animate-in slide-in-from-top-2 fade-in duration-200"
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-white/5">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/20">
         <div className="flex items-center gap-2">
           <Bell className="size-4 text-blue-400" />
-          <h3 className="font-semibold text-white text-sm">Thông báo</h3>
+          <h3 className="font-semibold text-text text-sm">Thông báo</h3>
           {unreadCount > 0 && (
             <span className="px-2 py-0.5 text-[10px] font-medium bg-blue-500/20 text-blue-400 rounded-full">
               {unreadCount} mới
@@ -100,9 +100,9 @@ export default function NotificationBell({ idUser }: NotificationBellProps) {
         </div>
         <button
           onClick={() => setIsOpen(false)}
-          className="p-1 hover:bg-white/10 rounded-lg transition-colors"
+          className="p-1 hover:bg-muted rounded-lg transition-colors"
         >
-          <X className="size-4 text-slate-400" />
+          <X className="size-4 text-muted-foreground" />
         </button>
       </div>
 
@@ -114,18 +114,18 @@ export default function NotificationBell({ idUser }: NotificationBellProps) {
           </div>
         ) : notifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-3">
-              <Bell className="size-6 text-slate-500" />
+            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
+              <Bell className="size-6 text-muted-foreground" />
             </div>
-            <p className="text-slate-400 text-sm">Không có thông báo nào</p>
+            <p className="text-muted-foreground text-sm">Không có thông báo nào</p>
           </div>
         ) : (
-          <div className="divide-y divide-white/5">
+          <div className="divide-y divide-border">
             {notifications.map((notification) => (
               <div
                 key={notification.idNotification}
                 onClick={() => handleNotificationClick(notification.idNotification, notification.isRead)}
-                className={`px-4 py-3 cursor-pointer transition-colors hover:bg-white/5 ${
+                className={`px-4 py-3 cursor-pointer transition-colors hover:bg-muted/50 ${
                   !notification.isRead ? "bg-blue-500/5" : ""
                 }`}
               >
@@ -133,11 +133,11 @@ export default function NotificationBell({ idUser }: NotificationBellProps) {
                   {/* Icon */}
                   <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
                     notification.isRead 
-                      ? "bg-white/5" 
+                      ? "bg-muted" 
                       : "bg-blue-500/20"
                   }`}>
                     {notification.isRead ? (
-                      <CheckCheck className="size-4 text-slate-500" />
+                      <CheckCheck className="size-4 text-muted-foreground" />
                     ) : (
                       <Bell className="size-4 text-blue-400" />
                     )}
@@ -147,7 +147,7 @@ export default function NotificationBell({ idUser }: NotificationBellProps) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <h4 className={`text-sm font-medium truncate ${
-                        notification.isRead ? "text-slate-300" : "text-white"
+                        notification.isRead ? "text-muted-foreground" : "text-text"
                       }`}>
                         {notification.title}
                       </h4>
@@ -155,10 +155,10 @@ export default function NotificationBell({ idUser }: NotificationBellProps) {
                         <span className="shrink-0 w-2 h-2 rounded-full bg-blue-500 mt-1.5" />
                       )}
                     </div>
-                    <p className="text-xs text-slate-400 line-clamp-2 mt-0.5">
+                    <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
                       {notification.content}
                     </p>
-                    <p className="text-[10px] text-slate-500 mt-1">
+                    <p className="text-[10px] text-muted-foreground mt-1">
                       {formatDate(notification.notificationDate)}
                     </p>
                   </div>
@@ -171,8 +171,8 @@ export default function NotificationBell({ idUser }: NotificationBellProps) {
 
       {/* Footer */}
       {notifications.length > 0 && (
-        <div className="px-4 py-2.5 border-t border-white/10 bg-white/5">
-          <p className="text-[10px] text-center text-slate-500">
+        <div className="px-4 py-2.5 border-t border-border bg-muted/20">
+          <p className="text-[10px] text-center text-muted-foreground">
             Hiển thị {notifications.length} thông báo
           </p>
         </div>
@@ -186,10 +186,10 @@ export default function NotificationBell({ idUser }: NotificationBellProps) {
       <button
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-200 group"
+        className="relative p-2 rounded-xl bg-muted/50 hover:bg-muted border border-border transition-all duration-200 group"
         aria-label="Thông báo"
       >
-        <Bell className="size-5 text-slate-300 group-hover:text-white transition-colors" />
+        <Bell className="size-5 text-muted-foreground group-hover:text-text transition-colors" />
         
         {/* Badge */}
         {unreadCount > 0 && (

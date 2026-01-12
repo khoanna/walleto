@@ -1,0 +1,657 @@
+/* ==================== */
+/* CSS Variables */
+/* ==================== */
+.dashboard-container {
+  --background: #080a0d;
+  --foreground: #f1f5f9;
+  --card: #111318;
+  --card-foreground: #f1f5f9;
+  --muted: #2a3441;
+  --muted-foreground: #6b7280;
+  --primary: #14b8a6;
+  --primary-foreground: #0f1419;
+  --accent: #10b981;
+  --border: #2a3441;
+  --green: #22c55e;
+  --red: #ef4444;
+  
+  --font-display: var(--font-space-grotesk), 'Space Grotesk', sans-serif;
+  --font-body: var(--font-inter), 'Inter', sans-serif;
+  
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+/* ==================== */
+/* Base Styles */
+/* ==================== */
+.dashboard-container *, .dashboard-container *::before, .dashboard-container *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.dashboard {
+  min-height: 100vh;
+  padding: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+  font-family: var(--font-body);
+  background-color: var(--background);
+  color: var(--foreground);
+  line-height: 1.6;
+}
+
+.dashboard-header {
+  margin-bottom: 32px;
+}
+
+.dashboard-header h1 {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 4px;
+}
+
+.dashboard-header p {
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+}
+
+/* ==================== */
+/* Stats Grid */
+/* ==================== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 640px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ==================== */
+/* Stat Card */
+/* ==================== */
+.stat-card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.stat-card:hover {
+  background: linear-gradient(135deg, rgba(20, 184, 166, 0.2) 0%, rgba(20, 184, 166, 0.05) 100%);
+  border-color: rgba(20, 184, 166, 0.2);
+}
+
+.stat-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.stat-card__label {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.stat-card__icon {
+  width: 20px;
+  height: 20px;
+  color: var(--primary);
+}
+
+.stat-card__icon--muted {
+  color: var(--muted-foreground);
+}
+
+.stat-card__icon-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-card__icon-circle--green {
+  background-color: rgba(34, 197, 94, 0.2);
+  color: var(--green);
+}
+
+.stat-card__icon-circle--red {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: var(--red);
+}
+
+.stat-card__value {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--foreground);
+  line-height: 1.2;
+}
+
+.stat-card__currency {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+.stat-card__sublabel {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.stat-card__trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.stat-card__trend--positive {
+  color: var(--green);
+}
+
+.stat-card__trend--negative {
+  color: var(--red);
+}
+
+/* ==================== */
+/* Charts Grid */
+/* ==================== */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 1024px) {
+  .charts-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+/* ==================== */
+/* Bottom Grid */
+/* ==================== */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 1024px) {
+  .bottom-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+/* ==================== */
+/* Card Component */
+/* ==================== */
+.card {
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.card--wide {
+  grid-column: span 1;
+}
+
+@media (min-width: 1024px) {
+  .card--wide {
+    grid-column: span 1;
+  }
+}
+
+.card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.card__title {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.card__tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.card__link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.card__link:hover {
+  opacity: 0.8;
+}
+
+.card__menu-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background-color 0.2s;
+}
+
+.card__menu-btn:hover {
+  background-color: var(--muted);
+}
+
+.card__content {
+  padding: 24px;
+}
+
+.card__content--centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ==================== */
+/* Tabs */
+/* ==================== */
+.tab {
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background-color: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  background-color: var(--muted);
+}
+
+.tab--active {
+  background-color: var(--muted);
+  color: var(--foreground);
+}
+
+/* ==================== */
+/* Chart Legend */
+/* ==================== */
+.chart-legend {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.chart-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.chart-legend__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.chart-legend__dot--green {
+  background-color: var(--green);
+}
+
+.chart-legend__dot--red {
+  background-color: var(--red);
+}
+
+/* ==================== */
+/* Chart Placeholder */
+/* ==================== */
+.chart-placeholder {
+  width: 100%;
+  height: 220px;
+}
+
+.chart-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ==================== */
+/* Donut Chart */
+/* ==================== */
+.donut-chart {
+  width: 160px;
+  height: 160px;
+  margin-bottom: 16px;
+}
+
+.donut-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.donut-legend {
+  display: flex;
+  gap: 24px;
+}
+
+.donut-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.donut-legend__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.donut-legend__label {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.donut-legend__value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+/* ==================== */
+/* Crypto Table */
+/* ==================== */
+.crypto-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.crypto-table__th {
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.crypto-table__th:not(:first-child) {
+  text-align: right;
+}
+
+.crypto-table__row {
+  transition: background-color 0.2s;
+}
+
+.crypto-table__row:hover {
+  background-color: rgba(42, 52, 65, 0.5);
+}
+
+.crypto-table__td {
+  padding: 16px 8px;
+  border-bottom: 1px solid rgba(42, 52, 65, 0.5);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.crypto-table__td:not(:first-child) {
+  text-align: right;
+}
+
+.crypto-table__td--muted {
+  color: var(--muted-foreground);
+}
+
+.crypto-table__th--hide-mobile,
+.crypto-table__td--hide-mobile {
+  display: none;
+}
+
+.crypto-table__th--hide-tablet,
+.crypto-table__td--hide-tablet {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .crypto-table__th--hide-mobile,
+  .crypto-table__td--hide-mobile {
+    display: table-cell;
+  }
+}
+
+@media (min-width: 1024px) {
+  .crypto-table__th--hide-tablet,
+  .crypto-table__td--hide-tablet {
+    display: table-cell;
+  }
+}
+
+/* ==================== */
+/* Crypto Info */
+/* ==================== */
+.crypto-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.crypto-info__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(20, 184, 166, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.crypto-info__icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.crypto-info__details {
+  display: flex;
+  flex-direction: column;
+}
+
+.crypto-info__name {
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.crypto-info__symbol {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+}
+
+/* ==================== */
+/* Badge */
+/* ==================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge--positive {
+  background-color: rgba(34, 197, 94, 0.2);
+  color: var(--green);
+}
+
+.badge--negative {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: var(--red);
+}
+
+/* ==================== */
+/* Transactions */
+/* ==================== */
+.transactions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.transaction {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background-color: rgba(42, 52, 65, 0.3);
+  border-radius: var(--radius-sm);
+  transition: background-color 0.2s;
+}
+
+.transaction:hover {
+  background-color: rgba(42, 52, 65, 0.5);
+}
+
+.transaction__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(20, 184, 166, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+}
+
+.transaction__details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.transaction__name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.transaction__time {
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.transaction__amount {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.transaction__amount--positive {
+  color: var(--green);
+}
+
+.transaction__amount--negative {
+  color: var(--red);
+}
+
+/* ==================== */
+/* Buttons */
+/* ==================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.btn--outline {
+  background-color: transparent;
+  border: 1px solid var(--border);
+  color: var(--foreground);
+}
+
+.btn--outline:hover {
+  background-color: var(--muted);
+}
+
+.btn--full {
+  width: 100%;
+}
+
+/* ==================== */
+/* Responsive */
+/* ==================== */
+@media (max-width: 640px) {
+  .dashboard {
+    padding: 16px;
+  }
+  
+  .stat-card__value {
+    font-size: 1.5rem;
+  }
+  
+  .card__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .card__tabs {
+    width: 100%;
+    overflow-x: auto;
+  }
+}

@@ -175,8 +175,8 @@ export default function BuyPage() {
               const isBasic = pkg.packageName.toUpperCase() === "BASIC";
 
               const cardClass = isBasic
-                ? "relative bg-white text-black border border-gray-200 shadow"
-                : "relative bg-[#0C1222] text-white shadow-xl";
+                ? "relative bg-card text-text border border-border shadow"
+                : "relative bg-card text-text shadow-xl";
 
               return (
                 <div
@@ -250,7 +250,7 @@ export default function BuyPage() {
                     {isBasic ? (
                       <button
                         disabled
-                        className="w-full border rounded-full py-2 text-black pointer-events-none cursor-not-allowed"
+                        className="w-full border rounded-full py-2 text-muted-foreground pointer-events-none cursor-not-allowed"
                       >
                         Mặc định
                       </button>
@@ -282,15 +282,15 @@ export default function BuyPage() {
       {/* Modal xác nhận HỦY gói */}
       {showCancelModal && cancellingPackage && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
+          <div className="bg-card rounded-2xl max-w-md w-full p-6 animate-in fade-in zoom-in duration-200">
             <h3 className="text-xl font-bold text-red-600 mb-3">
               Xác nhận hủy gói
             </h3>
-            <p className="text-gray-700 mb-6">
+            <p className="text-gray-300 mb-6">
               Bạn có chắc chắn muốn{" "}
               <strong>hủy gói {cancellingPackage.packageName}</strong>?
               <br />
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-gray-400">
                 Sau khi hủy, bạn sẽ mất quyền truy cập các tính năng cao cấp cho
                 đến khi gia hạn lại.
               </span>
@@ -300,7 +300,7 @@ export default function BuyPage() {
               <button
                 onClick={handleCloseCancelModal}
                 disabled={cancellingId === cancellingPackage.idPackage}
-                className="px-5 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
+                className="px-5 py-2 border border-blue-900 rounded-lg hover:bg-slate-800 transition disabled:opacity-50"
               >
                 Không, giữ lại
               </button>
@@ -321,11 +321,11 @@ export default function BuyPage() {
       {/* Modal xác nhận */}
       {showConfirmModal && selectedPackage && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6">
-            <h3 className="text-lg text-black font-bold mb-2">
+          <div className="bg-card rounded-2xl max-w-md w-full p-6">
+            <h3 className="text-lg text-text font-bold mb-2">
               Xác nhận mua gói
             </h3>
-            <p className="text-gray-600  mb-4">
+            <p className="text-gray-300  mb-4">
               Bạn có chắc chắn muốn mua gói{" "}
               <span className="font-semibold">
                 {selectedPackage.packageName}
@@ -343,7 +343,7 @@ export default function BuyPage() {
               <button
                 onClick={handleCloseModal}
                 disabled={buyingId === selectedPackage.idPackage}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                className="px-4 py-2 border border-blue-900 rounded-lg hover:bg-slate-800 disabled:opacity-50"
               >
                 Hủy
               </button>

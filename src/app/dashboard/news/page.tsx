@@ -2,7 +2,7 @@
 
 import useNews from "@/services/useNews";
 import { useEffect, useState } from "react";
-import { Loader2, ChevronRight } from "lucide-react";
+import { Loader2, ChevronRight, Clock } from "lucide-react";
 
 interface NewsItem {
   id: number;
@@ -157,34 +157,34 @@ export default function NewsPage() {
   const TrendingSkeleton = () => (
     <div className="mb-10">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 bg-gradient-to-r from-red-500/20 to-orange-500/20 rounded-lg animate-pulse" />
+        <div className="w-12 h-12 bg-gray-800 rounded-xl animate-pulse" />
         <div>
-          <div className="h-7 w-32 bg-text/10 rounded animate-pulse mb-2" />
-          <div className="h-4 w-48 bg-text/10 rounded animate-pulse" />
+          <div className="h-7 w-32 bg-gray-800 rounded animate-pulse mb-2" />
+          <div className="h-4 w-48 bg-gray-800 rounded animate-pulse" />
         </div>
       </div>
       <div className="grid lg:grid-cols-2 gap-6">
-        <div className="lg:row-span-2 rounded-2xl overflow-hidden border border-text/10 bg-background">
-          <div className="h-80 w-full bg-text/5 animate-pulse" />
+        <div className="lg:row-span-2 rounded-2xl overflow-hidden border border-gray-800 bg-[#111318]">
+          <div className="h-80 w-full bg-gray-800 animate-pulse" />
           <div className="p-6 space-y-4">
-            <div className="h-4 w-32 bg-text/10 rounded animate-pulse" />
-            <div className="h-7 w-full bg-text/10 rounded animate-pulse" />
-            <div className="h-7 w-3/4 bg-text/10 rounded animate-pulse" />
+            <div className="h-4 w-32 bg-gray-800 rounded animate-pulse" />
+            <div className="h-7 w-full bg-gray-800 rounded animate-pulse" />
+            <div className="h-7 w-3/4 bg-gray-800 rounded animate-pulse" />
             <div className="space-y-2">
-              <div className="h-4 w-full bg-text/10 rounded animate-pulse" />
-              <div className="h-4 w-5/6 bg-text/10 rounded animate-pulse" />
+              <div className="h-4 w-full bg-gray-800 rounded animate-pulse" />
+              <div className="h-4 w-5/6 bg-gray-800 rounded animate-pulse" />
             </div>
           </div>
         </div>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="rounded-xl border border-text/10 bg-background flex h-32">
-              <div className="w-32 h-32 bg-text/5 animate-pulse flex-shrink-0" />
+            <div key={i} className="rounded-xl border border-gray-800 bg-[#111318] flex h-32">
+              <div className="w-32 h-32 bg-gray-800 animate-pulse shrink-0" />
               <div className="p-4 flex-1 space-y-2">
-                <div className="h-3 w-24 bg-text/10 rounded animate-pulse" />
-                <div className="h-4 w-full bg-text/10 rounded animate-pulse" />
-                <div className="h-4 w-4/5 bg-text/10 rounded animate-pulse" />
-                <div className="h-3 w-3/4 bg-text/10 rounded animate-pulse" />
+                <div className="h-3 w-24 bg-gray-800 rounded animate-pulse" />
+                <div className="h-4 w-full bg-gray-800 rounded animate-pulse" />
+                <div className="h-4 w-4/5 bg-gray-800 rounded animate-pulse" />
+                <div className="h-3 w-3/4 bg-gray-800 rounded animate-pulse" />
               </div>
             </div>
           ))}
@@ -197,21 +197,21 @@ export default function NewsPage() {
   const ReportsSkeleton = () => (
     <div className="mb-10">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-lg animate-pulse" />
+        <div className="w-12 h-12 bg-gray-800 rounded-xl animate-pulse" />
         <div>
-          <div className="h-7 w-40 bg-text/10 rounded animate-pulse mb-2" />
-          <div className="h-4 w-56 bg-text/10 rounded animate-pulse" />
+          <div className="h-7 w-40 bg-gray-800 rounded animate-pulse mb-2" />
+          <div className="h-4 w-56 bg-gray-800 rounded animate-pulse" />
         </div>
       </div>
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="rounded-2xl overflow-hidden border border-text/10 bg-background">
-            <div className="h-40 w-full bg-text/5 animate-pulse" />
+          <div key={i} className="rounded-2xl overflow-hidden border border-gray-800 bg-[#111318]">
+            <div className="h-40 w-full bg-gray-800 animate-pulse" />
             <div className="p-4 space-y-2">
-              <div className="h-3 w-24 bg-text/10 rounded animate-pulse" />
-              <div className="h-4 w-full bg-text/10 rounded animate-pulse" />
-              <div className="h-4 w-5/6 bg-text/10 rounded animate-pulse" />
-              <div className="h-3 w-3/4 bg-text/10 rounded animate-pulse" />
+              <div className="h-3 w-24 bg-gray-800 rounded animate-pulse" />
+              <div className="h-4 w-full bg-gray-800 rounded animate-pulse" />
+              <div className="h-4 w-5/6 bg-gray-800 rounded animate-pulse" />
+              <div className="h-3 w-3/4 bg-gray-800 rounded animate-pulse" />
             </div>
           </div>
         ))}
@@ -223,16 +223,16 @@ export default function NewsPage() {
   const SectionSkeleton = () => (
     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {[1, 2, 3, 4, 5, 6].map((i) => (
-        <div key={i} className="rounded-2xl overflow-hidden border border-text/10 bg-background">
-          <div className="h-48 w-full bg-text/5 animate-pulse" />
+        <div key={i} className="rounded-2xl overflow-hidden border border-gray-800 bg-[#111318]">
+          <div className="h-48 w-full bg-gray-800 animate-pulse" />
           <div className="p-5 space-y-3">
-            <div className="h-3 w-32 bg-text/10 rounded animate-pulse" />
-            <div className="h-5 w-full bg-text/10 rounded animate-pulse" />
-            <div className="h-5 w-4/5 bg-text/10 rounded animate-pulse" />
+            <div className="h-3 w-32 bg-gray-800 rounded animate-pulse" />
+            <div className="h-5 w-full bg-gray-800 rounded animate-pulse" />
+            <div className="h-5 w-4/5 bg-gray-800 rounded animate-pulse" />
             <div className="space-y-2">
-              <div className="h-3 w-full bg-text/10 rounded animate-pulse" />
-              <div className="h-3 w-5/6 bg-text/10 rounded animate-pulse" />
-              <div className="h-3 w-4/5 bg-text/10 rounded animate-pulse" />
+              <div className="h-3 w-full bg-gray-800 rounded animate-pulse" />
+              <div className="h-3 w-5/6 bg-gray-800 rounded animate-pulse" />
+              <div className="h-3 w-4/5 bg-gray-800 rounded animate-pulse" />
             </div>
           </div>
         </div>
@@ -241,12 +241,14 @@ export default function NewsPage() {
   );
 
   return (
-    <div className="min-h-screen py-8 px-6 md:px-12">
+    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-background">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-text mb-2">Tin tức thị trường</h1>
-          <p className="text-text/60">Cập nhật tin tức mới nhất từ CNBC</p>
+        <div className="mb-8 pl-2">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-white to-gray-400 mb-2">
+            Tin tức thị trường
+          </h1>
+          <p className="text-gray-400 text-sm">Cập nhật tin tức mới nhất từ CNBC</p>
         </div>
 
         {/* Trending News Section */}
@@ -255,14 +257,11 @@ export default function NewsPage() {
         ) : popularNews.length > 0 ? (
           <div className="mb-10">
             <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-gradient-to-r from-red-500 to-orange-500 rounded-lg">
-                <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-              </div>
+              <span className="w-1 h-6 bg-red-500 rounded-full" />
               <div>
-                <h2 className="text-2xl font-bold text-text">Tin nổi bật</h2>
-                <p className="text-sm text-text/60">Những tin tức được quan tâm nhất</p>
+                <h2 className="text-xl font-bold text-white uppercase tracking-wider">
+                  Tin nổi bật
+                </h2>
               </div>
             </div>
 
@@ -271,10 +270,10 @@ export default function NewsPage() {
               {popularNews[0] && (
                 <article
                   onClick={() => window.open(popularNews[0].url, '_blank')}
-                  className="lg:row-span-2 group cursor-pointer rounded-2xl overflow-hidden shadow-xl border border-text/10 bg-gradient-to-br from-orange-500/5 to-red-500/5 hover:shadow-2xl hover:border-orange-500/30 transition-all duration-300"
+                  className="lg:row-span-2 group cursor-pointer rounded-2xl overflow-hidden shadow-lg border border-gray-800 bg-[#111318]"
                 >
                   {popularNews[0].promoImage && (
-                    <div className="relative h-80 w-full overflow-hidden bg-text/5">
+                    <div className="relative h-80 w-full overflow-hidden bg-gray-800">
                       <img
                         src={popularNews[0].promoImage.url}
                         alt={popularNews[0].headline}
@@ -282,13 +281,13 @@ export default function NewsPage() {
                       />
                       {getTypeIcon(popularNews[0].type)}
                       <div className="absolute top-4 left-4">
-                        <span className="px-4 py-2 rounded-full text-xs font-bold bg-gradient-to-r from-red-500 to-orange-500 text-white shadow-lg">
+                        <span className="px-4 py-2 rounded-full text-xs font-bold bg-linear-to-r from-red-600 to-orange-600 text-white shadow-lg">
                           🔥 HOT NHẤT
                         </span>
                       </div>
                       {popularNews[0].section && (
                         <div className="absolute bottom-4 left-4">
-                          <span className="px-3 py-1.5 rounded-full text-xs font-semibold bg-black/60 backdrop-blur-sm text-white">
+                          <span className="px-3 py-1.5 rounded-full text-xs font-semibold bg-black/60 backdrop-blur-sm text-white border border-white/10">
                             {popularNews[0].section.tagName}
                           </span>
                         </div>
@@ -296,7 +295,7 @@ export default function NewsPage() {
                     </div>
                   )}
                   <div className="p-6">
-                    <div className="flex items-center gap-2 mb-3 text-xs text-text/60">
+                    <div className="flex items-center gap-2 mb-3 text-xs text-gray-400">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
@@ -304,14 +303,14 @@ export default function NewsPage() {
                       {getAuthors(popularNews[0].authorFormatted) && (
                         <>
                           <span>•</span>
-                          <span className="capitalize">{getAuthors(popularNews[0].authorFormatted)}</span>
+                          <span className="capitalize text-gray-300">{getAuthors(popularNews[0].authorFormatted)}</span>
                         </>
                       )}
                     </div>
-                    <h2 className="font-bold text-2xl mb-4 text-text group-hover:text-orange-500 transition-colors">
+                    <h2 className="font-bold text-2xl mb-4 text-white group-hover:text-primary transition-colors">
                       {popularNews[0].shorterHeadline || popularNews[0].headline}
                     </h2>
-                    <p className="text-base text-text/70 mb-4 line-clamp-4">
+                    <p className="text-base text-gray-400 mb-4 line-clamp-4">
                       {popularNews[0].description}
                     </p>
                     {popularNews[0].relatedTagsFilteredFormatted && getTags(popularNews[0].relatedTagsFilteredFormatted).length > 0 && (
@@ -336,10 +335,10 @@ export default function NewsPage() {
                   <article
                     key={news.id}
                     onClick={() => window.open(news.url, '_blank')}
-                    className="group cursor-pointer rounded-xl overflow-hidden shadow-md border border-text/10 bg-background hover:shadow-xl hover:border-orange-500/30 transition-all duration-300 flex"
+                    className="group cursor-pointer rounded-xl overflow-hidden shadow-md border border-gray-800 bg-[#111318] hover:border-gray-600 transition-all duration-300 flex"
                   >
                     {news.promoImage && (
-                      <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden bg-text/5">
+                      <div className="relative w-32 h-32 shrink-0 overflow-hidden bg-gray-800">
                         <img
                           src={news.promoImage.url}
                           alt={news.headline}
@@ -350,17 +349,17 @@ export default function NewsPage() {
                     )}
                     <div className="p-4 flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500/20 text-orange-600">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-white/10 text-white">
                           #{index + 2}
                         </span>
-                        <span className="text-xs text-text/60">
+                        <span className="text-xs text-gray-400">
                           {formatRelativeTime(news.dateLastPublished)}
                         </span>
                       </div>
-                      <h3 className="font-bold text-sm mb-2 text-text group-hover:text-orange-500 transition-colors line-clamp-2">
+                      <h3 className="font-bold text-sm mb-2 text-white group-hover:text-primary transition-colors line-clamp-2">
                         {news.shorterHeadline || news.headline}
                       </h3>
-                      <p className="text-xs text-text/60 line-clamp-2">
+                      <p className="text-xs text-gray-400 line-clamp-2">
                         {news.description}
                       </p>
                     </div>
@@ -377,15 +376,11 @@ export default function NewsPage() {
         ) : reportsNews.length > 0 ? (
           <div className="mb-10">
             <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg">
-                <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                  <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
-                </svg>
-              </div>
+              <span className="w-1 h-6 bg-primary rounded-full" />
               <div>
-                <h2 className="text-2xl font-bold text-text">Báo cáo đặc biệt</h2>
-                <p className="text-sm text-text/60">Phân tích chuyên sâu từ các chuyên gia</p>
+                <h2 className="text-xl font-bold text-white uppercase tracking-wider">
+                  Báo cáo đặc biệt
+                </h2>
               </div>
             </div>
 
@@ -394,10 +389,10 @@ export default function NewsPage() {
                 <article
                   key={report.id}
                   onClick={() => window.open(report.url, '_blank')}
-                  className="group cursor-pointer rounded-2xl overflow-hidden shadow-lg border border-text/10 bg-gradient-to-br from-purple-500/5 to-blue-500/5 hover:shadow-2xl hover:border-purple-500/30 transition-all duration-300"
+                  className="group cursor-pointer rounded-2xl overflow-hidden shadow-lg border border-gray-800 bg-[#111318] hover:border-gray-600 transition-all duration-300"
                 >
                   {report.promoImage && (
-                    <div className="relative h-40 w-full overflow-hidden bg-text/5">
+                    <div className="relative h-40 w-full overflow-hidden bg-gray-800">
                       <img
                         src={report.promoImage.url}
                         alt={report.headline}
@@ -405,7 +400,7 @@ export default function NewsPage() {
                       />
                       {getTypeIcon(report.type)}
                       <div className="absolute top-3 left-3">
-                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-md">
+                        <span className="px-3 py-1 rounded-full text-xs font-bold bg-primary text-white shadow-md">
                           📊 REPORT
                         </span>
                       </div>
@@ -418,14 +413,14 @@ export default function NewsPage() {
                       </svg>
                       <span>{formatRelativeTime(report.dateLastPublished)}</span>
                     </div>
-                    <h3 className="font-bold text-base mb-2 text-text group-hover:text-purple-500 transition-colors line-clamp-3">
+                    <h3 className="font-bold text-base mb-2 text-white group-hover:text-primary transition-colors line-clamp-3">
                       {report.shorterHeadline || report.headline}
                     </h3>
-                    <p className="text-xs text-text/60 line-clamp-2 mb-3">
+                    <p className="text-xs text-gray-400 line-clamp-2 mb-3">
                       {report.description}
                     </p>
                     {report.section && (
-                      <span className="inline-block text-[10px] px-2 py-1 rounded-full font-medium bg-purple-500/20 text-purple-600">
+                      <span className="inline-block text-[10px] px-2 py-1 rounded-full font-medium bg-white/5 text-gray-300 border border-gray-700">
                         {report.section.tagName}
                       </span>
                     )}
@@ -466,10 +461,10 @@ export default function NewsPage() {
                 <button
                   key={section.id}
                   onClick={() => setActiveSection(index)}
-                  className={`px-6 cursor-pointer py-3 rounded-xl font-semibold whitespace-nowrap transition-all ${
+                  className={`px-6 cursor-pointer py-2.5 rounded-full font-bold text-sm whitespace-nowrap transition-all border ${
                     activeSection === index
-                      ? "bg-blue-500 text-white shadow-lg"
-                      : "bg-foreground text-text/70 hover:bg-foreground/80 hover:text-text"
+                      ? "bg-primary border-primary text-white shadow-lg shadow-primary/25"
+                      : "bg-[#111318] border-gray-800 text-gray-400 hover:bg-gray-800 hover:border-gray-600"
                   }`}
                 >
                   {section.shortestHeadline || section.name}
@@ -481,21 +476,21 @@ export default function NewsPage() {
 
         {/* Section Info */}
         {loadingSections ? (
-          <div className="mb-6 p-6 rounded-2xl border border-text/10 bg-background">
-            <div className="h-7 w-2/3 bg-text/10 rounded animate-pulse mb-3" />
-            <div className="h-4 w-full bg-text/10 rounded animate-pulse mb-2" />
-            <div className="h-4 w-4/5 bg-text/10 rounded animate-pulse mb-3" />
-            <div className="h-5 w-32 bg-text/10 rounded animate-pulse" />
+          <div className="mb-6 p-6 rounded-2xl border border-gray-800 bg-[#111318]">
+            <div className="h-7 w-2/3 bg-gray-800 rounded animate-pulse mb-3" />
+            <div className="h-4 w-full bg-gray-800 rounded animate-pulse mb-2" />
+            <div className="h-4 w-4/5 bg-gray-800 rounded animate-pulse mb-3" />
+            <div className="h-5 w-32 bg-gray-800 rounded animate-pulse" />
           </div>
         ) : currentSection && (
-          <div className="mb-6 p-6 rounded-2xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20">
-            <h2 className="text-2xl font-bold text-text mb-2">{currentSection.headline}</h2>
-            <p className="text-text/70 mb-3">{currentSection.description}</p>
+          <div className="mb-6 p-6 rounded-2xl bg-[#111318] border border-gray-800">
+            <h2 className="text-2xl font-bold text-white mb-2">{currentSection.headline}</h2>
+            <p className="text-gray-400 mb-3">{currentSection.description}</p>
             <a
               href={currentSection.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-blue-500 hover:text-blue-600 font-medium"
+              className="inline-flex items-center gap-2 text-primary hover:text-primary-hover font-medium"
             >
               Xem tất cả bài viết
               <ChevronRight size={16} />
@@ -512,11 +507,11 @@ export default function NewsPage() {
             <article
               key={news.id}
               onClick={() => window.open(news.url, '_blank')}
-              className="group cursor-pointer rounded-2xl overflow-hidden shadow-lg border border-text/10 bg-background hover:shadow-2xl hover:border-text/20 transition-all duration-300"
+              className="group cursor-pointer rounded-2xl overflow-hidden shadow-lg border border-gray-800 bg-[#111318] hover:border-gray-600 transition-all duration-300"
             >
               {/* Image */}
               {news.promoImage && (
-                <div className="relative h-48 w-full overflow-hidden bg-text/5">
+                <div className="relative h-48 w-full overflow-hidden bg-gray-800">
                   <img
                     src={news.promoImage.url}
                     alt={news.headline}
@@ -527,7 +522,7 @@ export default function NewsPage() {
                   {/* Category Badge */}
                   {news.section && (
                     <div className="absolute top-3 left-3">
-                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-500 text-white shadow-md">
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-primary text-white shadow-md">
                         {news.section.tagName}
                       </span>
                     </div>
@@ -537,10 +532,8 @@ export default function NewsPage() {
 
               <div className="p-5">
                 {/* Meta info */}
-                <div className="flex items-center gap-2 mb-3 text-xs text-text/60">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                <div className="flex items-center gap-2 mb-3 text-xs text-gray-400">
+                  <Clock size={14} />
                   <span>{formatRelativeTime(news.dateLastPublished)}</span>
                   {getAuthors(news.authorFormatted) && (
                     <>
@@ -551,12 +544,12 @@ export default function NewsPage() {
                 </div>
 
                 {/* Title */}
-                <h2 className="font-bold text-lg mb-3 text-text group-hover:text-blue-500 transition-colors line-clamp-2">
+                <h2 className="font-bold text-lg mb-3 text-white group-hover:text-primary transition-colors line-clamp-2">
                   {news.shorterHeadline || news.headline}
                 </h2>
 
                 {/* Description */}
-                <p className="text-sm text-text/70 mb-4 line-clamp-3">
+                <p className="text-sm text-gray-400 mb-4 line-clamp-3">
                   {news.description}
                 </p>
 
@@ -566,13 +559,7 @@ export default function NewsPage() {
                     {getTags(news.relatedTagsFilteredFormatted).map((tag, index) => (
                       <span
                         key={index}
-                        className={`text-xs px-2.5 py-1 rounded-full font-medium ${
-                          index % 3 === 0
-                            ? "bg-purple-500/20 text-purple-500"
-                            : index % 3 === 1
-                            ? "bg-green-500/20 text-green-500"
-                            : "bg-orange-500/20 text-orange-500"
-                        }`}
+                        className="text-xs px-2.5 py-1 rounded-full font-medium bg-gray-800 text-gray-400 border border-gray-700 group-hover:bg-gray-700 transition-colors"
                       >
                         {tag.replace(/-/g, ' ')}
                       </span>
@@ -588,10 +575,10 @@ export default function NewsPage() {
         {/* Empty State - only show if sections are loaded and empty */}
         {!loadingSections && newsSections.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16">
-            <svg className="w-24 h-24 text-text/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-24 h-24 text-gray-800 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
             </svg>
-            <p className="text-text/60 text-center text-lg">
+            <p className="text-gray-500 text-center text-lg">
               Không có tin tức nào
             </p>
           </div>
@@ -599,10 +586,10 @@ export default function NewsPage() {
 
         {!loadingSections && currentSection && currentSection.assets.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16">
-            <svg className="w-24 h-24 text-text/20 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-24 h-24 text-gray-800 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <p className="text-text/60 text-center text-lg">
+            <p className="text-gray-500 text-center text-lg">
               Mục này chưa có bài viết
             </p>
           </div>

@@ -34,13 +34,13 @@ const CryptoTable = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-background/50 backdrop-blur-sm">
+    <div className="w-full h-full flex flex-col bg-card backdrop-blur-sm">
       {/* Header Section - Sticky */}
-      <div className="flex-shrink-0 p-3 sm:p-4 sticky top-0 z-20 bg-background/95 backdrop-blur border-b border-white/5">
+      <div className="flex-shrink-0 p-3 sm:p-4 sticky top-0 z-20 bg-card/95 backdrop-blur border-b border-border">
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-text">Market</h2>
-            <span className="text-xs text-text/50 bg-white/5 px-2 py-1 rounded-md">
+            <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-md">
               {filteredCryptoData?.length || 0} coins
             </span>
           </div>
@@ -52,12 +52,12 @@ const CryptoTable = () => {
               placeholder="Tìm kiếm coin..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-text/5 text-text rounded-lg border border-transparent 
-                                     focus:outline-none focus:bg-background focus:border-text/20 focus:ring-1 focus:ring-text/20
-                                     placeholder:text-text/30 transition-all text-sm"
+              className="w-full pl-10 pr-4 py-2 bg-muted text-text rounded-lg border border-transparent 
+                                     focus:outline-none focus:bg-background focus:border-border focus:ring-1 focus:ring-border
+                                     placeholder:text-muted-foreground transition-all text-sm"
             />
             <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text/40 group-focus-within:text-text/80 transition-colors"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-text transition-colors"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -76,7 +76,7 @@ const CryptoTable = () => {
       {/* Table Section */}
       <div className="flex-1 overflow-auto nice-scroll">
         <table className="w-full text-left border-collapse">
-          <thead className="sticky top-0 z-10 bg-background/95 backdrop-blur text-xs uppercase text-text/50 font-medium">
+          <thead className="sticky top-0 z-10 bg-card/95 backdrop-blur text-xs uppercase text-muted-foreground font-medium">
             <tr>
               <th className="px-4 py-3 w-10">#</th>
               <th className="px-2 py-3">Name</th>
@@ -85,13 +85,13 @@ const CryptoTable = () => {
               <th className="px-4 py-3 text-right">24h</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/5 text-sm">
+          <tbody className="divide-y divide-border text-sm">
             {filteredCryptoData?.map((crypto, index) => (
               <tr
                 key={crypto.id}
-                className="hover:bg-text/5 transition-colors cursor-pointer group"
+                className="hover:bg-muted/50 transition-colors cursor-pointer group"
               >
-                <td className="px-4 py-3 text-text/40 text-xs font-mono">
+                <td className="px-4 py-3 text-muted-foreground text-xs font-mono">
                   {index + 1}
                 </td>
                 <td className="px-2 py-3">
@@ -105,7 +105,7 @@ const CryptoTable = () => {
                       <span className="font-semibold text-text group-hover:text-primary transition-colors">
                         {crypto.symbol.toUpperCase()}
                       </span>
-                      <span className="text-xs text-text/40 truncate max-w-[80px]">
+                      <span className="text-xs text-muted-foreground truncate max-w-[80px]">
                         {crypto.name}
                       </span>
                     </div>

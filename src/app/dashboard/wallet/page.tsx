@@ -318,58 +318,68 @@ const FinanceDashboard: React.FC = () => {
     <>
       <div className="h-screen overflow-y-auto nice-scroll p-2 sm:p-3 lg:p-4">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 sm:mb-4 gap-2 sm:gap-3">
-          <div className="text-xl sm:text-2xl font-semibold m-auto md:m-0">
-            Thống kê
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
+              Ví của tôi
+            </h1>
+            <p className="text-xs sm:text-sm text-gray-400 mt-1">
+              Quản lý tài chính cá nhân hiệu quả
+            </p>
           </div>
           <button
             onClick={() =>
               setTransactionModal({ isOpen: true, mode: "add", data: null })
             }
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 
-                     active:scale-95 transition-all font-medium text-xs sm:text-sm"
+            className="w-full sm:w-auto group flex items-center justify-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary/90 
+                     text-primary-foreground font-medium rounded-lg shadow-lg shadow-primary/20 
+                     transition-all duration-200 text-sm sm:text-base active:scale-95"
           >
-            <Plus className="w-4 h-4" /> Thêm giao dịch
+            <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />{" "}
+            Thêm giao dịch
           </button>
         </div>
 
         {/* Main grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 mb-4 sm:mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
           {/* Transaction table */}
-          <div className="lg:col-span-7 rounded-xl sm:rounded-2xl bg-background shadow-xl p-3 sm:p-4 lg:p-6 transition-all">
-            <h2 className="text-xs sm:text-sm font-bold opacity-80 mb-3 sm:mb-4">
-              Lịch sử giao dịch
-            </h2>
+          <div className="lg:col-span-7 rounded-2xl bg-[#111318] border border-gray-800 p-5 shadow-2xl overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
+                <span className="w-1 h-6 bg-teal-500 rounded-full inline-block"></span>
+                Lịch sử giao dịch
+              </h2>
+            </div>
             {transactionList.length > 0 ? (
               <div className="overflow-x-auto -mx-3 sm:mx-0">
                 <div className="inline-block min-w-full align-middle">
                   <table className="min-w-full">
                     <thead>
-                      <tr className="text-[var(--color-text)] border-b border-[var(--color-border)]/20">
-                        <th className="text-left pb-2 sm:pb-3 px-2 sm:px-2 font-medium text-[10px] sm:text-xs lg:text-sm">
+                      <tr className="text-gray-400 border-b border-gray-800">
+                        <th className="text-left pb-3 px-3 font-medium text-xs lg:text-sm">
                           Tên giao dịch
                         </th>
-                        <th className="text-center pb-2 sm:pb-3 px-1 sm:px-2 font-medium text-[10px] sm:text-xs lg:text-sm hidden sm:table-cell">
+                        <th className="text-center pb-3 px-3 font-medium text-xs lg:text-sm hidden sm:table-cell">
                           Loại
                         </th>
-                        <th className="text-right pb-2 sm:pb-3 px-2 sm:px-2 font-medium text-[10px] sm:text-xs lg:text-sm">
+                        <th className="text-right pb-3 px-3 font-medium text-xs lg:text-sm">
                           Số tiền
                         </th>
-                        <th className="text-center pb-2 sm:pb-3 px-1 sm:px-2 font-medium text-[10px] sm:text-xs lg:text-sm hidden md:table-cell">
+                        <th className="text-center pb-3 px-3 font-medium text-xs lg:text-sm hidden md:table-cell">
                           Ngày
                         </th>
-                        <th className="text-center pb-2 sm:pb-3 px-2 sm:px-2 font-medium text-[10px] sm:text-xs lg:text-sm">
-                          Action
+                        <th className="text-center pb-3 px-3 font-medium text-xs lg:text-sm">
+                          Hành động
                         </th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-gray-800/50">
                       {transactionList.slice(0, 10).map((t) => (
                         <tr
                           key={t.idTransaction}
-                          className="border-b border-[var(--color-border)]/5 hover:bg-foreground/50 transition-colors"
+                          className="hover:bg-white/5 transition-colors group"
                         >
-                          <td className="py-2 sm:py-3 px-2 sm:px-2">
+                          <td className="py-4 px-3">
                             <div className="flex flex-col gap-0.5 sm:gap-1">
                               <span className="font-medium text-xs sm:text-sm truncate max-w-[120px] sm:max-w-none">
                                 {t.transactionName}
@@ -392,7 +402,7 @@ const FinanceDashboard: React.FC = () => {
                               </div>
                             </div>
                           </td>
-                          <td className="py-2 sm:py-3 px-1 sm:px-2 text-center hidden sm:table-cell">
+                          <td className="py-4 px-3 text-center hidden sm:table-cell">
                             <span
                               className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium inline-block ${
                                 t.transactionType === "Chi"
@@ -403,17 +413,17 @@ const FinanceDashboard: React.FC = () => {
                               {t.transactionType}
                             </span>
                           </td>
-                          <td className="py-2 sm:py-3 px-2 sm:px-2 text-right">
+                          <td className="py-4 px-3 text-right">
                             <span className="font-semibold text-xs sm:text-sm whitespace-nowrap">
                               {t.amount.toLocaleString()}đ
                             </span>
                           </td>
-                          <td className="py-2 sm:py-3 px-1 sm:px-2 text-center text-xs sm:text-sm text-[var(--color-text)] hidden md:table-cell">
+                          <td className="py-4 px-3 text-center text-sm text-gray-400 hidden md:table-cell">
                             {new Date(t.transactionDate).toLocaleDateString(
                               "vi-VN"
                             )}
                           </td>
-                          <td className="py-2 sm:py-3 px-2 sm:px-2">
+                          <td className="py-4 px-3">
                             <div className="flex items-center justify-center gap-1 sm:gap-1.5">
                               <button
                                 onClick={() =>
@@ -461,7 +471,8 @@ const FinanceDashboard: React.FC = () => {
                       data: null,
                     })
                   }
-                  className="mt-3 sm:mt-4 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all text-xs sm:text-sm"
+                  className="mt-4 px-5 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg shadow-lg shadow-primary/20 
+                           transition-all duration-200 text-sm active:scale-95"
                 >
                   Thêm giao dịch đầu tiên
                 </button>
@@ -470,12 +481,13 @@ const FinanceDashboard: React.FC = () => {
           </div>
 
           {/* Chart + Budget */}
-          <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4">
-            {/* Donut Chart - styled like dashboard */}
-            <div className="rounded-xl sm:rounded-2xl shadow-xl bg-background p-3 sm:p-4 min-h-[280px] sm:min-h-[340px]">
-              <div className="text-xs sm:text-sm font-bold opacity-80 mb-2">
+          <div className="lg:col-span-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
+            {/* Donut Chart */}
+            <div className="rounded-2xl bg-[#111318] border border-gray-800 p-5 shadow-2xl">
+              <h2 className="text-base font-bold text-white flex items-center gap-2 mb-4">
+                <span className="w-1 h-6 bg-purple-500 rounded-full inline-block"></span>
                 Tỉ lệ chi tiêu
-              </div>
+              </h2>
               {chartData.length > 0 ? (
                 <ReactApexChart
                   options={chartOptions}
@@ -484,28 +496,27 @@ const FinanceDashboard: React.FC = () => {
                   height={260}
                 />
               ) : (
-                <div className="flex items-center justify-center h-[220px] sm:h-[260px]">
-                  <p className="text-xs sm:text-sm text-[var(--color-text)]">
-                    Chưa có dữ liệu
-                  </p>
+                <div className="flex items-center justify-center h-[220px] sm:h-[260px] opacity-50">
+                  <p className="text-sm">Chưa có dữ liệu</p>
                 </div>
               )}
             </div>
 
             {/* Budget List */}
-            <div className="rounded-xl sm:rounded-2xl bg-background shadow-xl p-3 sm:p-4 lg:p-5 transition-all">
-              <div className="flex items-center justify-between mb-2 sm:mb-3">
-                <h2 className="text-xs sm:text-sm font-bold opacity-80">
+            <div className="rounded-2xl bg-[#111318] border border-gray-800 p-5 shadow-2xl">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-base font-bold text-white flex items-center gap-2">
+                  <span className="w-1 h-6 bg-blue-500 rounded-full inline-block"></span>
                   Ngân sách
                 </h2>
                 <button
                   onClick={() =>
                     setBudgetModal({ isOpen: true, mode: "add", data: null })
                   }
-                  className="p-1 sm:p-1.5 hover:bg-blue-500/10 rounded-lg transition-colors"
+                  className="p-2 hover:bg-blue-500/10 rounded-xl transition-colors group"
                   title="Thêm ngân sách"
                 >
-                  <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500" />
+                  <Plus className="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform" />
                 </button>
               </div>
 
@@ -554,7 +565,7 @@ const FinanceDashboard: React.FC = () => {
                             {b.currentBudget.toLocaleString()}đ
                           </span>
                         </div>
-                        <div className="w-full bg-gray-200/30 rounded-full h-2 sm:h-2.5">
+                        <div className="w-full bg-muted rounded-full h-2 sm:h-2.5">
                           <div
                             className={`h-2 sm:h-2.5 rounded-full transition-all ${
                               percent >= 90
@@ -591,24 +602,32 @@ const FinanceDashboard: React.FC = () => {
         </div>
 
         {/* Savings Goals */}
-        <div className="mt-4 sm:mt-6">
-          <div className="flex flex-col sm:flex-row justify-between mb-3 sm:mb-4 gap-2 sm:gap-3">
-            <div className="text-base sm:text-lg font-semibold">
-              Mục tiêu tiết kiệm
+        <div className="mt-8">
+          <div className="flex flex-col sm:flex-row justify-between items-end mb-6 gap-4">
+            <div>
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <span className="w-2 h-2 bg-amber-500 rounded-full inline-block"></span>
+                Mục tiêu tiết kiệm
+              </h2>
+              <p className="text-sm text-gray-400 mt-1">
+                Theo dõi tiến độ các khoản tiết kiệm của bạn
+              </p>
             </div>
             <button
               onClick={() =>
                 setSavingModal({ isOpen: true, mode: "add", data: null })
               }
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-lg font-semibold bg-amber-500 text-white shadow-xl cursor-pointer
-            hover:bg-amber-600 active:scale-[0.97] transition-all text-xs sm:text-sm"
+              className="w-full sm:w-auto group flex items-center justify-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary/90 
+                     text-primary-foreground font-medium rounded-lg shadow-lg shadow-primary/20 
+                     transition-all duration-200 text-sm sm:text-base active:scale-95"
             >
-              <Plus className="w-4 h-4" /> Thêm mục tiêu
+              <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />{" "}
+              Thêm mục tiêu
             </button>
           </div>
 
           {savingList.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {savingList.map((g) => {
                 const percent = Math.min(
                   100,
@@ -617,122 +636,134 @@ const FinanceDashboard: React.FC = () => {
                 return (
                   <div
                     key={g.idSaving}
-                    className="border border-[var(--color-border)]/10 bg-background rounded-xl p-3 sm:p-4 hover:shadow-md transition group"
+                    className="group relative rounded-2xl bg-[#111318] border border-gray-800 p-5 
+                           hover:border-primary/50 transition-all duration-300 
+                           hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-1 overflow-hidden"
                   >
-                    {/* Header with icon and title */}
-                    <div className="flex items-start justify-between mb-2 sm:mb-3">
-                      <div className="flex items-center gap-2 min-w-0 flex-1">
-                        {g.urlImage ? (
-                          <img
-                            src={g.urlImage}
-                            alt={g.savingName}
-                            className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg object-cover flex-shrink-0"
-                          />
-                        ) : (
-                          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
-                            <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500" />
-                          </div>
-                        )}
-                        <h3 className="font-semibold text-xs sm:text-sm lg:text-base truncate">
-                          {g.savingName}
-                        </h3>
+                    {/* Decoration Gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                    <div className="relative z-10">
+                      {/* Header with icon and title */}
+                      <div className="flex items-start justify-between mb-4 text-white">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          {g.urlImage ? (
+                            <img
+                              src={g.urlImage}
+                              alt={g.savingName}
+                              className="w-10 h-10 rounded-xl object-cover flex-shrink-0 border border-gray-700"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center flex-shrink-0 border border-amber-500/20">
+                              <Wallet className="w-5 h-5 text-amber-500" />
+                            </div>
+                          )}
+                          <h3 className="font-bold text-base truncate group-hover:text-amber-500 transition-colors">
+                            {g.savingName}
+                          </h3>
+                        </div>
+
+                        {/* Action buttons */}
+                        <div className="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0 ml-2">
+                          <button
+                            onClick={() => handleOpenSavingHistory(g)}
+                            className="p-1.5 hover:bg-blue-500/10 rounded-lg transition-colors"
+                            title="Lịch sử"
+                          >
+                            <History className="w-4 h-4 text-blue-500" />
+                          </button>
+                          <button
+                            onClick={() =>
+                              setSavingTransactionModal({
+                                isOpen: true,
+                                saving: g,
+                              })
+                            }
+                            className="p-1.5 hover:bg-green-500/10 rounded-lg transition-colors"
+                            title="Thêm tiền"
+                          >
+                            <Plus className="w-4 h-4 text-green-500" />
+                          </button>
+                          <button
+                            onClick={() =>
+                              setDeleteModal({
+                                isOpen: true,
+                                type: "saving",
+                                id: g.idSaving,
+                                name: g.savingName,
+                              })
+                            }
+                            className="p-1.5 hover:bg-red-500/10 rounded-lg transition-colors"
+                            title="Xóa"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-500" />
+                          </button>
+                        </div>
                       </div>
 
-                      {/* Action buttons - Always visible on mobile, hover on desktop */}
-                      <div className="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0 ml-2">
-                        <button
-                          onClick={() => handleOpenSavingHistory(g)}
-                          className="p-1 sm:p-1.5 hover:bg-blue-500/10 rounded-lg transition-colors"
-                          title="Lịch sử"
-                        >
-                          <History className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-500" />
-                        </button>
-                        <button
-                          onClick={() =>
-                            setSavingTransactionModal({
-                              isOpen: true,
-                              saving: g,
-                            })
-                          }
-                          className="p-1 sm:p-1.5 hover:bg-green-500/10 rounded-lg transition-colors"
-                          title="Thêm tiền"
-                        >
-                          <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-500" />
-                        </button>
-                        <button
-                          onClick={() =>
-                            setDeleteModal({
-                              isOpen: true,
-                              type: "saving",
-                              id: g.idSaving,
-                              name: g.savingName,
-                            })
-                          }
-                          className="p-1 sm:p-1.5 hover:bg-red-500/10 rounded-lg transition-colors"
-                          title="Xóa"
-                        >
-                          <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-500" />
-                        </button>
+                      {/* Target date */}
+                      {g.targetDate && (
+                        <span className="text-xs text-gray-400 whitespace-nowrap block mb-3 font-medium flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-gray-500"></span>
+                          {new Date(g.targetDate).toLocaleDateString("vi-VN")}
+                        </span>
+                      )}
+
+                      {/* Target amount */}
+                      <div className="text-lg font-bold text-amber-500 mb-1">
+                        {g.targetAmount.toLocaleString()}đ
                       </div>
-                    </div>
 
-                    {/* Target date */}
-                    {g.targetDate && (
-                      <span className="text-[10px] sm:text-xs lg:text-sm text-[var(--color-text)] whitespace-nowrap block mb-2">
-                        {new Date(g.targetDate).toLocaleDateString("vi-VN")}
-                      </span>
-                    )}
-
-                    {/* Target amount */}
-                    <div className="text-sm sm:text-base lg:text-lg font-bold text-amber-500 mb-1">
-                      {g.targetAmount.toLocaleString()}đ
-                    </div>
-
-                    {/* Current amount */}
-                    <p className="text-[10px] sm:text-xs lg:text-sm text-[var(--color-text)] mb-2">
-                      {g.currentAmount.toLocaleString()}đ đã tiết kiệm (
-                      {percent}%)
-                    </p>
-
-                    {/* Progress bar */}
-                    <div className="w-full bg-gray-200/30 rounded-full h-1.5 sm:h-2 mb-2">
-                      <div
-                        className="h-1.5 sm:h-2 rounded-full bg-amber-500 transition-all"
-                        style={{ width: `${percent}%` }}
-                      ></div>
-                    </div>
-
-                    {/* Description */}
-                    {g.description && (
-                      <p className="text-[10px] sm:text-xs text-gray-500 italic break-words line-clamp-2 mb-2">
-                        {g.description}
+                      {/* Current amount */}
+                      <p className="text-xs text-gray-400 mb-3">
+                        {g.currentAmount.toLocaleString()}đ đã tiết kiệm (
+                        {percent}%)
                       </p>
-                    )}
 
-                    {/* Status badge */}
-                    <div
-                      className={`mt-1 sm:mt-2 px-2 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs inline-block ${
-                        g.status === "Hoàn Thành"
-                          ? "bg-green-500/10 text-green-500"
-                          : "bg-blue-500/10 text-blue-500"
-                      }`}
-                    >
-                      {g.status}
+                      {/* Progress bar */}
+                      <div className="w-full bg-gray-800 rounded-full h-2 mb-3">
+                        <div
+                          className="h-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all shadow-lg shadow-amber-500/20"
+                          style={{ width: `${percent}%` }}
+                        ></div>
+                      </div>
+
+                      {/* Description */}
+                      {g.description && (
+                        <p className="text-xs text-gray-500 italic break-words line-clamp-2 min-h-[2.5em]">
+                          {g.description}
+                        </p>
+                      )}
+
+                      {/* Status badge */}
+                      <div
+                        className={`mt-2 px-2.5 py-1 rounded-full text-[10px] font-bold inline-block border ${
+                          g.status === "Hoàn Thành"
+                            ? "bg-green-500/5 text-green-500 border-green-500/20"
+                            : "bg-blue-500/5 text-blue-500 border-blue-500/20"
+                        }`}
+                      >
+                        {g.status}
+                      </div>
                     </div>
                   </div>
                 );
               })}
             </div>
           ) : (
-            <div className="text-center py-8 sm:py-12 border border-[var(--color-border)]/10 bg-background rounded-xl">
-              <p className="text-[var(--color-text)] mb-3 sm:mb-4 text-sm">
+            <div className="text-center py-16 border border-gray-800 bg-[#111318] rounded-2xl shadow-xl">
+              <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Wallet className="w-8 h-8 text-amber-500" />
+              </div>
+              <p className="text-gray-400 mb-6 font-medium">
                 Chưa có mục tiêu tiết kiệm nào
               </p>
               <button
                 onClick={() =>
                   setSavingModal({ isOpen: true, mode: "add", data: null })
                 }
-                className="px-4 sm:px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-all text-xs sm:text-sm"
+                className="px-5 py-2.5 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg shadow-lg shadow-primary/20 
+                           transition-all duration-200 text-sm active:scale-95"
               >
                 Tạo mục tiêu đầu tiên
               </button>

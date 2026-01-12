@@ -94,18 +94,18 @@ const Fund = () => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-text tracking-tight flex items-center gap-2">
-            <FolderOpen className="w-6 h-6 text-blue-500" />
+            <FolderOpen className="w-6 h-6 text-primary" />
             Quản lý quỹ
           </h1>
-          <p className="text-text/50 text-xs sm:text-sm mt-1">
+          <p className="text-muted-foreground text-xs sm:text-sm mt-1">
             Theo dõi hiệu suất và phân bổ tài sản của bạn
           </p>
         </div>
 
         <button
           onClick={() => setIsCreateModalOpen(true)}
-          className="w-full sm:w-auto group flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 
-                     text-white font-medium rounded-lg shadow-lg shadow-blue-500/20 
+          className="w-full sm:w-auto group flex items-center justify-center gap-2 px-5 py-2.5 bg-primary hover:bg-primary/90 
+                     text-primary-foreground font-medium rounded-lg shadow-lg shadow-primary/20 
                      transition-all duration-200 text-sm sm:text-base active:scale-95"
         >
           <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
@@ -116,7 +116,7 @@ const Fund = () => {
       {/* --- Grid Content --- */}
       <div className="flex-1 overflow-y-auto pb-10 custom-scrollbar pr-1">
         {funds.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 text-text/40 border border-dashed border-text/10 rounded-xl bg-background/30">
+          <div className="flex flex-col items-center justify-center h-64 text-muted-foreground border border-dashed border-border rounded-xl bg-background/30">
             <FolderOpen className="w-12 h-12 mb-3 opacity-20" />
             <p className="text-sm">Chưa có quỹ nào được tạo.</p>
           </div>
@@ -135,19 +135,19 @@ const Fund = () => {
                 onClick={() =>
                   router.push(`/dashboard/portfolio/${fund.idFund}`)
                 }
-                className="group relative bg-background border border-border/50 hover:border-blue-500/50 
+                className="group relative bg-background border border-border hover:border-primary/20 
                            rounded-xl p-4 sm:p-5 cursor-pointer transition-all duration-300 
                            hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-1 flex flex-col h-full"
               >
                 {/* Decoration Gradient */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl" />
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl" />
 
                 {/* --- Card Header: Icon & Actions --- */}
                 <div className="relative flex justify-between items-start mb-4 z-10">
                   {/* Avatar */}
                   <div
-                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 
-                                border border-border flex items-center justify-center text-lg sm:text-xl font-bold text-blue-600 shadow-sm flex-shrink-0"
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-muted 
+                                border border-border flex items-center justify-center text-lg sm:text-xl font-bold text-primary shadow-sm flex-shrink-0"
                   >
                     {fund.fundName.charAt(0).toUpperCase()}
                   </div>
@@ -156,7 +156,7 @@ const Fund = () => {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={(e) => handleEditFund(e, fund)}
-                      className="p-1.5 sm:p-2 text-text/40 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                      className="p-1.5 sm:p-2 text-text/40 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors"
                       title="Chỉnh sửa"
                     >
                       <Edit3 size={16} />
@@ -175,7 +175,7 @@ const Fund = () => {
 
                 {/* --- Card Body: Info --- */}
                 <div className="relative z-10 flex-1 min-h-[60px]">
-                  <h3 className="text-base sm:text-lg font-bold text-text mb-1 group-hover:text-blue-500 transition-colors line-clamp-1 break-all">
+                  <h3 className="text-base sm:text-lg font-bold text-text mb-1 group-hover:text-primary transition-colors line-clamp-1 break-all">
                     {fund.fundName}
                   </h3>
                   <p className="text-xs sm:text-sm text-text/50 line-clamp-2 leading-relaxed">
@@ -187,7 +187,7 @@ const Fund = () => {
                 <div className="relative z-10 flex items-center justify-between pt-4 mt-2 border-t border-border/30">
                   {/* Date - Moved here to avoid overlapping */}
                   <div className="flex items-center gap-1.5 text-xs text-text/40 font-medium">
-                    <Clock size={12} className="text-blue-500" />
+                    <Clock size={12} className="text-primary" />
                     <span>
                       {new Date(fund.createAt).toLocaleDateString("vi-VN")}
                     </span>
@@ -196,8 +196,8 @@ const Fund = () => {
                   {/* CTA Arrow */}
                   <div
                     className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full 
-                                  bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400
-                                  group-hover:bg-blue-600 group-hover:text-white transition-all duration-300"
+                                  bg-primary/10 text-primary
+                                  group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300"
                   >
                     <ArrowRight
                       size={18}

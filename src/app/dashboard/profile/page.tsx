@@ -410,7 +410,7 @@ export default function ProfilePage() {
                   <button
                     onClick={handleCancel}
                     disabled={isSaving}
-                    className="flex-1 flex items-center justify-center gap-2 bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 rounded-lg transition"
+                    className="flex-1 flex items-center justify-center gap-2 bg-muted hover:bg-muted/80 text-text font-medium py-3 rounded-lg transition"
                   >
                     <X className="h-4 w-4" />
                     Hủy

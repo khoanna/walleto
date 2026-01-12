@@ -36,7 +36,9 @@ interface BriefTransaction {
 }
 
 export interface InvestmentAssetDashboard {
-  data: Asset[];
+  data: {
+    listInvestmentAssetResponse: Asset[];
+  };
 }
 
 export interface TransactionDashboard {

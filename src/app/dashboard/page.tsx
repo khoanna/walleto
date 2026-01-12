@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useUserContext } from "@/context";
 import useDashboard from "@/services/useDashboard";
 import {
+  Asset,
   FinanceDasboard,
   InvestmentAssetDashboard,
   TransactionDashboard,
@@ -41,6 +42,7 @@ export default function DashBoard() {
   const [assetData, setAssetData] = useState<InvestmentAssetDashboard | null>(
     null
   );
+
   const [transactionData, setTransactionData] =
     useState<TransactionDashboard | null>(null);
   const [weekData, setWeekData] = useState<TransactionThisWeekDashboard | null>(
@@ -186,6 +188,8 @@ export default function DashBoard() {
         ]);
 
         setFinanceData(finance);
+        console.log(assets);
+        
         setAssetData(assets);
         setTransactionData(transactions);
         setWeekData(week);
@@ -553,7 +557,7 @@ export default function DashBoard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {assetData?.data?.slice(0, 5).map((asset) => (
+                    {assetData?.data?.listInvestmentAssetResponse?.slice(0, 5).map((asset: Asset) => (
                       <tr key={asset.idAsset} className="crypto-table__row">
                         <td className="crypto-table__td pl-6">
                           <div className="crypto-info">
@@ -600,7 +604,7 @@ export default function DashBoard() {
                         </td>
                       </tr>
                     ))}
-                    {(!assetData?.data || assetData.data.length === 0) && (
+                    {(!assetData?.data?.listInvestmentAssetResponse || assetData.data.listInvestmentAssetResponse.length === 0) && (
                       <tr>
                         <td colSpan={5} className="p-4 text-center text-sm text-muted-foreground">
                           Chưa có tài sản nào
@@ -623,7 +627,7 @@ export default function DashBoard() {
             </div>
             <div className="card__content">
               <div className="transactions-list">
-                {weekData?.listBriefTransactionResponses?.slice(0, 3).map((t) => (
+                {weekData?.listBriefTransactionResponses?.slice(0, 3).map((t: { idTransaction: string; transactionName: string; transactionDate: string; amount: number }) => (
                   <div key={t.idTransaction} className="transaction">
                     <div className="transaction__icon">
                       <Wallet size={18} className="text-primary" />

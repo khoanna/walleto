@@ -19,19 +19,19 @@ export default function AuthPage() {
   const isLeftDark = mode === "signUp" || mode === "forgot" || mode === "reset";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0A1628] via-[#0F1F3A] to-[#050F24] p-4 transition-colors duration-500">
-      <div className="flex flex-col lg:flex-row w-full max-w-6xl min-h-[620px] rounded-3xl overflow-hidden shadow-2xl bg-white">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#080a0d] via-[#0f1419] to-[#080a0d] p-4 transition-colors duration-500">
+      <div className="flex flex-col lg:flex-row w-full max-w-6xl min-h-[620px] rounded-3xl overflow-hidden shadow-2xl bg-[#111318] border border-[#2a3441]">
         {/* Left Panel - Logo & Info */}
         <div
           className={`flex flex-col items-center justify-center w-full lg:w-1/2 px-6 sm:px-8 py-8 lg:py-6 transition-all duration-500 ${
-            isLeftDark ? "bg-[#050F24] text-white" : "bg-white text-[#050F24]"
+            isLeftDark ? "bg-[#0f1419] text-white" : "bg-[#111318] text-white"
           }`}>
           <Image
             src="/logo.png"
             alt="Logo"
             width={80}
             height={80}
-            className={`mb-4 sm:mb-6 ${isLeftDark ? "" : "invert"}`}
+            className="mb-4 sm:mb-6"
           />
           <h1 className="text-3xl sm:text-4xl font-bold mb-3">WALLETO</h1>
           <p className="text-sm sm:text-base text-center opacity-80 leading-relaxed max-w-xs">
@@ -45,7 +45,7 @@ export default function AuthPage() {
               Người mới?{" "}
               <button
                 onClick={() => setMode("signUp")}
-                className="cursor-pointer text-blue-500 hover:underline font-semibold">
+                className="cursor-pointer text-[#14b8a6] hover:text-[#10b981] hover:underline font-semibold transition-colors">
                 Đăng ký ngay
               </button>
             </div>
@@ -56,7 +56,7 @@ export default function AuthPage() {
               Đã có tài khoản?{" "}
               <button
                 onClick={() => setMode("signIn")}
-                className="cursor-pointer text-blue-400 hover:underline font-semibold">
+                className="cursor-pointer text-[#14b8a6] hover:text-[#10b981] hover:underline font-semibold transition-colors">
                 Đăng nhập ngay
               </button>
             </div>
@@ -65,7 +65,7 @@ export default function AuthPage() {
           {(mode === "forgot" || mode === "reset") && (
             <button
               onClick={() => setMode("signIn")}
-              className="cursor-pointer mt-6 sm:mt-10 px-6 py-2.5 border border-white/40 rounded-full text-sm sm:text-base hover:bg-white/10 transition-all duration-300 hover:scale-105">
+              className="cursor-pointer mt-6 sm:mt-10 px-6 py-2.5 border border-[#2a3441] rounded-full text-sm sm:text-base hover:bg-[#14b8a6]/10 hover:border-[#14b8a6] transition-all duration-300 hover:scale-105">
               ← Quay lại
             </button>
           )}
@@ -74,7 +74,7 @@ export default function AuthPage() {
         {/* Right Panel - Forms */}
         <div
           className={`flex flex-col items-center justify-center w-full lg:w-1/2 px-6 sm:px-10 py-8 lg:py-6 transition-all duration-500 ${
-            isLeftDark ? "bg-white text-[#050F24]" : "bg-[#050F24] text-white"
+            isLeftDark ? "bg-[#111318] text-white" : "bg-[#0f1419] text-white"
           }`}>
           {mode === "signIn" && <SignIn setMode={setMode} />}
 
@@ -109,10 +109,10 @@ const Input = ({
     value={value}
     onChange={(e) => onChange(e.target.value)}
     className="w-full px-4 py-3 sm:py-3.5 mb-3 sm:mb-4 text-sm sm:text-base rounded-xl
-      bg-white/10 text-[#94a3b8] placeholder:text-[#94a3b8]/60
-      border border-black/50 focus:border-blue-400
-      focus:outline-none focus:ring-2 focus:ring-blue-400/40
-      transition-all duration-300 hover:border-blue-300"
+      bg-[#080a0d] text-[#f1f5f9] placeholder:text-[#6b7280]
+      border border-[#2a3441] focus:border-[#14b8a6]
+      focus:outline-none focus:ring-2 focus:ring-[#14b8a6]/40
+      transition-all duration-300 hover:border-[#14b8a6]/60"
   />
 );
 
@@ -128,8 +128,8 @@ const Button = ({
   <button
     onClick={onClick}
     disabled={loading}
-    className="cursor-pointer w-full py-3 sm:py-3.5 mt-2 sm:mt-3 bg-gradient-to-r from-[#081A32] to-[#0B2142] text-white font-semibold rounded-xl 
-    shadow-md hover:shadow-xl hover:brightness-110 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed
+    className="cursor-pointer w-full py-3 sm:py-3.5 mt-2 sm:mt-3 bg-gradient-to-r from-[#14b8a6] to-[#10b981] text-[#0f1419] font-semibold rounded-xl 
+    shadow-lg shadow-[#14b8a6]/20 hover:shadow-xl hover:shadow-[#14b8a6]/30 hover:brightness-110 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed
     active:scale-95 text-sm sm:text-base">
     {loading ? <Loader2 className="animate-spin mx-auto" size={20} /> : label}
   </button>

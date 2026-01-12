@@ -36,6 +36,8 @@ export default function useDashboard() {
         }
       );
       const data = await res.json();
+      console.log(data);
+      
       return data as unknown as InvestmentAssetDashboard;
     } catch (error) {
       throw error;

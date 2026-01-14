@@ -80,7 +80,7 @@ const ComparisonCard = ({
         </div>
         <div className="text-center">
           <p className="font-bold text-base text-gray-300">{title}</p>
-          <p className="text-sm mt-1">Không có dữ liệu giao dịch</p>
+          <p className="text-sm mt-1">Không có dữ liệu</p>
         </div>
       </div>
     );
@@ -272,7 +272,7 @@ export default function Compare() {
     compareTransactionsByMonth,
     compareTransactionsByYear,
     compareInvestmentsByMonth,
-    compareInvetmenstsByYear,
+    compareInvetmenstsByYear, // Giữ nguyên chính tả từ hook
     compareLoading,
   } = useCompare();
 
@@ -302,7 +302,6 @@ export default function Compare() {
   const [assets, setAssets] = useState<InvestmentAsset[]>([]);
   const [selectedAssetId, setSelectedAssetId] = useState<string>("");
 
-  // SỬA: Dùng Generic Type <T> thay vì any
   const processResponse = <T,>(
     res: ApiResponse<T> | undefined | void
   ): T | null => {
@@ -332,10 +331,24 @@ export default function Compare() {
             idUser: userId,
           });
         }
-        // TypeScript sẽ tự hiểu res là ApiResponse<TransactionCompareData>
         setTransactionData(processResponse(res));
       } else {
-        if (!selectedAssetId) return;
+        // --- XỬ LÝ SO SÁNH ĐẦU TƯ ---
+        if (!selectedAssetId) {
+          console.warn("Chưa chọn tài sản đầu tư.");
+          // Nếu danh sách tài sản không rỗng mà vẫn chưa chọn được ID, hãy thử set lại cái đầu tiên
+          if (assets.length > 0) {
+            setSelectedAssetId(assets[0].idAsset);
+            // Sau khi set state, lần render sau sẽ gọi lại API nhờ useEffect
+            return;
+          }
+          // Nếu danh sách rỗng thật sự thì reset data
+          setInvestmentData(null);
+          return;
+        }
+
+        console.log("Đang gọi API Investment với Asset ID:", selectedAssetId);
+
         if (timeRange === "month") {
           res = await compareInvestmentsByMonth({
             firstMonth: p1Month,
@@ -353,7 +366,6 @@ export default function Compare() {
             idAsset: selectedAssetId,
           });
         }
-        // TypeScript sẽ tự hiểu res là ApiResponse<InvestmentCompareData>
         setInvestmentData(processResponse(res));
       }
     } catch (error) {
@@ -370,11 +382,20 @@ export default function Compare() {
     p2Month,
     p2Year,
     selectedAssetId,
+    assets,
     compareTransactionsByMonth,
     compareTransactionsByYear,
     compareInvestmentsByMonth,
     compareInvetmenstsByYear,
   ]);
+
+  // --- TRIGGER TỰ ĐỘNG GỌI API KHI CHỌN ASSET KHÁC ---
+  useEffect(() => {
+    if (compareMode === "investment" && userId && selectedAssetId) {
+      handleCompare();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedAssetId, compareMode]); // Thêm compareMode để khi switch tab cũng gọi
 
   const handleExportPDF = async () => {
     if (!contentRef.current) return;
@@ -420,56 +441,75 @@ export default function Compare() {
     }
   };
 
+  // --- INITIAL DATA FETCHING ---
   useEffect(() => {
     const initialFetch = async () => {
       if (!userId) return;
 
+      // 1. Lấy lịch sử giao dịch
       HisotryTransaction(userId).then(
         (res: ApiResponse<TransactionDetail[]>) => {
           if (res.success) setHistoryList(res.data);
         }
       );
 
-      // SỬA: Thay 'any' bằng 'unknown' để an toàn hơn khi ép kiểu
-      getInvesmentAsset(userId).then(async (res: unknown) => {
-        // Ép kiểu res (từ unknown) về ApiResponse chuẩn
-        const typedRes = res as ApiResponse<InvestmentAsset[]>;
-        if (typedRes.success && typedRes.data.length > 0) {
-          const assetList = typedRes.data;
-          setAssets(assetList);
+      // 2. Lấy danh sách tài sản (SỬA LOGIC GỘP API)
+      getInvesmentAsset(userId).then(async (res: any) => {
+        // Dữ liệu API trả về là Object { listInvestmentAssetResponse: [], sjcGoldResponse: [] }
+        if (res.success && res.data) {
+          const cryptoList = res.data.listInvestmentAssetResponse || [];
+          // Map dữ liệu vàng cho khớp với interface InvestmentAsset
+          const goldList = (res.data.sjcGoldResponse || []).map(
+            (gold: any) => ({
+              idAsset: gold.idAsset,
+              assetName: gold.name,
+              assetSymbol: "GOLD " + gold.type,
+            })
+          );
 
-          const defaultAssetId = assetList[0].idAsset;
-          if (!selectedAssetId) setSelectedAssetId(defaultAssetId);
+          // Gộp 2 mảng lại
+          const combinedAssets = [...cryptoList, ...goldList];
+          setAssets(combinedAssets);
 
-          const [transRes, investRes] = await Promise.all([
-            compareTransactionsByMonth({
+          console.log("Assets loaded:", combinedAssets);
+
+          // Nếu có tài sản, chọn mặc định cái đầu tiên và gọi API so sánh ngay
+          if (combinedAssets.length > 0) {
+            const defaultAssetId = combinedAssets[0].idAsset;
+            if (!selectedAssetId) setSelectedAssetId(defaultAssetId);
+
+            // Gọi song song 2 API để init data
+            const [transRes, investRes] = await Promise.all([
+              compareTransactionsByMonth({
+                firstMonth: p1Month,
+                firstYear: p1Year,
+                secondMonth: p2Month,
+                secondYear: p2Year,
+                idUser: userId,
+              }),
+              compareInvestmentsByMonth({
+                firstMonth: p1Month,
+                firstYear: p1Year,
+                secondMonth: p2Month,
+                secondYear: p2Year,
+                idUser: userId,
+                idAsset: selectedAssetId || defaultAssetId,
+              }),
+            ]);
+
+            setTransactionData(processResponse(transRes));
+            setInvestmentData(processResponse(investRes));
+          } else {
+            // Trường hợp không có tài sản nào, chỉ gọi Transaction
+            const transRes = await compareTransactionsByMonth({
               firstMonth: p1Month,
               firstYear: p1Year,
               secondMonth: p2Month,
               secondYear: p2Year,
               idUser: userId,
-            }),
-            compareInvestmentsByMonth({
-              firstMonth: p1Month,
-              firstYear: p1Year,
-              secondMonth: p2Month,
-              secondYear: p2Year,
-              idUser: userId,
-              idAsset: defaultAssetId,
-            }),
-          ]);
-
-          setTransactionData(processResponse(transRes));
-          setInvestmentData(processResponse(investRes));
-        } else {
-          const transRes = await compareTransactionsByMonth({
-            firstMonth: p1Month,
-            firstYear: p1Year,
-            secondMonth: p2Month,
-            secondYear: p2Year,
-            idUser: userId,
-          });
-          setTransactionData(processResponse(transRes));
+            });
+            setTransactionData(processResponse(transRes));
+          }
         }
       });
     };
@@ -637,41 +677,46 @@ export default function Compare() {
           className="flex flex-col xl:flex-row gap-4 items-start xl:items-center justify-between p-4 rounded-2xl shadow-xl bg-[#111318] border border-gray-800"
         >
           <div className="flex flex-wrap gap-2 items-center">
-      <div className="p-1 sm:p-2 rounded-xl flex items-center bg-[#111318] border border-gray-800">
-        <button
-          onClick={() => setCompareMode("transaction")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-            compareMode === "transaction"
-              ? "bg-primary text-primary-foreground shadow-sm"
-              : "text-gray-400 hover:text-white"
-          }`}
-        >
-          Theo thu chi
-        </button>
-        <button
-          onClick={() => setCompareMode("investment")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-            compareMode === "investment"
-              ? "bg-primary text-primary-foreground shadow-sm"
-              : "text-gray-400 hover:text-white"
-          }`}
-        >
-          Theo đầu tư
-        </button>
-      </div>
+            <div className="p-1 sm:p-2 rounded-xl flex items-center bg-[#111318] border border-gray-800">
+              <button
+                onClick={() => setCompareMode("transaction")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  compareMode === "transaction"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                Theo thu chi
+              </button>
+              <button
+                onClick={() => setCompareMode("investment")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  compareMode === "investment"
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                Theo đầu tư
+              </button>
+            </div>
 
             {compareMode === "investment" && (
               <div className="relative">
                 <select
                   value={selectedAssetId}
                   onChange={(e) => setSelectedAssetId(e.target.value)}
-                  className="appearance-none cursor-pointer text-white bg-[#111318] border border-gray-800 hover:border-gray-700 py-2 pl-4 pr-10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 h-[40px] transition-all"
+                  className="appearance-none cursor-pointer text-white bg-[#111318] border border-gray-800 hover:border-gray-700 py-2 pl-4 pr-10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 h-[40px] transition-all min-w-[200px]"
                 >
                   {assets.map((asset) => (
                     <option key={asset.idAsset} value={asset.idAsset}>
                       {asset.assetName} ({asset.assetSymbol.toUpperCase()})
                     </option>
                   ))}
+                  {assets.length === 0 && (
+                    <option value="" disabled>
+                      Không có tài sản
+                    </option>
+                  )}
                 </select>
                 <Coins className="absolute right-3 top-3 h-4 w-4 text-primary pointer-events-none" />
               </div>
@@ -680,17 +725,21 @@ export default function Compare() {
 
           <div className="flex flex-wrap gap-2 items-center w-full xl:w-auto">
             <div className="relative" ref={timeRangeRef}>
-      <button
-        type="button"
-        aria-haspopup="menu"
-        aria-expanded={timeRangeOpen}
-        onClick={() => setTimeRangeOpen((s) => !s)}
-        className="bg-[#111318] border border-gray-800 hover:border-gray-700 text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 h-[40px] transition-all"
-      >
-                <span className="truncate">{timeRange === "month" ? "Tháng" : "Năm"}</span>
+              <button
+                type="button"
+                aria-haspopup="menu"
+                aria-expanded={timeRangeOpen}
+                onClick={() => setTimeRangeOpen((s) => !s)}
+                className="bg-[#111318] border border-gray-800 hover:border-gray-700 text-white px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 h-[40px] transition-all"
+              >
+                <span className="truncate">
+                  {timeRange === "month" ? "Tháng" : "Năm"}
+                </span>
                 <Filter size={14} />
                 <svg
-                  className={`w-3 h-3 transition-transform ${timeRangeOpen ? "rotate-180" : "rotate-0"}`}
+                  className={`w-3 h-3 transition-transform ${
+                    timeRangeOpen ? "rotate-180" : "rotate-0"
+                  }`}
                   viewBox="0 0 20 20"
                   fill="currentColor"
                   xmlns="http://www.w3.org/2000/svg"
@@ -701,34 +750,34 @@ export default function Compare() {
 
               {timeRangeOpen && (
                 <div className="absolute right-0 mt-2 w-36 bg-background border border-foreground rounded-lg shadow-lg z-50 py-1">
-      <button
-        type="button"
-        onClick={() => {
-          setTimeRange("month");
-          setTimeRangeOpen(false);
-        }}
-        className={`w-full text-left px-4 py-2 text-sm ${
-          timeRange === "month"
-            ? "bg-primary/10 text-primary font-bold"
-            : "hover:bg-gray-800 text-gray-300"
-        }`}
-      >
-        Tháng
-      </button>
-      <button
-        type="button"
-        onClick={() => {
-          setTimeRange("year");
-          setTimeRangeOpen(false);
-        }}
-        className={`w-full text-left px-4 py-2 text-sm ${
-          timeRange === "year"
-            ? "bg-primary/10 text-primary font-bold"
-            : "hover:bg-gray-800 text-gray-300"
-        }`}
-      >
-        Năm
-      </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTimeRange("month");
+                      setTimeRangeOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-sm ${
+                      timeRange === "month"
+                        ? "bg-primary/10 text-primary font-bold"
+                        : "hover:bg-gray-800 text-gray-300"
+                    }`}
+                  >
+                    Tháng
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTimeRange("year");
+                      setTimeRangeOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-sm ${
+                      timeRange === "year"
+                        ? "bg-primary/10 text-primary font-bold"
+                        : "hover:bg-gray-800 text-gray-300"
+                    }`}
+                  >
+                    Năm
+                  </button>
                 </div>
               )}
             </div>

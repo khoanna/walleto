@@ -304,7 +304,9 @@ export default function SocialPage() {
 
   const loadRawAssets = async () => {
     if (!user?.idUser) return [];
-    const res = (await getInvesmentAsset(user.idUser)) as ApiResponse<Asset[]>;
+    const res = (await getInvesmentAsset(
+      user.idUser
+    )) as unknown as ApiResponse<Asset[]>;
     setPendingAssets(res.data || []);
     return res.data || [];
   };
@@ -753,7 +755,9 @@ export default function SocialPage() {
         >
           {hasPostPermission && (
             <div className="bg-[#111318] rounded-2xl p-6 space-y-4 relative shadow-lg border border-gray-800">
-              <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider">Tạo bài viết</h3>
+              <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider">
+                Tạo bài viết
+              </h3>
               <PostForm
                 content={postContent}
                 setContent={setPostContent}

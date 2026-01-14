@@ -4,6 +4,8 @@ export interface FinanceDasboard {
   cashPercent: number;
   crypto: number;
   cryptoPercent: number;
+  gold: number;
+  goldPercent: number;
 }
 
 export interface Asset {
@@ -38,6 +40,7 @@ interface BriefTransaction {
 export interface InvestmentAssetDashboard {
   data: {
     listInvestmentAssetResponse: Asset[];
+    sjcGoldResponse: SjcGoldItem[];
   };
 }
 
@@ -48,4 +51,15 @@ export interface TransactionDashboard {
 export interface TransactionThisWeekDashboard {
   totalTransactionInWeek: number;
   listBriefTransactionResponses: BriefTransaction[];
+}
+
+export interface SjcGoldItem {
+  idAsset: string;
+  id: string;
+  name: string;
+  type: string;
+  buyPrice: number;
+  sellPrice: number;
+  location: string;
+  lastUpdated: string;
 }

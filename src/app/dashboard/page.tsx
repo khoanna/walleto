@@ -15,9 +15,9 @@ import {
   Wallet,
   ArrowUpRight,
   ArrowDownRight,
-  ArrowRightLeft,
   MoreHorizontal,
-  ArrowUpRight as ArrowUpRightIcon, 
+  ArrowUpRight as ArrowUpRightIcon,
+  Coins,
 } from "lucide-react";
 import Link from "next/link";
 import "./dashboard.css";
@@ -53,124 +53,86 @@ export default function DashBoard() {
   // Chart states
   const [chartSeries, setChartSeries] = useState<any[]>([]);
   const [chartOptions, setChartOptions] = useState<ApexOptions>({});
-  
-  const [chartMode, setChartMode] = useState<"week" | "month" | "year">("month");
-  
+
+  const [chartMode, setChartMode] = useState<"week" | "month" | "year">(
+    "month"
+  );
+
+  const totalGoldValue = useMemo(() => {
+    const goldList = assetData?.data?.sjcGoldResponse;
+    if (!goldList || !Array.isArray(goldList)) return 0;
+    return goldList.reduce((total: number, item: any) => {
+      return total + (item.sellPrice || 0);
+    }, 0);
+  }, [assetData]);
+
   // Constants for Donut Chart
   const radius = 40;
   const circumference = 2 * Math.PI * radius;
 
   // Recalculate Financial Stats & Allocation
-  const { 
-    calculatedTotal, 
-    displayCashPercent, 
+  const {
+    calculatedTotal,
+    displayCashPercent,
     displayCryptoPercent,
+    displayGoldPercent,
     incomeMonth,
     expenseMonth,
-    incomeTrend,
-    expenseTrend 
   } = useMemo(() => {
-    const defaultVals = { 
-        calculatedTotal: financeData?.totalAmount || 0,
-        displayCashPercent: 0, 
-        displayCryptoPercent: 0,
-        incomeMonth: 0,
-        expenseMonth: 0,
-        incomeTrend: 0,
-        expenseTrend: 0
+    const defaultVals = {
+      calculatedTotal: financeData?.totalAmount || 0,
+      displayCashPercent: 0,
+      displayCryptoPercent: 0,
+      displayGoldPercent: 0,
+      incomeMonth: 0,
+      expenseMonth: 0,
     };
 
-    if (!transactionData?.data || transactionData.data.length === 0) return defaultVals;
+    // Lấy trực tiếp phần trăm từ API, không tính toán lại
+    // Nếu API chưa có dữ liệu thì dùng defaultVals, nếu có thì lấy trực tiếp
+    const cPercent = financeData?.cashPercent ?? 0;
+    const crPercent = financeData?.cryptoPercent ?? 0;
+    const gPercent = financeData?.goldPercent ?? 0;
+    const total = financeData?.totalAmount ?? 0;
+
+    if (!transactionData?.data || transactionData.data.length === 0) {
+      // Vẫn trả về thông tin tài chính dù chưa có transaction
+      return {
+        ...defaultVals,
+        calculatedTotal: total,
+        displayCashPercent: cPercent,
+        displayCryptoPercent: crPercent,
+        displayGoldPercent: gPercent,
+      };
+    }
 
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
 
-    // 1. Calculate Monthly Income/Expense (Current Month)
+    // 1. Calculate Monthly Income/Expense
     const thisMonthTransactions = transactionData.data.filter((t) => {
       const tDate = new Date(t.transactionDate);
-      return tDate.getMonth() === currentMonth && tDate.getFullYear() === currentYear;
+      return (
+        tDate.getMonth() === currentMonth && tDate.getFullYear() === currentYear
+      );
     });
 
-    // INFLOW: Sum all income transactions (Thu) this month
     const incMonth = thisMonthTransactions
       .filter((t) => t.transactionType === "Thu")
       .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
-    // OUTFLOW: Sum all expense transactions (Chi) this month
     const expMonth = thisMonthTransactions
       .filter((t) => t.transactionType === "Chi")
       .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
-    // 2. Calculate Trends (vs Previous Month)
-    const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-    const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
-
-    const prevMonthTransactions = transactionData.data.filter((t) => {
-      const tDate = new Date(t.transactionDate);
-      return tDate.getMonth() === prevMonth && tDate.getFullYear() === prevYear;
-    });
-
-    const prevInc = prevMonthTransactions
-      .filter((t) => t.transactionType === "Thu")
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-    
-    const prevExp = prevMonthTransactions
-      .filter((t) => t.transactionType === "Chi")
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-    
-    // Calculate percentage change
-    const calcIncomeTrend = (current: number, previous: number) => {
-       if (previous === 0) return current > 0 ? 100 : 0;
-       return ((current - previous) / previous) * 100;
-    };
-
-    // For expenses: DECREASE is GOOD (positive), INCREASE is BAD (negative for display purposes)
-    const calcExpenseTrend = (current: number, previous: number) => {
-       if (previous === 0) return current > 0 ? -100 : 0;
-       return ((current - previous) / previous) * 100;
-    };
-
-    // 3. Calculate Net Worth & Allocation
-    // Sử dụng trực tiếp dữ liệu từ backend
-    const cashValue = Math.abs(financeData?.cash || 0);
-    const cryptoValue = Math.abs(financeData?.crypto || 0);
-    
-    // Debug: In ra giá trị thực tế từ backend
-    console.log('=== PORTFOLIO ALLOCATION DEBUG ===');
-    console.log('Backend cash:', financeData?.cash);
-    console.log('Backend crypto:', financeData?.crypto);
-    console.log('Backend totalAmount:', financeData?.totalAmount);
-    console.log('Calculated cashValue:', cashValue);
-    console.log('Calculated cryptoValue:', cryptoValue);
-    
-    // Total net worth từ backend
-    const total = financeData?.totalAmount || 0;
-
-    // Portfolio Allocation Calculation
-    // Công thức: % = (giá trị / tổng) * 100
-    let cPercent = 0;
-    let crPercent = 0;
-    
-    const totalAssets = cashValue + cryptoValue;
-    
-    if (totalAssets > 0) {
-        cPercent = (cashValue / totalAssets) * 100;
-        crPercent = (cryptoValue / totalAssets) * 100;
-    }
-    
-    console.log('Cash %:', cPercent.toFixed(2));
-    console.log('Crypto %:', crPercent.toFixed(2));
-    console.log('===================================');
-
-    return { 
-        calculatedTotal: total, 
-        displayCashPercent: cPercent, 
-        displayCryptoPercent: crPercent,
-        incomeMonth: incMonth,
-        expenseMonth: expMonth,
-        incomeTrend: calcIncomeTrend(incMonth, prevInc),
-        expenseTrend: calcExpenseTrend(expMonth, prevExp)
+    return {
+      calculatedTotal: total,
+      displayCashPercent: cPercent,
+      displayCryptoPercent: crPercent,
+      displayGoldPercent: gPercent,
+      incomeMonth: incMonth,
+      expenseMonth: expMonth,
     };
   }, [transactionData, financeData]);
 
@@ -188,8 +150,6 @@ export default function DashBoard() {
         ]);
 
         setFinanceData(finance);
-        console.log(assets);
-        
         setAssetData(assets);
         setTransactionData(transactions);
         setWeekData(week);
@@ -205,121 +165,159 @@ export default function DashBoard() {
 
   // --- Calculate Chart Data based on Mode ---
   useEffect(() => {
-     if (!transactionData?.data) return;
+    if (!transactionData?.data) return;
 
-     const transactions = transactionData.data;
-     const now = new Date();
-     const currentYear = now.getFullYear();
-     const currentMonth = now.getMonth();
-     
-     let categories: string[] = [];
-     let incomeData: number[] = [];
-     let expenseData: number[] = [];
-     
-     if (chartMode === "week") {
-       categories = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
-       // Calculate start of week (Monday)
-       const day = now.getDay(); // 0 is Sunday
-       const diff = now.getDate() - day + (day === 0 ? -6 : 1); 
-       const monday = new Date(now);
-       monday.setDate(diff);
-       monday.setHours(0,0,0,0);
+    const transactions = transactionData.data;
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
 
-       Array.from({ length: 7 }, (_, i) => {
-         const targetDate = new Date(monday);
-         targetDate.setDate(monday.getDate() + i);
-         
-         const dayTrans = transactions.filter(t => {
-            const d = new Date(t.transactionDate);
-            return d.getDate() === targetDate.getDate() && 
-                   d.getMonth() === targetDate.getMonth() && 
-                   d.getFullYear() === targetDate.getFullYear();
-         });
+    let categories: string[] = [];
+    let incomeData: number[] = [];
+    let expenseData: number[] = [];
 
-         incomeData.push(dayTrans.filter(t => t.transactionType === "Thu").reduce((sum, t) => sum + Math.abs(t.amount), 0));
-         expenseData.push(dayTrans.filter(t => t.transactionType === "Chi").reduce((sum, t) => sum + Math.abs(t.amount), 0));
-       });
+    if (chartMode === "week") {
+      categories = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
+      const day = now.getDay();
+      const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+      const monday = new Date(now);
+      monday.setDate(diff);
+      monday.setHours(0, 0, 0, 0);
 
-     } else if (chartMode === "month") {
-        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-        categories = Array.from({ length: daysInMonth }, (_, i) => `${i + 1}`);
+      Array.from({ length: 7 }, (_, i) => {
+        const targetDate = new Date(monday);
+        targetDate.setDate(monday.getDate() + i);
 
-        Array.from({ length: daysInMonth }, (_, i) => i + 1).forEach((day) => {
-          const dayTrans = transactions.filter((t) => {
-            const d = new Date(t.transactionDate);
-            return d.getDate() === day && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
-          });
-
-          incomeData.push(dayTrans.filter((t) => t.transactionType === "Thu").reduce((sum, t) => sum + Math.abs(t.amount), 0));
-          expenseData.push(dayTrans.filter((t) => t.transactionType === "Chi").reduce((sum, t) => sum + Math.abs(t.amount), 0));
+        const dayTrans = transactions.filter((t) => {
+          const d = new Date(t.transactionDate);
+          return (
+            d.getDate() === targetDate.getDate() &&
+            d.getMonth() === targetDate.getMonth() &&
+            d.getFullYear() === targetDate.getFullYear()
+          );
         });
 
-     } else if (chartMode === "year") {
-        categories = ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8", "T9", "T10", "T11", "T12"];
-        Array.from({ length: 12 }, (_, i) => {
-           const monthTrans = transactions.filter(t => {
-              const d = new Date(t.transactionDate);
-              return d.getMonth() === i && d.getFullYear() === currentYear;
-           });
-           
-           incomeData.push(monthTrans.filter(t => t.transactionType === "Thu").reduce((sum, t) => sum + Math.abs(t.amount), 0));
-           expenseData.push(monthTrans.filter(t => t.transactionType === "Chi").reduce((sum, t) => sum + Math.abs(t.amount), 0));
+        incomeData.push(
+          dayTrans
+            .filter((t) => t.transactionType === "Thu")
+            .reduce((sum, t) => sum + Math.abs(t.amount), 0)
+        );
+        expenseData.push(
+          dayTrans
+            .filter((t) => t.transactionType === "Chi")
+            .reduce((sum, t) => sum + Math.abs(t.amount), 0)
+        );
+      });
+    } else if (chartMode === "month") {
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+      categories = Array.from({ length: daysInMonth }, (_, i) => `${i + 1}`);
+
+      Array.from({ length: daysInMonth }, (_, i) => i + 1).forEach((day) => {
+        const dayTrans = transactions.filter((t) => {
+          const d = new Date(t.transactionDate);
+          return (
+            d.getDate() === day &&
+            d.getMonth() === currentMonth &&
+            d.getFullYear() === currentYear
+          );
         });
-     }
 
-     setChartSeries([
-       { name: "Tiền vào", data: incomeData },
-       { name: "Tiền ra", data: expenseData },
-     ]);
+        incomeData.push(
+          dayTrans
+            .filter((t) => t.transactionType === "Thu")
+            .reduce((sum, t) => sum + Math.abs(t.amount), 0)
+        );
+        expenseData.push(
+          dayTrans
+            .filter((t) => t.transactionType === "Chi")
+            .reduce((sum, t) => sum + Math.abs(t.amount), 0)
+        );
+      });
+    } else if (chartMode === "year") {
+      categories = [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "T7",
+        "T8",
+        "T9",
+        "T10",
+        "T11",
+        "T12",
+      ];
+      Array.from({ length: 12 }, (_, i) => {
+        const monthTrans = transactions.filter((t) => {
+          const d = new Date(t.transactionDate);
+          return d.getMonth() === i && d.getFullYear() === currentYear;
+        });
 
-     setChartOptions({
-        chart: {
-            type: "area",
-            height: 300,
-            toolbar: { show: false },
-            background: "transparent",
-            fontFamily: "var(--font-body)",
-        },
-        colors: ["#22c55e", "#ef4444"],
-        fill: {
-            type: "gradient",
-            gradient: {
-                shadeIntensity: 1,
-                opacityFrom: 0.4,
-                opacityTo: 0.1,
-                stops: [0, 90, 100]
-            }
-        },
-        dataLabels: { enabled: false },
-        stroke: { curve: "smooth", width: 2 },
-        xaxis: {
-            categories: categories,
-            axisBorder: { show: false },
-            axisTicks: { show: false },
-            labels: { style: { colors: "#6b7280" } }
-        },
-        yaxis: {
-            labels: { 
-              style: { colors: "#6b7280" },
-              formatter: (val) => formatLargeCurrency(val),
-            }
-        },
-        grid: {
-            borderColor: "#2a3441",
-            strokeDashArray: 4,
-        },
-        tooltip: {
-            theme: "dark",
-            y: {
-              formatter: (val) => formatVND(val)
-            }
-        },
-        theme: { mode: "dark" }
-     });
+        incomeData.push(
+          monthTrans
+            .filter((t) => t.transactionType === "Thu")
+            .reduce((sum, t) => sum + Math.abs(t.amount), 0)
+        );
+        expenseData.push(
+          monthTrans
+            .filter((t) => t.transactionType === "Chi")
+            .reduce((sum, t) => sum + Math.abs(t.amount), 0)
+        );
+      });
+    }
 
+    setChartSeries([
+      { name: "Tiền vào", data: incomeData },
+      { name: "Tiền ra", data: expenseData },
+    ]);
+
+    setChartOptions({
+      chart: {
+        type: "area",
+        height: 300,
+        toolbar: { show: false },
+        background: "transparent",
+        fontFamily: "var(--font-body)",
+      },
+      colors: ["#22c55e", "#ef4444"],
+      fill: {
+        type: "gradient",
+        gradient: {
+          shadeIntensity: 1,
+          opacityFrom: 0.4,
+          opacityTo: 0.1,
+          stops: [0, 90, 100],
+        },
+      },
+      dataLabels: { enabled: false },
+      stroke: { curve: "smooth", width: 2 },
+      xaxis: {
+        categories: categories,
+        axisBorder: { show: false },
+        axisTicks: { show: false },
+        labels: { style: { colors: "#6b7280" } },
+      },
+      yaxis: {
+        labels: {
+          style: { colors: "#6b7280" },
+          formatter: (val) => formatLargeCurrency(val),
+        },
+      },
+      grid: {
+        borderColor: "#2a3441",
+        strokeDashArray: 4,
+      },
+      tooltip: {
+        theme: "dark",
+        y: {
+          formatter: (val) => formatVND(val),
+        },
+      },
+      theme: { mode: "dark" },
+    });
   }, [transactionData, chartMode]);
 
-  // Format large numbers (e.g. 4.92 tỷ)
   const formatLargeCurrency = (value: number) => {
     if (value >= 1_000_000_000) {
       return (value / 1_000_000_000).toFixed(2).replace(".", ",") + " tỷ";
@@ -328,7 +326,7 @@ export default function DashBoard() {
     }
     return formatVND(value, false);
   };
- 
+
   if (loading) {
     return (
       <div className="h-screen flex items-center justify-center dashboard-container">
@@ -391,17 +389,19 @@ export default function DashBoard() {
             </div>
           </div>
 
-          {/* Card 4: Transactions */}
+          {/* Card 4: Gold Assets */}
           <div className="stat-card">
             <div className="stat-card__header">
-              <span className="stat-card__label">Giao dịch tuần này</span>
-              <ArrowRightLeft className="stat-card__icon stat-card__icon--muted" />
+              <span className="stat-card__label">
+                Tổng tài sản vàng hiện tại
+              </span>
+              <Coins className="stat-card__icon text-yellow-500" />
             </div>
             <div className="stat-card__content">
               <div className="stat-card__value">
-                {weekData?.totalTransactionInWeek || 0}
+                {formatLargeCurrency(totalGoldValue)}
               </div>
-              <div className="stat-card__sublabel">giao dịch</div>
+              <div className="stat-card__currency">VNĐ</div>
             </div>
           </div>
         </div>
@@ -433,7 +433,9 @@ export default function DashBoard() {
                 </button>
                 <button
                   onClick={() => setChartMode("month")}
-                  className={`tab ${chartMode === "month" ? "tab--active" : ""}`}
+                  className={`tab ${
+                    chartMode === "month" ? "tab--active" : ""
+                  }`}
                 >
                   Theo tháng
                 </button>
@@ -447,12 +449,12 @@ export default function DashBoard() {
             </div>
             <div className="card__content">
               <div className="chart-placeholder w-full h-[300px]">
-                {typeof window !== 'undefined' && (
-                  <ReactApexChart 
-                    options={chartOptions} 
-                    series={chartSeries} 
-                    type="area" 
-                    height={300} 
+                {typeof window !== "undefined" && (
+                  <ReactApexChart
+                    options={chartOptions}
+                    series={chartSeries}
+                    type="area"
+                    height={300}
                   />
                 )}
               </div>
@@ -467,6 +469,7 @@ export default function DashBoard() {
             <div className="card__content card__content--centered">
               <div className="donut-chart">
                 <svg viewBox="0 0 100 100" className="donut-svg">
+                  {/* Background Circle */}
                   <circle
                     cx="50"
                     cy="50"
@@ -475,7 +478,8 @@ export default function DashBoard() {
                     stroke="#2a3441"
                     strokeWidth="12"
                   />
-                  {/* Cash Segment */}
+
+                  {/* Segment 1: Cash (Teal) */}
                   <circle
                     cx="50"
                     cy="50"
@@ -486,8 +490,10 @@ export default function DashBoard() {
                     strokeDasharray={`${
                       (displayCashPercent / 100) * circumference
                     } ${circumference}`}
+                    strokeDashoffset={0}
                   />
-                  {/* Crypto Segment - Offset based on Cash */}
+
+                  {/* Segment 2: Crypto (Green) */}
                   <circle
                     cx="50"
                     cy="50"
@@ -502,8 +508,27 @@ export default function DashBoard() {
                       (displayCashPercent / 100) * circumference
                     }`}
                   />
+
+                  {/* Segment 3: Gold (Yellow) */}
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="40"
+                    fill="transparent"
+                    stroke="#EAB308"
+                    strokeWidth="12"
+                    strokeDasharray={`${
+                      (displayGoldPercent / 100) * circumference
+                    } ${circumference}`}
+                    strokeDashoffset={`-${
+                      ((displayCashPercent + displayCryptoPercent) / 100) *
+                      circumference
+                    }`}
+                  />
                 </svg>
               </div>
+
+              {/* Legend */}
               <div className="donut-legend">
                 <div className="donut-legend__item">
                   <span
@@ -525,12 +550,22 @@ export default function DashBoard() {
                     {displayCryptoPercent.toFixed(2)}%
                   </span>
                 </div>
+                <div className="donut-legend__item">
+                  <span
+                    className="donut-legend__dot"
+                    style={{ backgroundColor: "#EAB308" }}
+                  ></span>
+                  <span className="donut-legend__label">Vàng</span>
+                  <span className="donut-legend__value">
+                    {displayGoldPercent.toFixed(2)}%
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Bottom Grid */}
+        {/* Bottom Grid: Portfolio & Recent Transactions */}
         <div className="bottom-grid">
           {/* Portfolio Table */}
           <div className="card">
@@ -557,56 +592,63 @@ export default function DashBoard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {assetData?.data?.listInvestmentAssetResponse?.slice(0, 5).map((asset: Asset) => (
-                      <tr key={asset.idAsset} className="crypto-table__row">
-                        <td className="crypto-table__td pl-6">
-                          <div className="crypto-info">
-                            <div className="crypto-info__icon">
-                              <img
-                                src={asset.url}
-                                alt={asset.assetName}
-                                onError={(e) => {
-                                  (e.target as HTMLImageElement).src =
-                                    "https://via.placeholder.com/25";
-                                }}
-                              />
+                    {assetData?.data?.listInvestmentAssetResponse
+                      ?.slice(0, 5)
+                      .map((asset: Asset) => (
+                        <tr key={asset.idAsset} className="crypto-table__row">
+                          <td className="crypto-table__td pl-6">
+                            <div className="crypto-info">
+                              <div className="crypto-info__icon">
+                                <img
+                                  src={asset.url}
+                                  alt={asset.assetName}
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src =
+                                      "https://via.placeholder.com/25";
+                                  }}
+                                />
+                              </div>
+                              <div className="crypto-info__details">
+                                <span className="crypto-info__name">
+                                  {asset.assetName}
+                                </span>
+                                <span className="crypto-info__symbol">
+                                  {asset.assetSymbol}
+                                </span>
+                              </div>
                             </div>
-                            <div className="crypto-info__details">
-                              <span className="crypto-info__name">
-                                {asset.assetName}
-                              </span>
-                              <span className="crypto-info__symbol">
-                                {asset.assetSymbol}
-                              </span>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="crypto-table__td crypto-table__td--muted crypto-table__td--hide-tablet">
-                          {formatLargeCurrency(asset.marketCap)}
-                        </td>
-                        <td className="crypto-table__td crypto-table__td--muted crypto-table__td--hide-mobile">
-                          {formatLargeCurrency(asset.totalVolume)}
-                        </td>
-                        <td className="crypto-table__td font-mono">
-                          {formatVND(asset.currentPrice)}
-                        </td>
-                        <td className="crypto-table__td pr-6">
-                          <span
-                            className={`badge ${
-                              asset.priceChangePercentage24h >= 0
-                                ? "badge--positive"
-                                : "badge--negative"
-                            }`}
-                          >
-                            {asset.priceChangePercentage24h >= 0 ? "+" : ""}
-                            {asset.priceChangePercentage24h.toFixed(2)}%
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                    {(!assetData?.data?.listInvestmentAssetResponse || assetData.data.listInvestmentAssetResponse.length === 0) && (
+                          </td>
+                          <td className="crypto-table__td crypto-table__td--muted crypto-table__td--hide-tablet">
+                            {formatLargeCurrency(asset.marketCap)}
+                          </td>
+                          <td className="crypto-table__td crypto-table__td--muted crypto-table__td--hide-mobile">
+                            {formatLargeCurrency(asset.totalVolume)}
+                          </td>
+                          <td className="crypto-table__td font-mono">
+                            {formatVND(asset.currentPrice)}
+                          </td>
+                          <td className="crypto-table__td pr-6">
+                            <span
+                              className={`badge ${
+                                asset.priceChangePercentage24h >= 0
+                                  ? "badge--positive"
+                                  : "badge--negative"
+                              }`}
+                            >
+                              {asset.priceChangePercentage24h >= 0 ? "+" : ""}
+                              {asset.priceChangePercentage24h.toFixed(2)}%
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    {(!assetData?.data?.listInvestmentAssetResponse ||
+                      assetData.data.listInvestmentAssetResponse.length ===
+                        0) && (
                       <tr>
-                        <td colSpan={5} className="p-4 text-center text-sm text-muted-foreground">
+                        <td
+                          colSpan={5}
+                          className="p-4 text-center text-sm text-muted-foreground"
+                        >
                           Chưa có tài sản nào
                         </td>
                       </tr>
@@ -627,35 +669,47 @@ export default function DashBoard() {
             </div>
             <div className="card__content">
               <div className="transactions-list">
-                {weekData?.listBriefTransactionResponses?.slice(0, 3).map((t: { idTransaction: string; transactionName: string; transactionDate: string; amount: number }) => (
-                  <div key={t.idTransaction} className="transaction">
-                    <div className="transaction__icon">
-                      <Wallet size={18} className="text-primary" />
-                    </div>
-                    <div className="transaction__details">
-                      <span className="transaction__name">
-                        {t.transactionName}
-                      </span>
-                      <span className="transaction__time">
-                        {new Date(t.transactionDate).toLocaleDateString("vi-VN")}
-                      </span>
-                    </div>
-                    <div
-                      className={`transaction__amount ${
-                        t.amount > 0 
-                          ? "transaction__amount--positive"
-                          : "transaction__amount--negative"
-                      }`}
-                    >
-                      {formatVND(t.amount)}
-                    </div>
-                  </div>
-                ))}
-                 {(!weekData?.listBriefTransactionResponses || weekData.listBriefTransactionResponses.length === 0) && (
-                      <div className="text-center text-sm text-muted-foreground py-4">
-                        Chưa có giao dịch nào
+                {weekData?.listBriefTransactionResponses
+                  ?.slice(0, 3)
+                  .map(
+                    (t: {
+                      idTransaction: string;
+                      transactionName: string;
+                      transactionDate: string;
+                      amount: number;
+                    }) => (
+                      <div key={t.idTransaction} className="transaction">
+                        <div className="transaction__icon">
+                          <Wallet size={18} className="text-primary" />
+                        </div>
+                        <div className="transaction__details">
+                          <span className="transaction__name">
+                            {t.transactionName}
+                          </span>
+                          <span className="transaction__time">
+                            {new Date(t.transactionDate).toLocaleDateString(
+                              "vi-VN"
+                            )}
+                          </span>
+                        </div>
+                        <div
+                          className={`transaction__amount ${
+                            t.amount > 0
+                              ? "transaction__amount--positive"
+                              : "transaction__amount--negative"
+                          }`}
+                        >
+                          {formatVND(t.amount)}
+                        </div>
                       </div>
-                    )}
+                    )
+                  )}
+                {(!weekData?.listBriefTransactionResponses ||
+                  weekData.listBriefTransactionResponses.length === 0) && (
+                  <div className="text-center text-sm text-muted-foreground py-4">
+                    Chưa có giao dịch nào
+                  </div>
+                )}
               </div>
               <Link href="/dashboard/wallet">
                 <button className="btn btn--outline btn--full">

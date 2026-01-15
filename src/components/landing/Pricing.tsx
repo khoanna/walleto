@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function Pricing() {
   return (
     <section className="pricing-section">
@@ -15,37 +17,92 @@ export default function Pricing() {
         <div className="pricing-grid">
           <div className="pricing-card">
             <h3 className="pricing-name">Miễn phí</h3>
-            <p className="pricing-desc">Hoàn hảo để bắt đầu</p>
+            <p className="pricing-desc">Sử dụng những tính năng cơ bản của ứng dụng, giúp dễ dàng quản lý đầu tư và xem diễn biến thị trường đang diễn ra</p>
             <div className="pricing-price">
               <span className="price gradient-text">$0</span>
-              <span className="period">/trọn đời</span>
             </div>
             <ul className="pricing-features">
-              <li>✓ Theo dõi tới 5 tài sản crypto</li>
-              <li>✓ Theo dõi dòng tiền cơ bản</li>
-              <li>✓ Truy cập cộng đồng</li>
-              <li>✓ Hỗ trợ qua Email</li>
+              <li>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-500 mr-2">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Quản lý dòng tiền
+              </li>
+              <li>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-500 mr-2">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Biểu đồ dòng tiền
+              </li>
+              <li>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-500 mr-2">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Quản lý chi tiêu cá nhân
+              </li>
+              <li className="opacity-50">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-500 mr-2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+                Trao đổi cùng nhau trên blog
+              </li>
+              <li className="opacity-50">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-500 mr-2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+                Sử dụng chat bot thông minh
+              </li>
             </ul>
-            <button className="btn btn-outline full-width">Bắt đầu ngay</button>
+            <Link href="/auth" className="btn btn-outline full-width">Bắt đầu ngay</Link>
           </div>
 
           <div className="pricing-card popular">
-            <div className="popular-badge">✨ Phổ biến nhất</div>
-            <h3 className="pricing-name">Chuyên nghiệp</h3>
-            <p className="pricing-desc">Dành cho nhà đầu tư nghiêm túc</p>
+            <div className="popular-badge">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mr-1">
+                <path d="M2 20h20M5 20V8h14v12M12 4v4" />
+              </svg>
+            </div>
+            <h3 className="pricing-name">Premium</h3>
+            <p className="pricing-desc">Sử dụng những tính năng nâng cao giúp việc quản lý đầu tư dễ dàng hơn bao giờ hết với những công cụ nâng cao,</p>
             <div className="pricing-price">
-              <span className="price gradient-text">$19</span>
+              <span className="price gradient-text">120,000đ</span>
               <span className="period">/tháng</span>
             </div>
             <ul className="pricing-features">
-              <li>✓ Theo dõi crypto không giới hạn</li>
-              <li>✓ Phân tích & thông tin nâng cao</li>
-              <li>✓ Đề xuất hỗ trợ bởi AI</li>
-              <li>✓ Tính năng cộng đồng ưu tiên</li>
-              <li>✓ Cảnh báo thời gian thực</li>
-              <li>✓ Xuất báo cáo</li>
+              <li>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-500 mr-2">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Quản lý dòng tiền
+              </li>
+              <li>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-500 mr-2">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Biểu đồ dòng tiền
+              </li>
+              <li>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-500 mr-2">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Quản lý chi tiêu cá nhân
+              </li>
+              <li>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-500 mr-2">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Sử dụng chat bot thông minh
+              </li>
+              <li>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-500 mr-2">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Trao đổi cùng nhau trên blog
+              </li>
             </ul>
-            <button className="btn btn-hero full-width">⚡ Bắt đầu Dùng thử</button>
+            <Link href="/auth" className="btn btn-hero full-width">Bắt đầu ngay</Link>
           </div>
 
           <div className="pricing-card">
@@ -56,14 +113,14 @@ export default function Pricing() {
               <span className="period">/liên hệ</span>
             </div>
             <ul className="pricing-features">
-              <li>✓ Tất cả tính năng gói Chuyên nghiệp</li>
+              <li>✓ Tất cả tính năng gói Premium</li>
               <li>✓ Truy cập nhiều người dùng</li>
               <li>✓ Tích hợp tùy chỉnh</li>
               <li>✓ Quản lý tài khoản riêng</li>
               <li>✓ Đảm bảo SLA</li>
               <li>✓ Truy cập API</li>
             </ul>
-            <button className="btn btn-outline full-width">Liên hệ Kinh doanh</button>
+            <Link href="/auth" className="btn btn-outline full-width">Liên hệ Kinh doanh</Link>
           </div>
         </div>
 

@@ -7,7 +7,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[260px_1fr] bg-background text-text">
       <Sidebar />
-      <main className="h-screen overflow-auto">
+      <main className="h-screen overflow-auto pt-14 px-4 lg:p-0">
         <RequireAuth>
           {children}
         </RequireAuth>

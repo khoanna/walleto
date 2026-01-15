@@ -64,10 +64,10 @@ const ComparisonCard = ({
 
   if (loading) {
     return (
-      <div className="p-4 border rounded-xl animate-pulse bg-slate-100 h-80 flex flex-col gap-4">
-        <div className="h-6 bg-slate-200 rounded w-1/3"></div>
-        <div className="flex-1 bg-slate-200 rounded"></div>
-        <div className="flex-1 bg-slate-200 rounded"></div>
+      <div className="p-4 border border-gray-800 rounded-xl animate-pulse bg-[#111318] h-80 flex flex-col gap-4">
+        <div className="h-6 bg-gray-800 rounded w-1/3"></div>
+        <div className="flex-1 bg-gray-800/50 rounded"></div>
+        <div className="flex-1 bg-gray-800/50 rounded"></div>
       </div>
     );
   }
@@ -850,8 +850,8 @@ export default function Compare() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative min-h-[300px]">
           {compareLoading && currentData && (
             <div className="absolute inset-0 z-10 flex items-center justify-center backdrop-blur-sm rounded-2xl">
-              <div className="px-4 py-2 rounded-full shadow-lg border text-sm font-medium animate-bounce flex items-center gap-2">
-                <div className="w-2 h-2 bg-slate-900 rounded-full animate-ping"></div>
+              <div className="px-4 py-2 rounded-full shadow-lg border border-gray-800 bg-[#111318] text-sm font-medium animate-bounce flex items-center gap-2 text-white">
+                <div className="w-2 h-2 bg-primary rounded-full animate-ping"></div>
                 Đang cập nhật...
               </div>
             </div>

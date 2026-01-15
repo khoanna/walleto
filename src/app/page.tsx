@@ -19,7 +19,6 @@ export default function Home() {
       <HowItWorks />
       <Testimonials />
       <Pricing />
-      <Trust />
       <CTA />
       <Footer />
     </div>

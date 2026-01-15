@@ -98,8 +98,6 @@ export default function Features() {
               <h3 className="bento-title">Trợ lý AI Thông minh</h3>
               <p className="bento-desc">Nhận tư vấn tài chính cá nhân hóa được hỗ trợ bởi AI. Tự động hóa các tác vụ, nhận đề xuất thông minh và đi trước thị trường với phân tích dự đoán.</p>
               <div className="ai-capabilities">
-                <div className="capability">📈 Dự đoán</div>
-                <div className="capability">🔔 Cảnh báo Thông minh</div>
                 <div className="capability">🛡️ Phân tích Rủi ro</div>
                 <div className="capability">📊 Thông tin Chi tiết</div>
               </div>

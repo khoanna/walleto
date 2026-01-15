@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function Hero() {
   return (
     <section className="hero">
@@ -24,13 +26,12 @@ export default function Hero() {
         </p>
         
         <div className="hero-buttons">
-          <button className="btn btn-hero">
+          <Link href="/auth" className="btn btn-hero">
             Dùng thử Miễn phí
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M5 12h14M12 5l7 7-7 7"/>
             </svg>
-          </button>
-          <button className="btn btn-hero-outline">Xem Demo</button>
+          </Link>
         </div>
         
         <div className="hero-stats">

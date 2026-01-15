@@ -1,6 +1,7 @@
 "use client";
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,7 +14,9 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="container navbar-content">
         <div className="logo">
-          <div className="logo-icon">W</div>
+          <Link href="/">
+            <Image src="/logo.png" alt="Walleto Logo" width={32} height={32} />
+          </Link>
           <span className="logo-text">Walleto</span>
         </div>
         <div className={`nav-links ${isOpen ? 'show' : ''}`}>
@@ -22,8 +25,7 @@ export default function Navbar() {
           <Link href="#community">Cộng đồng</Link>
         </div>
         <div className={`nav-cta ${isOpen ? 'show' : ''}`}>
-          <button className="btn btn-ghost">Đăng nhập</button>
-          <button className="btn btn-primary">Bắt đầu ngay</button>
+          <Link href="/auth" className="btn btn-primary">Bắt đầu ngay</Link>
         </div>
         <button className="mobile-menu-btn" onClick={toggleMenu}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

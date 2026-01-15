@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Footer() {
   return (
@@ -7,7 +8,7 @@ export default function Footer() {
         <div className="footer-grid">
           <div className="footer-brand">
             <div className="logo">
-              <div className="logo-icon">W</div>
+              <Image src="/logo.png" alt="Walleto Logo" width={32} height={32} />
               <span className="logo-text">Walleto</span>
             </div>
             <p className="footer-tagline">Làm chủ tài chính, xây dựng tương lai với thông tin chi tiết từ AI.</p>

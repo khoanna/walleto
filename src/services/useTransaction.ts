@@ -15,6 +15,8 @@ export default function useTransaction() {
         }
       );
       const data = await response.json();
+      console.log("Tx List",data);
+      
       return data;
     } catch (error) {
       throw error;

@@ -343,7 +343,7 @@ const FinanceDashboard: React.FC = () => {
         {/* Main grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
           {/* Transaction table */}
-          <div className="lg:col-span-7 rounded-2xl bg-[#111318] border border-gray-800 p-5 shadow-2xl overflow-hidden flex flex-col">
+          <div className="lg:col-span-7 h-[700px] overflow-y-auto nice-scroll rounded-2xl bg-[#111318] border border-gray-800 p-5 shadow-2xl flex flex-col">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-base font-bold text-white flex items-center gap-2">
                 <span className="w-1 h-6 bg-teal-500 rounded-full inline-block"></span>
@@ -374,7 +374,7 @@ const FinanceDashboard: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-800/50">
-                      {transactionList.slice(0, 10).map((t) => (
+                      {transactionList.map((t) => (
                         <tr
                           key={t.idTransaction}
                           className="hover:bg-white/5 transition-colors group"

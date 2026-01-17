@@ -58,6 +58,8 @@ export default function DashBoard() {
     "month"
   );
 
+  const [portfolioTab, setPortfolioTab] = useState<"crypto" | "gold">("crypto");
+
   const totalGoldValue = useMemo(() => {
     const goldList = assetData?.data?.sjcGoldResponse;
     if (!goldList || !Array.isArray(goldList)) return 0;
@@ -571,9 +573,34 @@ export default function DashBoard() {
           <div className="card">
             <div className="card__header">
               <h3 className="card__title">Danh mục đầu tư</h3>
-              <Link href="/dashboard/portfolio" className="card__link">
-                Chi tiết <ArrowUpRightIcon size={14} />
-              </Link>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setPortfolioTab("crypto")}
+                  className={`min-w-[100px] px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+                    portfolioTab === "crypto"
+                      ? "bg-primary text-white shadow-lg shadow-primary/25"
+                      : "bg-background/50 text-text/60 hover:text-text hover:bg-background"
+                  }`}
+                >
+                  Crypto
+                </button>
+                <button
+                  onClick={() => setPortfolioTab("gold")}
+                  className={`min-w-[100px] px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+                    portfolioTab === "gold"
+                      ? "bg-yellow-500 text-white shadow-lg shadow-yellow-500/25"
+                      : "bg-background/50 text-text/60 hover:text-text hover:bg-background"
+                  }`}
+                >
+                  Vàng
+                </button>
+                <Link
+                  href="/dashboard/portfolio"
+                  className="card__link flex items-center ml-2"
+                >
+                  Chi tiết <ArrowUpRightIcon size={14} />
+                </Link>
+              </div>
             </div>
             <div className="card__content" style={{ padding: 0 }}>
               <div className="overflow-x-auto">
@@ -592,67 +619,115 @@ export default function DashBoard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {assetData?.data?.listInvestmentAssetResponse
-                      ?.slice(0, 5)
-                      .map((asset: Asset) => (
-                        <tr key={asset.idAsset} className="crypto-table__row">
+                    {portfolioTab === "crypto" &&
+                      assetData?.data?.listInvestmentAssetResponse
+                        ?.slice(0, 5)
+                        .map((asset: Asset) => (
+                          <tr key={asset.idAsset} className="crypto-table__row">
+                            <td className="crypto-table__td pl-6">
+                              <div className="crypto-info">
+                                <div className="crypto-info__icon">
+                                  <img
+                                    src={asset.url}
+                                    alt={asset.assetName}
+                                    onError={(e) => {
+                                      (e.target as HTMLImageElement).src =
+                                        "https://via.placeholder.com/25";
+                                    }}
+                                  />
+                                </div>
+                                <div className="crypto-info__details">
+                                  <span className="crypto-info__name">
+                                    {asset.assetName}
+                                  </span>
+                                  <span className="crypto-info__symbol">
+                                    {asset.assetSymbol}
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="crypto-table__td crypto-table__td--muted crypto-table__td--hide-tablet">
+                              {formatLargeCurrency(asset.marketCap)}
+                            </td>
+                            <td className="crypto-table__td crypto-table__td--muted crypto-table__td--hide-mobile">
+                              {formatLargeCurrency(asset.totalVolume)}
+                            </td>
+                            <td className="crypto-table__td font-mono">
+                              {formatVND(asset.currentPrice)}
+                            </td>
+                            <td className="crypto-table__td pr-6">
+                              <span
+                                className={`badge ${
+                                  asset.priceChangePercentage24h >= 0
+                                    ? "badge--positive"
+                                    : "badge--negative"
+                                }`}
+                              >
+                                {asset.priceChangePercentage24h >= 0 ? "+" : ""}
+                                {asset.priceChangePercentage24h.toFixed(2)}%
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                    {portfolioTab === "gold" &&
+                      assetData?.data?.sjcGoldResponse?.map((gold: any) => (
+                        <tr key={gold.id} className="crypto-table__row">
                           <td className="crypto-table__td pl-6">
                             <div className="crypto-info">
                               <div className="crypto-info__icon">
-                                <img
-                                  src={asset.url}
-                                  alt={asset.assetName}
-                                  onError={(e) => {
-                                    (e.target as HTMLImageElement).src =
-                                      "https://via.placeholder.com/25";
-                                  }}
-                                />
+                                <div className="w-[25px] h-[25px] rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-500 text-xs font-bold">
+                                  G
+                                </div>
                               </div>
                               <div className="crypto-info__details">
                                 <span className="crypto-info__name">
-                                  {asset.assetName}
+                                  {gold.name}
                                 </span>
                                 <span className="crypto-info__symbol">
-                                  {asset.assetSymbol}
+                                  {gold.type}
                                 </span>
                               </div>
                             </div>
                           </td>
                           <td className="crypto-table__td crypto-table__td--muted crypto-table__td--hide-tablet">
-                            {formatLargeCurrency(asset.marketCap)}
+                            -
                           </td>
                           <td className="crypto-table__td crypto-table__td--muted crypto-table__td--hide-mobile">
-                            {formatLargeCurrency(asset.totalVolume)}
+                            -
                           </td>
                           <td className="crypto-table__td font-mono">
-                            {formatVND(asset.currentPrice)}
+                            {formatVND(gold.sellPrice)}
                           </td>
                           <td className="crypto-table__td pr-6">
-                            <span
-                              className={`badge ${
-                                asset.priceChangePercentage24h >= 0
-                                  ? "badge--positive"
-                                  : "badge--negative"
-                              }`}
-                            >
-                              {asset.priceChangePercentage24h >= 0 ? "+" : ""}
-                              {asset.priceChangePercentage24h.toFixed(2)}%
-                            </span>
+                            <span className="text-text/40">-</span>
                           </td>
                         </tr>
                       ))}
-                    {(!assetData?.data?.listInvestmentAssetResponse ||
-                      assetData.data.listInvestmentAssetResponse.length ===
-                        0) && (
-                      <tr>
-                        <td
-                          colSpan={5}
-                          className="p-4 text-center text-sm text-muted-foreground"
-                        >
-                          Chưa có tài sản nào
-                        </td>
-                      </tr>
-                    )}
+                    {portfolioTab === "crypto" &&
+                      (!assetData?.data?.listInvestmentAssetResponse ||
+                        assetData.data.listInvestmentAssetResponse.length ===
+                          0) && (
+                        <tr>
+                          <td
+                            colSpan={5}
+                            className="p-4 text-center text-sm text-muted-foreground"
+                          >
+                            Chưa có tài sản Crypto nào
+                          </td>
+                        </tr>
+                      )}
+                    {portfolioTab === "gold" &&
+                      (!assetData?.data?.sjcGoldResponse ||
+                        assetData.data.sjcGoldResponse.length === 0) && (
+                        <tr>
+                          <td
+                            colSpan={5}
+                            className="p-4 text-center text-sm text-muted-foreground"
+                          >
+                            Chưa có tài sản Vàng nào
+                          </td>
+                        </tr>
+                      )}
                   </tbody>
                 </table>
               </div>

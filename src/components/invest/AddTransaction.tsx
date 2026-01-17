@@ -105,7 +105,7 @@ const AddTransaction = ({ isOpen, onClose, onSubmit, loading, assetId, assetName
                 <div className="p-8 overflow-y-auto nice-scroll">
                     <h2 className="text-2xl font-bold text-text mb-2 text-center">Thêm giao dịch</h2>
                     <p className="text-center text-text/60 mb-6 flex items-center justify-center gap-3">
-                        <img src={assetImage} alt={`${assetName} image`} className="w-6 h-6 rounded-full" />
+                        {assetImage && <img src={assetImage} alt={`${assetName} image`} className="w-6 h-6 rounded-full" />}
                         {assetName} ({assetSymbol.toUpperCase()})
                     </p>
 

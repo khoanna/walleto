@@ -59,7 +59,7 @@ body {
 html.nice-scroll,
 body.nice-scroll {
   scrollbar-width: thin;
-  scrollbar-color: var(--foreground) transparent;
+  scrollbar-color: #475569 transparent;
 }
 
 /* Chrome, Edge, Safari */
@@ -98,7 +98,7 @@ body.nice-scroll::-webkit-scrollbar-thumb:hover {
 /* apply class="nice-scroll" lên vùng cuộn */
 .nice-scroll {
   scrollbar-width: thin; /* Firefox */
-  scrollbar-color: var(--foreground) transparent;
+  scrollbar-color: #475569 transparent;
 }
 .nice-scroll::-webkit-scrollbar {
   width: 10px;

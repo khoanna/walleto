@@ -375,6 +375,8 @@
 
 .donut-legend {
   display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 24px;
 }
 
@@ -398,7 +400,7 @@
 .donut-legend__value {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--foreground);
+  color: var(--text);
 }
 
 /* ==================== */

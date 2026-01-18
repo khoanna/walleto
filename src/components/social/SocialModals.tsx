@@ -1,6 +1,16 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { X, CheckCircle, Circle, AlertTriangle, Send, Loader2, MoreVertical, Trash2, UserX } from "lucide-react";
+import {
+  X,
+  CheckCircle,
+  Circle,
+  AlertTriangle,
+  Send,
+  Loader2,
+  MoreVertical,
+  Trash2,
+  UserX,
+} from "lucide-react";
 import { UserAvatar } from "./SocialFeed";
 import { UserInfo } from "@/type/Social";
 import { Asset } from "@/type/Dashboard";
@@ -40,37 +50,65 @@ export const AssetSelectionModal = ({
         </button>
       </div>
       <div className="flex-1 overflow-y-auto p-2 space-y-2">
-        {assets.map((asset) => (
-          <div
-            key={asset.idAsset}
-            onClick={() => onToggle(asset.idAsset)}
-            className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
-              selectedIds.has(asset.idAsset)
-                ? "border-blue-500 bg-blue-500/10"
-                : "border-gray-800 hover:bg-[#1A1D24]"
-            }`}
-          >
-            <div className="flex items-center gap-3">
-              {selectedIds.has(asset.idAsset) ? (
-                <CheckCircle className="text-blue-500" size={20} />
-              ) : (
-                <Circle className="text-gray-600" size={20} />
-              )}
-              {/* Note: Ideally use Next/Image here if domains are configured */}
-              <img
-                src={asset.url}
-                className="w-8 h-8 rounded-full bg-white transition-transform group-hover:scale-105"
-                alt={asset.assetSymbol}
-              />
-              <div>
-                <p className="font-bold text-sm text-white">{asset.assetName}</p>
-                <p className="text-xs text-gray-500">
-                  {asset.assetSymbol.toUpperCase()}
+        {assets.map((asset) => {
+          // LOGIC CHECK VÀNG (Nếu không có URL hoặc URL rỗng thì là Vàng)
+          const isGold = !asset.url || asset.url === "";
+
+          return (
+            <div
+              key={asset.idAsset}
+              onClick={() => onToggle(asset.idAsset)}
+              className={`flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-all ${
+                selectedIds.has(asset.idAsset)
+                  ? "border-blue-500 bg-blue-500/10"
+                  : "border-gray-800 hover:bg-[#1A1D24]"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                {selectedIds.has(asset.idAsset) ? (
+                  <CheckCircle className="text-blue-500" size={20} />
+                ) : (
+                  <Circle className="text-gray-600" size={20} />
+                )}
+
+                {/* Render Icon G nếu là vàng */}
+                {isGold ? (
+                  <div className="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-500 text-xs font-bold border border-yellow-500/30">
+                    G
+                  </div>
+                ) : (
+                  <img
+                    src={asset.url}
+                    className="w-8 h-8 rounded-full bg-white transition-transform group-hover:scale-105"
+                    alt={asset.assetSymbol}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                )}
+
+                <div>
+                  <p className="font-bold text-sm text-white">
+                    {asset.assetName}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {asset.assetSymbol.toUpperCase()}
+                  </p>
+                </div>
+              </div>
+
+              <div className="text-right">
+                <p className="text-sm font-medium text-gray-300">
+                  {new Intl.NumberFormat("vi-VN", {
+                    style: "currency",
+                    currency: "VND",
+                    maximumFractionDigits: 0,
+                  }).format(asset.currentPrice)}
                 </p>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       <div className="p-3 border-t border-gray-800">
         <button
@@ -106,8 +144,9 @@ export const DeleteFriendModal = ({
       </div>
       <h3 className="text-lg font-bold mb-2 text-white">Hủy kết bạn?</h3>
       <p className="text-sm text-gray-400 mb-6">
-        Bạn có chắc chắn muốn xóa <span className="font-bold text-white">{name}</span> khỏi
-        danh sách bạn bè?
+        Bạn có chắc chắn muốn xóa{" "}
+        <span className="font-bold text-white">{name}</span> khỏi danh sách bạn
+        bè?
       </p>
       <div className="flex gap-3">
         <button
@@ -138,7 +177,7 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
   const hasUser = !!user && !!user.idUser && !!idFriendship;
   const userContext = useUserContext();
   const currentUser = userContext?.user;
-  
+
   const [inputMessage, setInputMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -146,7 +185,7 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
   const [isMinimized, setIsMinimized] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-  
+
   const {
     messages,
     isConnected,
@@ -164,7 +203,6 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
     currentUserId: currentUser?.idUser || "",
   });
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -175,27 +213,24 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Connect to socket and load messages on mount
   useEffect(() => {
     if (idFriendship && currentUser?.idUser) {
       connect();
       getMessages();
     }
-    
+
     return () => {
       disconnect();
     };
   }, [idFriendship, currentUser?.idUser]);
 
-  // Auto scroll to bottom when new message arrives
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Handle send message
   const handleSend = async () => {
     if (!inputMessage.trim() || isSending || !hasUser) return;
-    
+
     setIsSending(true);
     const success = await sendMessage(inputMessage);
     if (success) {
@@ -204,7 +239,6 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
     setIsSending(false);
   };
 
-  // Handle enter key
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -212,25 +246,27 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
     }
   };
 
-  // Check if message is from current user by comparing idSender with current user's idUser
   const isMyMessage = (msg: ChatMessage) => {
     return msg.idSender === currentUser?.idUser;
   };
 
-  // Format time from sendAt
   const formatTime = (dateStr: string | undefined) => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
-    return date.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
+    return date.toLocaleTimeString("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
-  // Group messages by date
   const groupMessagesByDate = (msgs: ChatMessage[]) => {
     const groups: { date: string; messages: ChatMessage[] }[] = [];
     let currentDate = "";
-    
+
     msgs.forEach((msg) => {
-      const msgDate = msg.sendAt ? new Date(msg.sendAt).toLocaleDateString("vi-VN") : "";
+      const msgDate = msg.sendAt
+        ? new Date(msg.sendAt).toLocaleDateString("vi-VN")
+        : "";
       if (msgDate !== currentDate) {
         currentDate = msgDate;
         groups.push({ date: msgDate, messages: [msg] });
@@ -238,64 +274,76 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
         groups[groups.length - 1].messages.push(msg);
       }
     });
-    
+
     return groups;
   };
 
   const formatDateLabel = (dateStr: string) => {
     const today = new Date().toLocaleDateString("vi-VN");
-    const yesterday = new Date(Date.now() - 86400000).toLocaleDateString("vi-VN");
-    
+    const yesterday = new Date(Date.now() - 86400000).toLocaleDateString(
+      "vi-VN"
+    );
+
     if (dateStr === today) return "Hôm nay";
     if (dateStr === yesterday) return "Hôm qua";
     return dateStr;
   };
 
   return (
-    <div 
+    <div
       className={`fixed bottom-4 right-4 bg-[#111318] rounded-2xl flex flex-col z-40 overflow-hidden transition-all duration-300 ease-in-out border border-gray-800
         ${isMinimized ? "w-72 h-16" : "w-[360px] h-[520px]"}
         shadow-2xl shadow-black/50`}
     >
-      {/* Header */}
-      <div 
+      <div
         className="relative bg-[#111318] text-white px-4 py-3 flex justify-between items-center cursor-pointer border-b border-gray-800"
         onClick={() => setIsMinimized(!isMinimized)}
       >
         <div className="flex items-center gap-3 relative z-10">
-          {/* Avatar with online indicator */}
           <div className="relative">
             <div className="w-10 h-10 rounded-full overflow-hidden">
               <UserAvatar url={user?.urlAvatar} size="w-10 h-10" />
             </div>
-            <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#111318] 
-              ${isConnected ? "bg-emerald-500" : isConnecting ? "bg-amber-500 animate-pulse" : "bg-gray-500"}`} 
+            <span
+              className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#111318] 
+              ${
+                isConnected
+                  ? "bg-emerald-500"
+                  : isConnecting
+                  ? "bg-amber-500 animate-pulse"
+                  : "bg-gray-500"
+              }`}
             />
           </div>
-          
+
           <div className="flex flex-col">
             <span className="font-semibold text-[15px] leading-tight text-white">
               {hasUser ? user!.name : "Không thể tải dữ liệu"}
             </span>
             {hasUser && (
               <span className="text-[11px] text-gray-400 flex items-center gap-1">
-                {isConnected ? "Đang hoạt động" : isConnecting ? "Đang kết nối..." : "Offline"}
+                {isConnected
+                  ? "Đang hoạt động"
+                  : isConnecting
+                  ? "Đang kết nối..."
+                  : "Offline"}
               </span>
             )}
           </div>
         </div>
-        
-        {/* Action Buttons */}
-        <div className="flex items-center gap-1 relative z-10" onClick={(e) => e.stopPropagation()}>
+
+        <div
+          className="flex items-center gap-1 relative z-10"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="relative" ref={menuRef}>
-            <button 
-              onClick={() => setShowMenu(!showMenu)} 
+            <button
+              onClick={() => setShowMenu(!showMenu)}
               className="w-8 h-8 flex items-center justify-center hover:bg-[#1A1D24] text-gray-400 hover:text-white rounded-full transition-all duration-200"
             >
               <MoreVertical size={18} />
             </button>
-            
-            {/* Dropdown Menu */}
+
             {showMenu && (
               <div className="absolute right-0 top-full mt-2 w-52 bg-[#1A1D24] border border-gray-800 rounded-xl shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                 <button
@@ -313,9 +361,9 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
               </div>
             )}
           </div>
-          
-          <button 
-            onClick={onClose} 
+
+          <button
+            onClick={onClose}
             className="w-8 h-8 flex items-center justify-center hover:bg-[#1A1D24] text-gray-400 hover:text-white rounded-full transition-all duration-200"
           >
             <X size={18} />
@@ -323,7 +371,6 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 rounded-2xl animate-in fade-in duration-200">
           <div className="bg-[#1A1D24] border border-gray-800 rounded-2xl p-5 m-4 shadow-2xl max-w-[300px] animate-in zoom-in-95 duration-200">
@@ -332,7 +379,9 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
                 <Trash2 className="text-red-500" size={24} />
               </div>
             </div>
-            <h4 className="font-bold text-center mb-2 text-base text-white">Xóa lịch sử tin nhắn?</h4>
+            <h4 className="font-bold text-center mb-2 text-base text-white">
+              Xóa lịch sử tin nhắn?
+            </h4>
             <p className="text-sm text-gray-400 text-center mb-5">
               Tất cả tin nhắn sẽ bị xóa vĩnh viễn và không thể khôi phục.
             </p>
@@ -358,18 +407,18 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
         </div>
       )}
 
-      {/* Error Banner */}
       {error && !isMinimized && (
         <div className="bg-red-500/10 text-red-500 text-xs px-4 py-2 flex justify-between items-center border-b border-red-500/20">
           <div className="flex items-center gap-2">
             <AlertTriangle size={14} />
             <span>{error}</span>
           </div>
-          <button onClick={clearError} className="hover:underline font-medium">Đóng</button>
+          <button onClick={clearError} className="hover:underline font-medium">
+            Đóng
+          </button>
         </div>
       )}
 
-      {/* Messages Area */}
       {!isMinimized && (
         <>
           <div className="flex-1 bg-[#0C0E12] px-4 py-3 overflow-y-auto">
@@ -408,44 +457,53 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
               <div className="space-y-4">
                 {groupMessagesByDate(messages).map((group, groupIdx) => (
                   <div key={groupIdx}>
-                    {/* Date separator */}
                     <div className="flex items-center justify-center my-4">
                       <div className="px-3 py-1 rounded-full bg-[#1A1D24] border border-gray-800 text-xs text-gray-400 font-medium">
                         {formatDateLabel(group.date)}
                       </div>
                     </div>
-                    
-                    {/* Messages in group */}
+
                     <div className="space-y-2">
                       {group.messages.map((msg, idx) => {
                         const isMe = isMyMessage(msg);
-                        
                         return (
-                          <div 
-                            key={msg.idMessage || idx} 
-                            className={`flex items-center gap-2 ${isMe ? "justify-end" : "justify-start"}`}
+                          <div
+                            key={msg.idMessage || idx}
+                            className={`flex items-center gap-2 ${
+                              isMe ? "justify-end" : "justify-start"
+                            }`}
                           >
-                            {/* Friend avatar - always visible for friend messages */}
                             {!isMe && (
                               <div className="shrink-0 self-center">
                                 <div className="w-7 h-7 rounded-full overflow-hidden">
-                                  <UserAvatar url={user?.urlAvatar} size="w-7 h-7" />
+                                  <UserAvatar
+                                    url={user?.urlAvatar}
+                                    size="w-7 h-7"
+                                  />
                                 </div>
                               </div>
                             )}
-                            
-                            <div className={`max-w-[70%] group ${isMe ? "order-1" : ""}`}>
+                            <div
+                              className={`max-w-[70%] group ${
+                                isMe ? "order-1" : ""
+                              }`}
+                            >
                               <div
                                 className={`px-4 py-2 text-[14px] leading-relaxed
-                                  ${isMe
-                                    ? "bg-blue-600 text-white rounded-2xl rounded-br-md"
-                                    : "bg-[#1A1D24] text-gray-200 rounded-2xl rounded-bl-md border border-gray-800"
+                                  ${
+                                    isMe
+                                      ? "bg-blue-600 text-white rounded-2xl rounded-br-md"
+                                      : "bg-[#1A1D24] text-gray-200 rounded-2xl rounded-bl-md border border-gray-800"
                                   }`}
                               >
                                 {msg.content}
                               </div>
                               {msg.sendAt && (
-                                <p className={`text-[10px] text-gray-500 mt-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${isMe ? "text-right" : "text-left"}`}>
+                                <p
+                                  className={`text-[10px] text-gray-500 mt-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ${
+                                    isMe ? "text-right" : "text-left"
+                                  }`}
+                                >
                                   {formatTime(msg.sendAt)}
                                 </p>
                               )}
@@ -461,7 +519,6 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
             )}
           </div>
 
-          {/* Input Area */}
           <div className="p-4 bg-[#111318] border-t border-gray-800">
             <div className="flex gap-3 items-center">
               <div className="flex-1 relative">
@@ -496,7 +553,9 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
               <div className="flex items-center justify-center gap-2 mt-2">
                 <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
                 <p className="text-xs text-amber-500">
-                  {isConnecting ? "Đang kết nối..." : "Mất kết nối. Đang thử lại..."}
+                  {isConnecting
+                    ? "Đang kết nối..."
+                    : "Mất kết nối. Đang thử lại..."}
                 </p>
               </div>
             )}
@@ -508,7 +567,8 @@ export const ChatPopup = ({ user, idFriendship, onClose }: ChatPopupProps) => {
 };
 
 // --- 4. EDIT POST MODAL ---
-interface EditPostModalProps {
+// Định nghĩa props ở đây để tránh lỗi TS
+export interface EditPostModalProps {
   onClose: () => void;
   children: React.ReactNode;
 }
@@ -518,7 +578,10 @@ export const EditPostModal = ({ onClose, children }: EditPostModalProps) => (
     <div className="bg-[#111318] border border-gray-800 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
       <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-[#111318] rounded-t-2xl">
         <h3 className="font-bold text-white text-lg">Chỉnh sửa bài viết</h3>
-        <button onClick={onClose} className="text-gray-400 hover:text-white transition-colors">
+        <button
+          onClick={onClose}
+          className="text-gray-400 hover:text-white transition-colors"
+        >
           <X size={24} />
         </button>
       </div>
@@ -528,6 +591,7 @@ export const EditPostModal = ({ onClose, children }: EditPostModalProps) => (
 );
 
 // --- 5. EDIT COMMENT MODAL ---
+// Định nghĩa props ở đây để tránh lỗi TS
 interface EditCommentModalProps {
   starRating: number;
   setStarRating: (v: number) => void;
@@ -547,15 +611,16 @@ export const EditCommentModal = ({
   onConfirm,
   isLoading = false,
 }: EditCommentModalProps) => {
-  // Removed forbidden require() call here.
-  // The 'Star' icon wasn't being used (emojis were used instead), so it's safe to remove.
-
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in">
       <div className="bg-[#111318] border border-gray-800 rounded-2xl shadow-2xl w-full max-w-sm">
         <div className="p-4 border-b border-gray-800 flex justify-between items-center">
           <h3 className="font-bold text-white">Sửa bình luận</h3>
-          <button onClick={onCancel} disabled={isLoading} className="text-gray-400 hover:text-white transition-colors">
+          <button
+            onClick={onCancel}
+            disabled={isLoading}
+            className="text-gray-400 hover:text-white transition-colors"
+          >
             <X size={20} />
           </button>
         </div>

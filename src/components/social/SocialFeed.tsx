@@ -9,8 +9,6 @@ import {
   Star,
   Send,
   X,
-  Calendar,
-  Plus,
   Heart,
 } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -199,7 +197,7 @@ export const PostForm = (props: PostFormProps) => {
         </div>
       )}
 
-      {/* Cashflow Section - ĐÃ FIX LỖI HỦY */}
+      {/* Cashflow Section */}
       {shareType === "cashflow" && (
         <div className="mt-4 bg-gray-800 rounded-xl p-4 border border-gray-700">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
@@ -227,7 +225,7 @@ export const PostForm = (props: PostFormProps) => {
               <button
                 onClick={() => {
                   setChartData(null);
-                  setShareType("none"); // <--- FIX LỖI: Reset shareType để ẩn thanh thời gian
+                  setShareType("none");
                 }}
                 className="text-xs text-red-500 hover:underline p-1 hover:bg-white/5 rounded"
               >
@@ -238,7 +236,11 @@ export const PostForm = (props: PostFormProps) => {
           {chartData && (
             <div className="rounded-xl p-2 bg-[#111318] mb-3 border border-gray-700">
               <Chart
-                options={{ ...chartOptions, grid: { borderColor: '#333' }, theme: { mode: 'dark' } }}
+                options={{
+                  ...chartOptions,
+                  grid: { borderColor: "#333" },
+                  theme: { mode: "dark" },
+                }}
                 series={[
                   {
                     name: "Thu",
@@ -279,7 +281,7 @@ export const PostForm = (props: PostFormProps) => {
                 <button
                   onClick={() => {
                     setAssetData(null);
-                    setShareType("none"); // Reset type
+                    setShareType("none");
                   }}
                   className="text-xs text-red-500 hover:underline"
                 >
@@ -289,19 +291,29 @@ export const PostForm = (props: PostFormProps) => {
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            {assetData.map((a) => (
-              <div
-                key={a.assetSymbol}
-                className="flex items-center gap-2 bg-[#111318] px-3 py-1.5 rounded-lg text-xs shadow-sm border border-gray-700"
-              >
-                <img
-                  src={a.url}
-                  className="w-5 h-5 rounded-full"
-                  alt={a.assetSymbol}
-                />
-                <span className="font-medium">{a.assetSymbol}</span>
-              </div>
-            ))}
+            {assetData.map((a) => {
+              // RENDER GOLD ICON
+              const isGold = a.url === "GOLD_ICON" || a.url === "";
+              return (
+                <div
+                  key={a.assetSymbol}
+                  className="flex items-center gap-2 bg-[#111318] px-3 py-1.5 rounded-lg text-xs shadow-sm border border-gray-700"
+                >
+                  {isGold ? (
+                    <div className="w-5 h-5 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-500 text-[10px] font-bold border border-yellow-500/30">
+                      G
+                    </div>
+                  ) : (
+                    <img
+                      src={a.url}
+                      className="w-5 h-5 rounded-full"
+                      alt={a.assetSymbol}
+                    />
+                  )}
+                  <span className="font-medium">{a.assetSymbol}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -406,8 +418,6 @@ export const PostItem = (props: PostItemProps) => {
     setIsFavoriting(true);
 
     try {
-      // Parent now handles the state update
-
       await onToggleFavorite(post.idPost, post.isFavorited ?? false);
     } catch (error) {
       console.error("Error toggling favorite:", error);
@@ -466,17 +476,20 @@ export const PostItem = (props: PostItemProps) => {
     chart: { toolbar: { show: false }, fontFamily: "inherit" },
     colors: ["#22C55E", "#EF4444"],
     stroke: { curve: "smooth", width: 2 },
-    theme: { mode: 'dark' },
-    grid: { borderColor: '#333' },
+    theme: { mode: "dark" },
+    grid: { borderColor: "#333" },
     xaxis: {
       categories: transactionData?.map((t) => t.transactionDate) || [],
-      labels: { formatter: (val: string) => formatDateVN(val), style: { colors: '#9CA3AF' } },
+      labels: {
+        formatter: (val: string) => formatDateVN(val),
+        style: { colors: "#9CA3AF" },
+      },
     },
     yaxis: {
-        labels: { style: { colors: '#9CA3AF' } }
+      labels: { style: { colors: "#9CA3AF" } },
     },
     tooltip: {
-      theme: 'dark',
+      theme: "dark",
       x: { formatter: (val) => formatDateVN(new Date(val).toISOString()) },
     },
   };
@@ -587,41 +600,67 @@ export const PostItem = (props: PostItemProps) => {
             <thead className="text-gray-400 bg-gray-800 text-xs font-semibold uppercase">
               <tr>
                 <th className="text-left p-2 pl-3">Token</th>
-
                 <th className="text-right p-2">Price</th>
-
                 <th className="text-right p-2 pr-3">24h</th>
               </tr>
             </thead>
 
             <tbody className="divide-y divide-gray-800">
-              {assetData.map((a, i) => (
-                <tr key={i} className="hover:bg-gray-800/50 transition-colors">
-                  <td className="p-2 pl-3 flex items-center gap-2 text-white">
-                    <img
-                      src={a.url}
-                      className="w-5 h-5 rounded-full"
-                      alt={a.assetSymbol}
-                    />
+              {assetData.map((a, i) => {
+                // CHECK GOLD ICON (nếu url rỗng hoặc là GOLD_ICON)
+                const isGold = a.url === "GOLD_ICON" || a.url === "";
 
-                    <span>{a.assetSymbol}</span>
-                  </td>
-
-                  <td className="text-right p-2 text-gray-300">
-                    ${formatCurrency(a.currentPrice)}
-                  </td>
-
-                  <td
-                    className={`text-right p-2 pr-3 font-medium ${
-                      a.priceChangePercentage24h >= 0
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }`}
+                return (
+                  <tr
+                    key={i}
+                    className="hover:bg-gray-800/50 transition-colors"
                   >
-                    {a.priceChangePercentage24h.toFixed(2)}%
-                  </td>
-                </tr>
-              ))}
+                    <td className="p-2 pl-3 flex items-center gap-2 text-white">
+                      {isGold ? (
+                        <div className="w-5 h-5 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-500 text-[10px] font-bold border border-yellow-500/30">
+                          G
+                        </div>
+                      ) : (
+                        <img
+                          src={a.url}
+                          className="w-5 h-5 rounded-full"
+                          alt={a.assetSymbol}
+                          onError={(e) =>
+                            (e.currentTarget.style.display = "none")
+                          }
+                        />
+                      )}
+
+                      <span>{a.assetSymbol}</span>
+                    </td>
+
+                    <td className="text-right p-2 text-gray-300">
+                      {new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                        maximumFractionDigits: 0,
+                      }).format(a.currentPrice)}
+                    </td>
+
+                    <td
+                      className={`text-right p-2 pr-3 font-medium ${
+                        a.priceChangePercentage24h >= 0
+                          ? "text-green-500"
+                          : "text-red-500"
+                      }`}
+                    >
+                      {a.priceChangePercentage24h !== 0 ? (
+                        <>
+                          {a.priceChangePercentage24h >= 0 ? "+" : ""}
+                          {a.priceChangePercentage24h.toFixed(2)}%
+                        </>
+                      ) : (
+                        <span className="text-gray-500">-</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -641,7 +680,9 @@ export const PostItem = (props: PostItemProps) => {
             </span>
           </div>
 
-          <div className="text-xs text-gray-500 font-medium">{commentCount} bình luận</div>
+          <div className="text-xs text-gray-500 font-medium">
+            {commentCount} bình luận
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -659,9 +700,7 @@ export const PostItem = (props: PostItemProps) => {
               className={post.isFavorited ? "fill-red-500 text-red-500" : ""}
             />
 
-            <span>
-              {post.isFavorited ? "Đã thích" : "Thích"}
-            </span>
+            <span>{post.isFavorited ? "Đã thích" : "Thích"}</span>
           </button>
 
           <button
@@ -716,7 +755,9 @@ export const PostItem = (props: PostItemProps) => {
                 <div className="flex-1 p-3 rounded-xl bg-[#1A1D24] border border-gray-800/50">
                   <div className="flex justify-between items-start gap-2">
                     <div className="flex-1">
-                      <span className="text-sm font-semibold text-white block">{c.name}</span>
+                      <span className="text-sm font-semibold text-white block">
+                        {c.name}
+                      </span>
                       {editingCommentId !== c.idEvaluate && (
                         <div className="flex gap-0.5 mt-1">
                           {[...Array(5)].map((_, i) => (

@@ -157,7 +157,10 @@ const ConfirmModal = memo(function ConfirmModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onCancel} />
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onCancel}
+      />
       <div className="relative bg-[#1a1a2e] rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl border border-white/10">
         <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
         <p className="text-gray-300 mb-6">{message}</p>
@@ -170,7 +173,10 @@ const ConfirmModal = memo(function ConfirmModal({
           </button>
           <button
             onClick={onConfirm}
-            className={"px-4 py-2 rounded-lg text-white transition-colors " + typeColors[type]}
+            className={
+              "px-4 py-2 rounded-lg text-white transition-colors " +
+              typeColors[type]
+            }
           >
             {confirmText}
           </button>
@@ -209,15 +215,17 @@ const PostCard = memo(function PostCard({
   onDelete?: (id: string) => void;
 }) {
   const snapshot = post.snapshotResponse?.[0] ?? {};
-  const transactionData: TransactionOfPost[] | null = snapshot.transactionOfPosts ?? null;
-  const assetData: InvestmentAssetOfPost[] | null = snapshot.investmentAssetOfPosts ?? null;
-  
+  const transactionData: TransactionOfPost[] | null =
+    snapshot.transactionOfPosts ?? null;
+  const assetData: InvestmentAssetOfPost[] | null =
+    snapshot.investmentAssetOfPosts ?? null;
+
   const hasChart = transactionData && transactionData.length > 0;
   const hasAssets = assetData && assetData.length > 0;
   const postType = hasChart ? "cashflow" : hasAssets ? "portfolio" : "post";
 
   const chartOptions: ApexOptions = {
-    chart: { 
+    chart: {
       toolbar: { show: false },
       background: "transparent",
       sparkline: { enabled: false },
@@ -226,15 +234,15 @@ const PostCard = memo(function PostCard({
     stroke: { curve: "smooth", width: 2 },
     fill: {
       type: "gradient",
-      gradient: { opacityFrom: 0.4, opacityTo: 0.1 }
+      gradient: { opacityFrom: 0.4, opacityTo: 0.1 },
     },
     dataLabels: { enabled: true, style: { fontSize: "10px" } },
     xaxis: {
       categories: transactionData?.map((t) => t.transactionDate) || [],
-      labels: { 
+      labels: {
         show: true,
         formatter: (val: string) => formatDateVN(val),
-        style: { colors: "#6b7280", fontSize: "9px" }
+        style: { colors: "#6b7280", fontSize: "9px" },
       },
       axisBorder: { show: false },
       axisTicks: { show: false },
@@ -242,19 +250,28 @@ const PostCard = memo(function PostCard({
     yaxis: { show: false },
     grid: { show: false },
     tooltip: { theme: "dark" },
-    legend: { 
-      show: true, 
+    legend: {
+      show: true,
       position: "bottom",
       labels: { colors: "#9ca3af" },
       fontSize: "10px",
-      markers: { size: 6 }
-    }
+      markers: { size: 6 },
+    },
   };
 
   const typeConfig = {
-    cashflow: { label: "Cashflow", color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" },
-    portfolio: { label: "Portfolio", color: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
-    post: { label: "Bài viết", color: "bg-violet-500/20 text-violet-400 border-violet-500/30" },
+    cashflow: {
+      label: "Cashflow",
+      color: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+    },
+    portfolio: {
+      label: "Portfolio",
+      color: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+    },
+    post: {
+      label: "Bài viết",
+      color: "bg-violet-500/20 text-violet-400 border-violet-500/30",
+    },
   };
 
   return (
@@ -271,25 +288,43 @@ const PostCard = memo(function PostCard({
             />
           </div>
           <div>
-            <p className="text-white font-medium text-sm leading-tight">{post.userOfPostResponse?.name}</p>
-            <p className="text-gray-500 text-[10px]">{formatDateVN(post.createAt)}</p>
+            <p className="text-white font-medium text-sm leading-tight">
+              {post.userOfPostResponse?.name}
+            </p>
+            <p className="text-gray-500 text-[10px]">
+              {formatDateVN(post.createAt)}
+            </p>
           </div>
         </div>
-        <span className={`px-2 py-0.5 text-[10px] font-medium rounded-full border ${typeConfig[postType].color}`}>
+        <span
+          className={`px-2 py-0.5 text-[10px] font-medium rounded-full border ${typeConfig[postType].color}`}
+        >
           {typeConfig[postType].label}
         </span>
       </div>
 
       {/* Content */}
       <div className="px-4 pb-3">
-        {post.title && <h3 className="text-white font-semibold text-sm mb-1">{post.title}</h3>}
+        {post.title && (
+          <h3 className="text-white font-semibold text-sm mb-1">
+            {post.title}
+          </h3>
+        )}
         <p className="text-gray-400 text-xs line-clamp-2">{post.content}</p>
       </div>
 
       {/* Image - if any */}
       {post.urlImage && (
-        <div className="relative w-full h-32 mx-4 mb-3 rounded-lg overflow-hidden" style={{ width: "calc(100% - 2rem)" }}>
-          <ImageWithFallback src={post.urlImage} alt={post.title || ""} fill className="object-cover" />
+        <div
+          className="relative w-full h-32 mx-4 mb-3 rounded-lg overflow-hidden"
+          style={{ width: "calc(100% - 2rem)" }}
+        >
+          <ImageWithFallback
+            src={post.urlImage}
+            alt={post.title || ""}
+            fill
+            className="object-cover"
+          />
         </div>
       )}
 
@@ -299,14 +334,26 @@ const PostCard = memo(function PostCard({
         {hasChart && (
           <div className="mx-4 mb-3 rounded-xl bg-[#12121f] border border-white/5 overflow-hidden">
             <div className="px-3 py-2 border-b border-white/5">
-              <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wide">Biểu đồ Thu/Chi</p>
+              <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wide">
+                Biểu đồ Thu/Chi
+              </p>
             </div>
             <div className="p-2">
               <Chart
                 options={chartOptions}
                 series={[
-                  { name: "Thu", data: transactionData!.map((t) => t.transactionType === "Thu" ? t.amount : 0) },
-                  { name: "Chi", data: transactionData!.map((t) => t.transactionType === "Chi" ? t.amount : 0) },
+                  {
+                    name: "Thu",
+                    data: transactionData!.map((t) =>
+                      t.transactionType === "Thu" ? t.amount : 0
+                    ),
+                  },
+                  {
+                    name: "Chi",
+                    data: transactionData!.map((t) =>
+                      t.transactionType === "Chi" ? t.amount : 0
+                    ),
+                  },
                 ]}
                 type="area"
                 height={140}
@@ -319,7 +366,9 @@ const PostCard = memo(function PostCard({
         {hasAssets && (
           <div className="mx-4 mb-3 rounded-xl bg-[#12121f] border border-white/5 overflow-hidden">
             <div className="px-3 py-2 border-b border-white/5 flex items-center justify-between">
-              <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wide">Danh mục đầu tư</p>
+              <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wide">
+                Danh mục đầu tư
+              </p>
             </div>
             <table className="w-full">
               <thead>
@@ -330,40 +379,87 @@ const PostCard = memo(function PostCard({
                 </tr>
               </thead>
               <tbody>
-                {assetData!.slice(0, 3).map((a, i) => (
-                  <tr key={i} className="text-xs border-b border-white/5 last:border-0">
-                    <td className="py-2 px-3">
-                      <div className="flex items-center gap-1.5">
-                        {a.url && <img src={a.url} className="w-4 h-4 rounded-full" alt="" />}
-                        <span className="text-white font-medium">{a.assetSymbol}</span>
-                      </div>
-                    </td>
-                    <td className="text-right py-2 px-3 text-gray-300">${formatCurrency(a.currentPrice)}</td>
-                    <td className={`text-right py-2 px-3 font-medium ${a.priceChangePercentage24h >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-                      {a.priceChangePercentage24h >= 0 ? "+" : ""}{a.priceChangePercentage24h.toFixed(2)}%
-                    </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {assetData!.length > 3 && (
-            <div className="text-center py-1.5 text-[10px] text-gray-500 border-t border-white/5">
-              +{assetData!.length - 3} tokens khác
-            </div>
-          )}
-        </div>
-      )}
+                {assetData!.slice(0, 3).map((a, i) => {
+                  // Logic check vàng: Nếu url là "GOLD_ICON", rỗng, hoặc symbol có chứa chữ GOLD/SJC
+                  const isGold =
+                    a.url === "GOLD_ICON" ||
+                    !a.url ||
+                    a.assetSymbol.includes("GOLD") ||
+                    a.assetSymbol.includes("SJC");
+
+                  return (
+                    <tr
+                      key={i}
+                      className="text-xs border-b border-white/5 last:border-0"
+                    >
+                      <td className="py-2 px-3">
+                        <div className="flex items-center gap-1.5">
+                          {/* SỬA: Render Icon G nếu là vàng, ngược lại render ảnh */}
+                          {isGold ? (
+                            <div className="w-4 h-4 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-500 text-[8px] font-bold border border-yellow-500/30">
+                              G
+                            </div>
+                          ) : (
+                            <img
+                              src={a.url}
+                              className="w-4 h-4 rounded-full"
+                              alt=""
+                            />
+                          )}
+
+                          <span className="text-white font-medium">
+                            {a.assetSymbol}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="text-right py-2 px-3 text-gray-300">
+                        ${formatCurrency(a.currentPrice)}
+                      </td>
+                      <td
+                        className={`text-right py-2 px-3 font-medium ${
+                          a.priceChangePercentage24h >= 0
+                            ? "text-emerald-400"
+                            : "text-red-400"
+                        }`}
+                      >
+                        {a.priceChangePercentage24h !== 0 ? (
+                          <>
+                            {a.priceChangePercentage24h >= 0 ? "+" : ""}
+                            {a.priceChangePercentage24h.toFixed(2)}%
+                          </>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            {assetData!.length > 3 && (
+              <div className="text-center py-1.5 text-[10px] text-gray-500 border-t border-white/5">
+                +{assetData!.length - 3} tokens khác
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Footer - Rating & Actions - Always at bottom */}
       <div className="px-4 pb-4 mt-auto border-t border-white/5 pt-3">
         <div className="flex items-center gap-1 mb-3 text-[11px] text-gray-500">
-          <svg className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500" viewBox="0 0 20 20">
+          <svg
+            className="w-3.5 h-3.5 text-yellow-500 fill-yellow-500"
+            viewBox="0 0 20 20"
+          >
             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
           </svg>
-          <span>{post.evaluateResponse?.averageStars?.toFixed(1) || "0"} ({post.evaluateResponse?.totalComments || 0} đánh giá)</span>
+          <span>
+            {post.evaluateResponse?.averageStars?.toFixed(1) || "0"} (
+            {post.evaluateResponse?.totalComments || 0} đánh giá)
+          </span>
         </div>
-        
+
         <div className="flex gap-2">
           {type === "pending" ? (
             <>
@@ -371,8 +467,18 @@ const PostCard = memo(function PostCard({
                 onClick={() => onApprove?.(post.idPost)}
                 className="flex-1 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1"
               >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
                 Duyệt bài
               </button>
@@ -380,8 +486,18 @@ const PostCard = memo(function PostCard({
                 onClick={() => onReject?.(post.idPost)}
                 className="flex-1 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs font-semibold transition-colors flex items-center justify-center gap-1"
               >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
                 Từ chối
               </button>
@@ -391,8 +507,18 @@ const PostCard = memo(function PostCard({
               onClick={() => onDelete?.(post.idPost)}
               className="flex-1 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs font-semibold transition-colors flex items-center justify-center gap-1"
             >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              <svg
+                className="w-3.5 h-3.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
               </svg>
               Xóa bài viết
             </button>
@@ -413,9 +539,12 @@ export default function AdminPage() {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [activeSection, setActiveSection] = useState<Section>("posts-pending");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  
+
   // Toast & Modal states
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
     title: string;
@@ -494,7 +623,13 @@ export default function AdminPage() {
       };
       fetchData();
     }
-  }, [isAuthorized, hasFetched, user?.idUser, getListPostNotApproved, getListPosApproved]);
+  }, [
+    isAuthorized,
+    hasFetched,
+    user?.idUser,
+    getListPostNotApproved,
+    getListPosApproved,
+  ]);
 
   // Manual refresh function
   const refreshPosts = useCallback(async () => {
@@ -515,97 +650,119 @@ export default function AdminPage() {
   }, [user?.idUser, getListPostNotApproved, getListPosApproved]);
 
   // Actions
-  const handleApprove = useCallback((id: string) => {
-    setConfirmModal({
-      isOpen: true,
-      title: "Duyệt bài viết",
-      message: "Bạn có chắc muốn duyệt bài viết này?",
-      type: "success",
-      action: async () => {
-        try {
-          await approvePost(id);
-          setToast({ message: "Đã duyệt bài viết!", type: "success" });
-          refreshPosts();
-        } catch {
-          setToast({ message: "Lỗi khi duyệt bài!", type: "error" });
-        }
-        setConfirmModal(null);
-      },
-    });
-  }, [approvePost, refreshPosts]);
+  const handleApprove = useCallback(
+    (id: string) => {
+      setConfirmModal({
+        isOpen: true,
+        title: "Duyệt bài viết",
+        message: "Bạn có chắc muốn duyệt bài viết này?",
+        type: "success",
+        action: async () => {
+          try {
+            await approvePost(id);
+            setToast({ message: "Đã duyệt bài viết!", type: "success" });
+            refreshPosts();
+          } catch {
+            setToast({ message: "Lỗi khi duyệt bài!", type: "error" });
+          }
+          setConfirmModal(null);
+        },
+      });
+    },
+    [approvePost, refreshPosts]
+  );
 
-  const handleReject = useCallback((id: string) => {
-    setConfirmModal({
-      isOpen: true,
-      title: "Từ chối bài viết",
-      message: "Bạn có chắc muốn từ chối bài viết này?",
-      type: "warning",
-      action: async () => {
-        try {
-          await rejectPost(id);
-          setToast({ message: "Đã từ chối bài viết!", type: "success" });
-          refreshPosts();
-        } catch {
-          setToast({ message: "Lỗi khi từ chối bài!", type: "error" });
-        }
-        setConfirmModal(null);
-      },
-    });
-  }, [rejectPost, refreshPosts]);
+  const handleReject = useCallback(
+    (id: string) => {
+      setConfirmModal({
+        isOpen: true,
+        title: "Từ chối bài viết",
+        message: "Bạn có chắc muốn từ chối bài viết này?",
+        type: "warning",
+        action: async () => {
+          try {
+            await rejectPost(id);
+            setToast({ message: "Đã từ chối bài viết!", type: "success" });
+            refreshPosts();
+          } catch {
+            setToast({ message: "Lỗi khi từ chối bài!", type: "error" });
+          }
+          setConfirmModal(null);
+        },
+      });
+    },
+    [rejectPost, refreshPosts]
+  );
 
-  const handleDelete = useCallback((id: string) => {
-    setConfirmModal({
-      isOpen: true,
-      title: "Xóa bài viết",
-      message: "Hành động này không thể hoàn tác. Bạn có chắc chắn?",
-      type: "danger",
-      action: async () => {
-        try {
-          await deletePost(id);
-          setToast({ message: "Đã xóa bài viết!", type: "success" });
-          refreshPosts();
-        } catch {
-          setToast({ message: "Lỗi khi xóa bài!", type: "error" });
-        }
-        setConfirmModal(null);
-      },
-    });
-  }, [deletePost, refreshPosts]);
+  const handleDelete = useCallback(
+    (id: string) => {
+      setConfirmModal({
+        isOpen: true,
+        title: "Xóa bài viết",
+        message: "Hành động này không thể hoàn tác. Bạn có chắc chắn?",
+        type: "danger",
+        action: async () => {
+          try {
+            await deletePost(id);
+            setToast({ message: "Đã xóa bài viết!", type: "success" });
+            refreshPosts();
+          } catch {
+            setToast({ message: "Lỗi khi xóa bài!", type: "error" });
+          }
+          setConfirmModal(null);
+        },
+      });
+    },
+    [deletePost, refreshPosts]
+  );
 
   // Stats
-  const stats = useMemo(() => ({
-    pending: pendingPosts.length,
-    approved: approvedPosts.length,
-  }), [pendingPosts.length, approvedPosts.length]);
+  const stats = useMemo(
+    () => ({
+      pending: pendingPosts.length,
+      approved: approvedPosts.length,
+    }),
+    [pendingPosts.length, approvedPosts.length]
+  );
 
   // Helper to determine post type
-  const getPostType = useCallback((post: Post): "cashflow" | "portfolio" | "post" => {
-    const snapshot = post.snapshotResponse?.[0] ?? {};
-    const hasChart = snapshot.transactionOfPosts && snapshot.transactionOfPosts.length > 0;
-    const hasAssets = snapshot.investmentAssetOfPosts && snapshot.investmentAssetOfPosts.length > 0;
-    if (hasChart) return "cashflow";
-    if (hasAssets) return "portfolio";
-    return "post";
-  }, []);
+  const getPostType = useCallback(
+    (post: Post): "cashflow" | "portfolio" | "post" => {
+      const snapshot = post.snapshotResponse?.[0] ?? {};
+      const hasChart =
+        snapshot.transactionOfPosts && snapshot.transactionOfPosts.length > 0;
+      const hasAssets =
+        snapshot.investmentAssetOfPosts &&
+        snapshot.investmentAssetOfPosts.length > 0;
+      if (hasChart) return "cashflow";
+      if (hasAssets) return "portfolio";
+      return "post";
+    },
+    []
+  );
 
   // Filtered posts
   const filteredPendingPosts = useMemo(() => {
     return pendingPosts.filter((post) => {
       // Search by user name or content
       const searchLower = filters.searchTerm.toLowerCase();
-      const matchesSearch = !filters.searchTerm || 
+      const matchesSearch =
+        !filters.searchTerm ||
         post.userOfPostResponse?.name?.toLowerCase().includes(searchLower) ||
         post.content?.toLowerCase().includes(searchLower) ||
         post.title?.toLowerCase().includes(searchLower);
-      
+
       // Filter by post type
-      const matchesType = filters.postType === "all" || getPostType(post) === filters.postType;
-      
+      const matchesType =
+        filters.postType === "all" || getPostType(post) === filters.postType;
+
       // Filter by date range
       const postDate = new Date(post.createAt);
-      const matchesDateFrom = !filters.dateFrom || postDate >= new Date(filters.dateFrom);
-      const matchesDateTo = !filters.dateTo || postDate <= new Date(filters.dateTo + "T23:59:59");
-      
+      const matchesDateFrom =
+        !filters.dateFrom || postDate >= new Date(filters.dateFrom);
+      const matchesDateTo =
+        !filters.dateTo || postDate <= new Date(filters.dateTo + "T23:59:59");
+
       return matchesSearch && matchesType && matchesDateFrom && matchesDateTo;
     });
   }, [pendingPosts, filters, getPostType]);
@@ -614,19 +771,23 @@ export default function AdminPage() {
     return approvedPosts.filter((post) => {
       // Search by user name or content
       const searchLower = filters.searchTerm.toLowerCase();
-      const matchesSearch = !filters.searchTerm || 
+      const matchesSearch =
+        !filters.searchTerm ||
         post.userOfPostResponse?.name?.toLowerCase().includes(searchLower) ||
         post.content?.toLowerCase().includes(searchLower) ||
         post.title?.toLowerCase().includes(searchLower);
-      
+
       // Filter by post type
-      const matchesType = filters.postType === "all" || getPostType(post) === filters.postType;
-      
+      const matchesType =
+        filters.postType === "all" || getPostType(post) === filters.postType;
+
       // Filter by date range
       const postDate = new Date(post.createAt);
-      const matchesDateFrom = !filters.dateFrom || postDate >= new Date(filters.dateFrom);
-      const matchesDateTo = !filters.dateTo || postDate <= new Date(filters.dateTo + "T23:59:59");
-      
+      const matchesDateFrom =
+        !filters.dateFrom || postDate >= new Date(filters.dateFrom);
+      const matchesDateTo =
+        !filters.dateTo || postDate <= new Date(filters.dateTo + "T23:59:59");
+
       return matchesSearch && matchesType && matchesDateFrom && matchesDateTo;
     });
   }, [approvedPosts, filters, getPostType]);
@@ -646,9 +807,22 @@ export default function AdminPage() {
   }
 
   const navItems = [
-    { id: "posts-pending" as Section, label: "Chờ duyệt", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z", badge: stats.pending },
-    { id: "posts-approved" as Section, label: "Đã duyệt", icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" },
-    { id: "users" as Section, label: "Người dùng", icon: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" },
+    {
+      id: "posts-pending" as Section,
+      label: "Chờ duyệt",
+      icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+      badge: stats.pending,
+    },
+    {
+      id: "posts-approved" as Section,
+      label: "Đã duyệt",
+      icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
+    },
+    {
+      id: "users" as Section,
+      label: "Người dùng",
+      icon: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z",
+    },
   ];
 
   return (
@@ -660,8 +834,18 @@ export default function AdminPage() {
             onClick={() => setIsSidebarOpen(true)}
             className="p-2 rounded-lg hover:bg-white/5"
           >
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            <svg
+              className="w-6 h-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
           </button>
           <h1 className="text-lg font-bold text-white">Admin Panel</h1>
@@ -681,8 +865,18 @@ export default function AdminPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  />
                 </svg>
               </div>
               <span className="text-xl font-bold text-white">Admin</span>
@@ -691,8 +885,18 @@ export default function AdminPage() {
               onClick={() => setIsSidebarOpen(false)}
               className="lg:hidden p-2 rounded-lg hover:bg-white/5"
             >
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-5 h-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -715,8 +919,18 @@ export default function AdminPage() {
               }
             >
               <div className="flex items-center gap-3">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d={item.icon}
+                  />
                 </svg>
                 <span className="font-medium">{item.label}</span>
               </div>
@@ -735,8 +949,18 @@ export default function AdminPage() {
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              />
             </svg>
             <span className="font-medium">Đăng xuất</span>
           </button>
@@ -762,8 +986,10 @@ export default function AdminPage() {
               {activeSection === "users" && "Quản lý người dùng"}
             </h1>
             <p className="text-gray-400 mt-1">
-              {activeSection === "posts-pending" && `${filteredPendingPosts.length}/${stats.pending} bài viết`}
-              {activeSection === "posts-approved" && `${filteredApprovedPosts.length}/${stats.approved} bài viết`}
+              {activeSection === "posts-pending" &&
+                `${filteredPendingPosts.length}/${stats.pending} bài viết`}
+              {activeSection === "posts-approved" &&
+                `${filteredApprovedPosts.length}/${stats.approved} bài viết`}
               {activeSection === "users" && "Quản lý tài khoản người dùng"}
             </p>
           </div>
@@ -775,14 +1001,29 @@ export default function AdminPage() {
                 {/* Search */}
                 <div className="flex-1">
                   <div className="relative">
-                    <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    <svg
+                      className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
                     </svg>
                     <input
                       type="text"
                       placeholder="Tìm theo tên người dùng, nội dung..."
                       value={filters.searchTerm}
-                      onChange={(e) => setFilters(prev => ({ ...prev, searchTerm: e.target.value }))}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          searchTerm: e.target.value,
+                        }))
+                      }
                       className="w-full pl-10 pr-4 py-2.5 bg-[#12121f] border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 transition-colors"
                     />
                   </div>
@@ -792,9 +1033,19 @@ export default function AdminPage() {
                 <div className="w-full lg:w-48">
                   <select
                     value={filters.postType}
-                    onChange={(e) => setFilters(prev => ({ ...prev, postType: e.target.value as typeof filters.postType }))}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        postType: e.target.value as typeof filters.postType,
+                      }))
+                    }
                     className="w-full px-4 py-2.5 bg-[#12121f] border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500/50 transition-colors appearance-none cursor-pointer"
-                    style={{ backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`, backgroundPosition: 'right 0.5rem center', backgroundRepeat: 'no-repeat', backgroundSize: '1.5em 1.5em' }}
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                      backgroundPosition: "right 0.5rem center",
+                      backgroundRepeat: "no-repeat",
+                      backgroundSize: "1.5em 1.5em",
+                    }}
                   >
                     <option value="all">Tất cả loại</option>
                     <option value="cashflow">Cashflow</option>
@@ -808,7 +1059,12 @@ export default function AdminPage() {
                   <input
                     type="date"
                     value={filters.dateFrom}
-                    onChange={(e) => setFilters(prev => ({ ...prev, dateFrom: e.target.value }))}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        dateFrom: e.target.value,
+                      }))
+                    }
                     className="w-full px-4 py-2.5 bg-[#12121f] border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500/50 transition-colors [color-scheme:dark]"
                     placeholder="Từ ngày"
                   />
@@ -819,20 +1075,45 @@ export default function AdminPage() {
                   <input
                     type="date"
                     value={filters.dateTo}
-                    onChange={(e) => setFilters(prev => ({ ...prev, dateTo: e.target.value }))}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        dateTo: e.target.value,
+                      }))
+                    }
                     className="w-full px-4 py-2.5 bg-[#12121f] border border-white/10 rounded-xl text-white focus:outline-none focus:border-purple-500/50 transition-colors [color-scheme:dark]"
                     placeholder="Đến ngày"
                   />
                 </div>
 
                 {/* Clear Filters */}
-                {(filters.searchTerm || filters.postType !== "all" || filters.dateFrom || filters.dateTo) && (
+                {(filters.searchTerm ||
+                  filters.postType !== "all" ||
+                  filters.dateFrom ||
+                  filters.dateTo) && (
                   <button
-                    onClick={() => setFilters({ searchTerm: "", postType: "all", dateFrom: "", dateTo: "" })}
+                    onClick={() =>
+                      setFilters({
+                        searchTerm: "",
+                        postType: "all",
+                        dateFrom: "",
+                        dateTo: "",
+                      })
+                    }
                     className="px-4 py-2.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-xl transition-colors flex items-center gap-2 whitespace-nowrap"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                     Xóa bộ lọc
                   </button>
@@ -866,12 +1147,24 @@ export default function AdminPage() {
                     ) : (
                       <div className="col-span-full text-center py-20">
                         <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/20 flex items-center justify-center">
-                          <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          <svg
+                            className="w-8 h-8 text-green-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 13l4 4L19 7"
+                            />
                           </svg>
                         </div>
                         <p className="text-gray-400">
-                          {pendingPosts.length > 0 ? "Không tìm thấy bài viết phù hợp" : "Không có bài viết nào chờ duyệt"}
+                          {pendingPosts.length > 0
+                            ? "Không tìm thấy bài viết phù hợp"
+                            : "Không có bài viết nào chờ duyệt"}
                         </p>
                       </div>
                     ))}
@@ -888,12 +1181,24 @@ export default function AdminPage() {
                     ) : (
                       <div className="col-span-full text-center py-20">
                         <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-500/20 flex items-center justify-center">
-                          <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          <svg
+                            className="w-8 h-8 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            />
                           </svg>
                         </div>
                         <p className="text-gray-400">
-                          {approvedPosts.length > 0 ? "Không tìm thấy bài viết phù hợp" : "Chưa có bài viết nào được duyệt"}
+                          {approvedPosts.length > 0
+                            ? "Không tìm thấy bài viết phù hợp"
+                            : "Chưa có bài viết nào được duyệt"}
                         </p>
                       </div>
                     ))}

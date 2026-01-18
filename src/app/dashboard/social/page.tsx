@@ -23,7 +23,14 @@ import {
   ApiResponse,
   EvaluateResponse,
 } from "@/type/Social";
-import { Transaction, Asset } from "@/type/Dashboard";
+
+// Import Type từ Dashboard (GIỮ NGUYÊN FILE GỐC, KHÔNG SỬA)
+import {
+  Transaction,
+  Asset,
+  InvestmentAssetDashboard,
+  SjcGoldItem,
+} from "@/type/Dashboard";
 
 // UI Components
 import { PostForm, PostItem } from "@/components/social/SocialFeed";
@@ -77,7 +84,6 @@ export default function SocialPage() {
   } = useFriendship();
 
   // --- STATE ---
-  // State quản lý Tab trên Mobile (Mặc định là Feed)
   const [mobileTab, setMobileTab] = useState<"feed" | "friends">("feed");
 
   const [postContent, setPostContent] = useState<string>("");
@@ -137,7 +143,7 @@ export default function SocialPage() {
 
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // --- LOGIC FUNCTIONS (Hoisted & Typed) ---
+  // --- LOGIC FUNCTIONS ---
   const fetchPosts = async () => {
     if (user?.idUser) {
       const r = showUserPostsOnly
@@ -302,13 +308,40 @@ export default function SocialPage() {
     return res?.data?.expenseList || [];
   };
 
+  // --- LOGIC LOAD ASSETS (FIXED MAPPING VÀNG -> ASSET) ---
   const loadRawAssets = async () => {
     if (!user?.idUser) return [];
-    const res = (await getInvesmentAsset(
-      user.idUser
-    )) as unknown as ApiResponse<Asset[]>;
-    setPendingAssets(res.data || []);
-    return res.data || [];
+
+    // Ép kiểu data theo cấu trúc API InvestmentAssetDashboard['data']
+    const res = (await getInvesmentAsset(user.idUser)) as ApiResponse<
+      InvestmentAssetDashboard["data"]
+    >;
+
+    if (res?.success && res?.data) {
+      const cryptoList = res.data.listInvestmentAssetResponse || [];
+      const goldList = res.data.sjcGoldResponse || [];
+
+      // Map Vàng sang cấu trúc Asset để dùng chung bảng/modal
+      const formattedGold: Asset[] = goldList.map((g: SjcGoldItem) => ({
+        idAsset: g.idAsset,
+        id: g.id,
+        assetName: g.name,
+        assetSymbol: g.type,
+        currentPrice: g.sellPrice,
+        // Điền giá trị mặc định cho các trường Asset bắt buộc mà Vàng không có
+        marketCap: 0,
+        totalVolume: 0,
+        priceChangePercentage24h: 0,
+        url: "", // Để rỗng, UI sẽ dựa vào đây để render icon G
+      }));
+
+      const allAssets = [...cryptoList, ...formattedGold];
+      setPendingAssets(allAssets);
+      return allAssets;
+    }
+
+    setPendingAssets([]);
+    return [];
   };
 
   const handleShareCashflow = async () => {
@@ -382,15 +415,24 @@ export default function SocialPage() {
     const selected = pendingAssets.filter((i) =>
       selectedAssetIds.has(i.idAsset)
     );
-    const formatted: InvestmentAssetOfPost[] = selected.map((i: Asset) => ({
-      assetName: i.assetName,
-      assetSymbol: i.assetSymbol.toUpperCase(),
-      currentPrice: i.currentPrice,
-      marketCap: i.marketCap,
-      totalVolume: i.totalVolume,
-      priceChangePercentage24h: i.priceChangePercentage24h,
-      url: i.url,
-    }));
+
+    const formatted: InvestmentAssetOfPost[] = selected.map((i: Asset) => {
+      // Logic check xem có phải vàng không (dựa vào ID SJC hoặc url rỗng)
+      const isGold = i.id.startsWith("SJC") || i.url === "";
+
+      return {
+        assetName: i.assetName,
+        assetSymbol: i.assetSymbol.toUpperCase(),
+        currentPrice: i.currentPrice,
+        // Fallback số 0 cho các trường Vàng bị thiếu để tránh lỗi
+        marketCap: i.marketCap || 0,
+        totalVolume: i.totalVolume || 0,
+        priceChangePercentage24h: i.priceChangePercentage24h || 0,
+        // Nếu là Vàng, gán url đặc biệt "GOLD_ICON" để PostItem nhận biết
+        url: isGold ? "GOLD_ICON" : i.url || "",
+      };
+    });
+
     setShareAssetData(formatted);
     setIsSelectingAssets(false);
   };

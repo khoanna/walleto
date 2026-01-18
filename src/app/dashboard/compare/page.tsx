@@ -24,6 +24,9 @@ import {
   FileX2,
   Download,
   Loader2,
+  // Thêm icon cho phân trang
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 import {
@@ -272,7 +275,7 @@ export default function Compare() {
     compareTransactionsByMonth,
     compareTransactionsByYear,
     compareInvestmentsByMonth,
-    compareInvetmenstsByYear, // Giữ nguyên chính tả từ hook
+    compareInvetmenstsByYear,
     compareLoading,
   } = useCompare();
 
@@ -288,6 +291,10 @@ export default function Compare() {
   const [timeRange, setTimeRange] = useState<"month" | "year">("month");
   const [timeRangeOpen, setTimeRangeOpen] = useState(false);
   const timeRangeRef = useRef<HTMLDivElement | null>(null);
+
+  // --- PAGINATION STATE ---
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5; // Số dòng hiển thị mỗi trang
 
   const now = new Date();
   const [p1Month, setP1Month] = useState(now.getMonth() + 1);
@@ -333,21 +340,15 @@ export default function Compare() {
         }
         setTransactionData(processResponse(res));
       } else {
-        // --- XỬ LÝ SO SÁNH ĐẦU TƯ ---
         if (!selectedAssetId) {
           console.warn("Chưa chọn tài sản đầu tư.");
-          // Nếu danh sách tài sản không rỗng mà vẫn chưa chọn được ID, hãy thử set lại cái đầu tiên
           if (assets.length > 0) {
             setSelectedAssetId(assets[0].idAsset);
-            // Sau khi set state, lần render sau sẽ gọi lại API nhờ useEffect
             return;
           }
-          // Nếu danh sách rỗng thật sự thì reset data
           setInvestmentData(null);
           return;
         }
-
-        console.log("Đang gọi API Investment với Asset ID:", selectedAssetId);
 
         if (timeRange === "month") {
           res = await compareInvestmentsByMonth({
@@ -389,13 +390,12 @@ export default function Compare() {
     compareInvetmenstsByYear,
   ]);
 
-  // --- TRIGGER TỰ ĐỘNG GỌI API KHI CHỌN ASSET KHÁC ---
   useEffect(() => {
     if (compareMode === "investment" && userId && selectedAssetId) {
       handleCompare();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedAssetId, compareMode]); // Thêm compareMode để khi switch tab cũng gọi
+  }, [selectedAssetId, compareMode]);
 
   const handleExportPDF = async () => {
     if (!contentRef.current) return;
@@ -441,24 +441,22 @@ export default function Compare() {
     }
   };
 
-  // --- INITIAL DATA FETCHING ---
   useEffect(() => {
     const initialFetch = async () => {
       if (!userId) return;
 
-      // 1. Lấy lịch sử giao dịch
       HisotryTransaction(userId).then(
         (res: ApiResponse<TransactionDetail[]>) => {
-          if (res.success) setHistoryList(res.data);
+          if (res.success) {
+            setHistoryList(res.data);
+            setCurrentPage(1); // Reset trang về 1 khi có dữ liệu mới
+          }
         }
       );
 
-      // 2. Lấy danh sách tài sản (SỬA LOGIC GỘP API)
       getInvesmentAsset(userId).then(async (res: any) => {
-        // Dữ liệu API trả về là Object { listInvestmentAssetResponse: [], sjcGoldResponse: [] }
         if (res.success && res.data) {
           const cryptoList = res.data.listInvestmentAssetResponse || [];
-          // Map dữ liệu vàng cho khớp với interface InvestmentAsset
           const goldList = (res.data.sjcGoldResponse || []).map(
             (gold: any) => ({
               idAsset: gold.idAsset,
@@ -467,18 +465,13 @@ export default function Compare() {
             })
           );
 
-          // Gộp 2 mảng lại
           const combinedAssets = [...cryptoList, ...goldList];
           setAssets(combinedAssets);
 
-          console.log("Assets loaded:", combinedAssets);
-
-          // Nếu có tài sản, chọn mặc định cái đầu tiên và gọi API so sánh ngay
           if (combinedAssets.length > 0) {
             const defaultAssetId = combinedAssets[0].idAsset;
             if (!selectedAssetId) setSelectedAssetId(defaultAssetId);
 
-            // Gọi song song 2 API để init data
             const [transRes, investRes] = await Promise.all([
               compareTransactionsByMonth({
                 firstMonth: p1Month,
@@ -500,7 +493,6 @@ export default function Compare() {
             setTransactionData(processResponse(transRes));
             setInvestmentData(processResponse(investRes));
           } else {
-            // Trường hợp không có tài sản nào, chỉ gọi Transaction
             const transRes = await compareTransactionsByMonth({
               firstMonth: p1Month,
               firstYear: p1Year,
@@ -518,7 +510,6 @@ export default function Compare() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
-  // Close timeRange dropdown when clicking outside or pressing Escape
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (!timeRangeRef.current) return;
@@ -564,6 +555,15 @@ export default function Compare() {
     return null;
   }, [currentData, timeRange]);
 
+  // --- LOGIC PHÂN TRANG ---
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentHistoryItems = historyList.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+  const totalPages = Math.ceil(historyList.length / itemsPerPage);
+
   return (
     <div
       ref={contentRef}
@@ -571,7 +571,7 @@ export default function Compare() {
     >
       {/* LỊCH SỬ GIAO DỊCH */}
       <section className="bg-background rounded-2xl shadow-sm">
-        <div className="flex justify-between items-center mb-6 pl-2">
+        <div className="flex justify-between items-center mt-10 mb-6 pl-2">
           <h2 className="text-xl font-bold flex items-center gap-2">
             <span className="w-1 h-6 bg-primary rounded-full inline-block"></span>
             Chi tiết dòng tiền
@@ -615,7 +615,7 @@ export default function Compare() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800 bg-[#111318]/50">
-              {historyList.map((item) => (
+              {currentHistoryItems.map((item) => (
                 <tr
                   key={item.idTransaction}
                   className="group hover:bg-white/5 transition-colors"
@@ -662,6 +662,38 @@ export default function Compare() {
             </tbody>
           </table>
         </div>
+
+        {/* --- THANH PHÂN TRANG (Pagination) --- */}
+        {historyList.length > 0 && (
+          <div className="flex justify-between items-center py-4 px-2 border-t border-gray-800">
+            <div className="text-xs text-gray-500">
+              Hiển thị {indexOfFirstItem + 1}-
+              {Math.min(indexOfLastItem, historyList.length)} trong tổng{" "}
+              {historyList.length} giao dịch
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="p-2 rounded-lg bg-[#111318] border border-gray-800 text-gray-400 hover:text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <span className="text-xs font-bold text-gray-300 px-2">
+                Trang {currentPage} / {totalPages}
+              </span>
+              <button
+                onClick={() =>
+                  setCurrentPage((p) => Math.min(totalPages, p + 1))
+                }
+                disabled={currentPage === totalPages}
+                className="p-2 rounded-lg bg-[#111318] border border-gray-800 text-gray-400 hover:text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* SO SÁNH */}
